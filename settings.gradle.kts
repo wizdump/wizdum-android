@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "wizdum-android"
 include(":app")
- 
+include(":data")
