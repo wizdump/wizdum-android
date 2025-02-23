@@ -24,3 +24,4 @@ rootProject.name = "wizdum-android"
 include(":app")
 include(":data")
 include(":feature")
+include(":designsystem")
