@@ -19,6 +19,7 @@ androidx-compose-compiler = "1.4.7"
 androidx-compose-navigation = "2.7.7"
 androidx-compose-material3 = "1.2.0"
 androidx-compose-bom = "2025.02.00"
+androidx-splash-screen = "1.0.1"
 
 okhttp = "4.12.0"
 retrofit = "2.11.0"
@@ -51,6 +52,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-splash-screen" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 room-runtime = {module = "androidx.room:room-runtime",version.ref ="room"}
