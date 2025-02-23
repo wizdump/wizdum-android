@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.teamwizdum.wizdum"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.teamwizdum.wizdum"
