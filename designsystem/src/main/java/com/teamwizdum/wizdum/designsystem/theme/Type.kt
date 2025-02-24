@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.ui.theme
+package com.teamwizdum.wizdum.designsystem.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

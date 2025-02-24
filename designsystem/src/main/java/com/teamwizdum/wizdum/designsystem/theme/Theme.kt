@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.ui.theme
+package com.teamwizdum.wizdum.designsystem.theme
 
 import android.app.Activity
 import android.os.Build
