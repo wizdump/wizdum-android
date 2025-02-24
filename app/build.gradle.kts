@@ -59,6 +59,9 @@ android {
 
 dependencies {
 
+    implementation(project(":designsystem"))
+    implementation(project(":feature"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -68,6 +71,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.splashscreen)
+    implementation(libs.hilt.navigation.compose)
 
     implementation(libs.kakao.sdk.user)
 
