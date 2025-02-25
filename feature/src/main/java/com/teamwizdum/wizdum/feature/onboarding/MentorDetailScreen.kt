@@ -34,6 +34,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.teamwizdum.wizdum.designsystem.component.BasicButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -112,7 +113,7 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
                             .padding(horizontal = 32.dp, vertical = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(text = "멘트링 스타일", style = WizdumTheme.typography.body1_semib)
+                    Text(text = "멘토링 스타일", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!", style = WizdumTheme.typography.body1)
                     Spacer(modifier = Modifier.height(24.dp))
@@ -144,19 +145,19 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
 
         }
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
-            .align(Alignment.BottomCenter)
-            .background(color = Color.Green)
-            .clickable {
-                clickNext()
-            }) {
-            Text(
-                text = "시작하기", modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(vertical = 20.dp)
-            )
+        BasicButton(
+            title = "시작하기",
+            bodyColor = Color.Green,
+            textColor = Color.Black,
+            modifier = Modifier
+                .padding(
+                    bottom = 80.dp,
+                    start = 32.dp,
+                    end = 32.dp
+                )
+                .align(Alignment.BottomCenter)
+        ) {
+            clickNext()
         }
     }
 }

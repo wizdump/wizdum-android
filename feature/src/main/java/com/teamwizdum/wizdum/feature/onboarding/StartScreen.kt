@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.teamwizdum.wizdum.designsystem.component.BasicButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -39,18 +40,12 @@ fun StartScreen(clickNext: () -> Unit) {
                 style = WizdumTheme.typography.body1
             )
             Spacer(modifier = Modifier.weight(1f))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color.Green)
-                .clickable {
-                    clickNext()
-                }) {
-                Text(
-                    text = "멘토 찾으러 떠나기",
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(vertical = 20.dp)
-                )
+            BasicButton(
+                title = "멘토 찾으러 떠나기",
+                bodyColor = Color.Green,
+                textColor = Color.Black
+            ) {
+                clickNext()
             }
         }
     }

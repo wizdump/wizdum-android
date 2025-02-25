@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.teamwizdum.wizdum.designsystem.component.BasicButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -49,7 +50,7 @@ fun KeywordSelectionScreen(
                     .background(color = Color.Black)
             )
             Spacer(modifier = Modifier.height(48.dp))
-            Text(text = "어떤 하루를 보내고 싶나요?", style = WizdumTheme.typography.h3)
+            Text(text = "어떤 하루를 보내고 싶나요?", style = WizdumTheme.typography.h2)
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "1개 선택 가능", style = WizdumTheme.typography.body1)
             Spacer(modifier = Modifier.height(32.dp))
@@ -64,19 +65,13 @@ fun KeywordSelectionScreen(
                 }
             }
         }
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 80.dp)
-            .align(Alignment.BottomCenter)
-            .background(color = Color.Green)
-            .clickable {
-                clickNext()
-            }) {
-            Text(
-                text = "다음", modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(vertical = 20.dp)
-            )
+        BasicButton(
+            title = "다음",
+            bodyColor = Color.Green,
+            textColor = Color.Black,
+            modifier = Modifier.padding(bottom = 80.dp).align(Alignment.BottomCenter)
+        ) {
+            clickNext()
         }
     }
 }

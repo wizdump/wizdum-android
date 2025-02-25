@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.teamwizdum.wizdum.designsystem.component.BasicButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -63,17 +64,12 @@ fun QuestionSelectionScreen(
                 Text(text = "다른 고민 보기")
             }
             Spacer(modifier = Modifier.weight(1f))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color.Green)
-                .clickable {
-                    clickNext()
-                }) {
-                Text(
-                    text = "멘토 추천받기", modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(vertical = 20.dp)
-                )
+            BasicButton(
+                title = "멘토 추천받기",
+                bodyColor = Color.Green,
+                textColor = Color.Black
+            ) {
+                clickNext()
             }
         }
     }
