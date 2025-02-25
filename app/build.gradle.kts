@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.splashscreen)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.timber)
 
     implementation(libs.kakao.sdk.user)
 
