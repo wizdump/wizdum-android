@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun GoalSelectionScreen(
+fun QuestionSelectionScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
     clickNext: () -> Unit,
 ) {
@@ -45,7 +45,7 @@ fun GoalSelectionScreen(
             Spacer(modifier = Modifier.height(32.dp))
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 for (question in questions) {
-                    GoalCard(question.content, question.level)
+                    QuestionCard(question.content, question.level)
                 }
             }
             Spacer(modifier = Modifier.height(32.dp))
@@ -70,7 +70,7 @@ fun GoalSelectionScreen(
 }
 
 @Composable
-private fun GoalCard(content: String, level: String) {
+private fun QuestionCard(content: String, level: String) {
     val levelEnum = Level.fromString(level)
     Box(
         modifier = Modifier
@@ -94,7 +94,7 @@ private fun GoalCard(content: String, level: String) {
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 fun GoalSelectionScreenPreview() {
-    GoalSelectionScreen {
+    QuestionSelectionScreen {
 
     }
 }

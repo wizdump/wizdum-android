@@ -18,7 +18,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel
     }
 
     composable(route = "GOAL") {
-        GoalSelectionScreen() {
+        QuestionSelectionScreen() {
             navController.navigate(route = "MENTOR")
         }
     }
