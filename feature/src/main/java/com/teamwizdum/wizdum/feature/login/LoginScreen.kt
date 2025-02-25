@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.teamwizdum.wizdum.designsystem.theme.WizdumandroidTheme
+import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
 fun LoginScreen() {
@@ -64,7 +64,7 @@ private fun kakaoLoginButton(context: Context) {
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 fun LoginScreenPreview() {
-    WizdumandroidTheme {
+    WizdumTheme {
         LoginScreen()
     }
 }

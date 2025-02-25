@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
 fun QuestionSelectionScreen(
@@ -40,9 +42,17 @@ fun QuestionSelectionScreen(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
-            Text(text = "조금 더 구체적으로 알고 싶어요")
-            Text(text = "1개 선택 가능")
-            Spacer(modifier = Modifier.height(32.dp))
+            Box(
+                modifier = Modifier
+                    .width(20.dp)
+                    .height(20.dp)
+                    .background(color = Color.Black)
+            )
+            Spacer(modifier = Modifier.height(48.dp))
+            Text(text = "조금 더 구체적으로 알고 싶어요", style = WizdumTheme.typography.h2)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "1개 선택 가능", style = WizdumTheme.typography.body1)
+            Spacer(modifier = Modifier.height(34.dp))
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 for (question in questions) {
                     QuestionCard(question.content, question.level)
@@ -77,25 +87,34 @@ private fun QuestionCard(content: String, level: String) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
             .background(Color.Gray)
-            .padding(vertical = 20.dp, horizontal = 12.dp)
+            .padding(vertical = 24.dp, horizontal = 16.dp)
     ) {
         Column {
-            Text(text = content)
+            Text(text = content, style = WizdumTheme.typography.h3)
+            Spacer(modifier = Modifier.height(8.dp))
             Row {
-                Text(text = "레벨")
-                Text(text = levelEnum.rating)
-                Text(text = levelEnum.comment)
+                Text(text = "레벨", style = WizdumTheme.typography.body2)
+                Text(text = levelEnum.rating, style = WizdumTheme.typography.body2)
+                Text(text = levelEnum.comment, style = WizdumTheme.typography.body2)
             }
         }
 
     }
 }
 
+@Preview
+@Composable
+fun QuestionCardPreview() {
+    WizdumTheme {
+        QuestionCard(content = "누가 나를 채찍질 해줬으면 좋겠어요", level = "HIGH")
+    }
+}
+
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
-fun GoalSelectionScreenPreview() {
-    QuestionSelectionScreen {
-
+fun QuestionSelectionScreenPreview() {
+    WizdumTheme {
+        QuestionSelectionScreen() {}
     }
 }
 
@@ -110,7 +129,7 @@ enum class Level(val rating: String, val comment: String) {
                 "HIGH" -> HIGH
                 "MEDIUM" -> MEDIUM
                 "LOW" -> LOW
-                else -> LOW  // 기본값
+                else -> LOW
             }
         }
     }

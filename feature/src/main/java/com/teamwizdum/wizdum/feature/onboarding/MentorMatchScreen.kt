@@ -2,6 +2,7 @@ package com.teamwizdum.wizdum.feature.onboarding
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,18 +23,31 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun MentorMatchScreen(clickNext: () -> Unit = {}) {
+fun MentorMatchScreen(clickNext: () -> Unit) {
     Surface(modifier = Modifier.padding(top = 24.dp, bottom = 80.dp, start = 32.dp, end = 32.dp)) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            Box(
+                modifier = Modifier
+                    .width(20.dp)
+                    .height(20.dp)
+                    .background(color = Color.Black)
+            )
+            Spacer(modifier = Modifier.height(48.dp))
             Row {
-                Text(text = "시간을 초월한\n당신만의 멘토를 찾았어요!")
+                Text(text = "시간을 초월한\n당신만의 멘토를 찾았어요!", style = WizdumTheme.typography.h2)
             }
             Spacer(modifier = Modifier.height(38.dp))
             MentorCard(clickNext = { clickNext() })
+//            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+//                items(1) {
+//                    MentorCard(clickNext = { clickNext() })
+//                }
+//            }
             Spacer(modifier = Modifier.weight(1f))
         }
     }
@@ -53,7 +68,13 @@ private fun MentorCard(clickNext: () -> Unit = {}) {
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "스파르타 멘토님", modifier = Modifier.fillMaxWidth())
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "스파르타", style = WizdumTheme.typography.h3_semib)
+                Text(text = " 멘토님", style = WizdumTheme.typography.body1)
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier
@@ -62,12 +83,16 @@ private fun MentorCard(clickNext: () -> Unit = {}) {
                     .background(color = Color.Green)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "작심삼일을 극복하는\n초집중력과 루틴 만들기", modifier = Modifier.fillMaxWidth())
+            Text(
+                text = "작심삼일을 극복하는\n초집중력과 루틴 만들기",
+                style = WizdumTheme.typography.h3_semib,
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth()) {
-                Text(text = "레벨")
-                Text(text = " 별별별")
-                Text(text = " 적당히 강하게")
+                Text(text = "레벨", style = WizdumTheme.typography.body2)
+                Text(text = "⭐⭐⭐", style = WizdumTheme.typography.body2)
+                Text(text = "적당히 강하게", style = WizdumTheme.typography.body2)
             }
         }
         Box(
@@ -76,12 +101,13 @@ private fun MentorCard(clickNext: () -> Unit = {}) {
                 .height(48.dp)
                 .background(Color.Green)
                 .align(Alignment.BottomCenter)
-                .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)).clickable {
+                .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+                .clickable {
                     clickNext()
                 },
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "강의 미리보기")
+            Text(text = "강의 미리보기", style = WizdumTheme.typography.body1)
         }
     }
 }
@@ -89,11 +115,15 @@ private fun MentorCard(clickNext: () -> Unit = {}) {
 @Preview
 @Composable
 fun MentorCardPreview() {
-    MentorCard()
+    WizdumTheme {
+        MentorCard()
+    }
 }
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 fun MentorMatchScreenPreview() {
-    MentorMatchScreen()
+    WizdumTheme {
+        MentorMatchScreen() {}
+    }
 }

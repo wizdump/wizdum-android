@@ -31,11 +31,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun MentorDetailScreen(clickNext: () -> Unit = {}) {
+fun MentorDetailScreen(clickNext: () -> Unit) {
     var columnHeightFraction by remember { mutableStateOf(0.76f) }
     val animatedHeight by animateFloatAsState(targetValue = columnHeightFraction, label = "")
 
@@ -53,7 +55,11 @@ fun MentorDetailScreen(clickNext: () -> Unit = {}) {
     }
 
 
-    Box(modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(nestedScrollConnection)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -72,35 +78,60 @@ fun MentorDetailScreen(clickNext: () -> Unit = {}) {
                 .padding(top = 32.dp, start = 32.dp)
                 .align(Alignment.BottomCenter)
         ) {
-            item {Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = "스파르타 멘토님")
-                Text(text = "소요시간 16분", modifier = Modifier.padding(end = 32.dp))
-            }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "작심삼일을 극복하는\n초집중력과 루틴 만들기")
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "레벨")
-                    Text(text = " 별별별")
-                    Text(text = " 적당히 강하게")
+            item {
+                Column(modifier = Modifier.padding(end = 32.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row {
+                            Text(text = "스파르타", style = WizdumTheme.typography.body1_semib)
+                            Text(text = " 멘토님", style = WizdumTheme.typography.body1)
+                        }
+                        Text(
+                            text = "소요시간 16분",
+                            style = WizdumTheme.typography.body1
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "작심삼일을 극복하는\n초집중력과 루틴 만들기", style = WizdumTheme.typography.h2)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Text(text = "레벨", style = WizdumTheme.typography.body2)
+                        Text(text = "⭐⭐⭐", style = WizdumTheme.typography.body2)
+                        Text(text = "적당히 강하게", style = WizdumTheme.typography.body2)
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = "결심은 약하다. 행동만이 너를 강하게 만든다!",
+                        style = WizdumTheme.typography.body2,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+                            .padding(horizontal = 32.dp, vertical = 16.dp)
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(text = "멘트링 스타일", style = WizdumTheme.typography.body1_semib)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(text = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!", style = WizdumTheme.typography.body1)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(text = "배울점", style = WizdumTheme.typography.body1_semib)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                        Text(text = "- 작심삼일을 극복하는 스파르타식 마인드셋", style = WizdumTheme.typography.body1)
+                        Text(
+                            text = "- 목표를 습관으로 만들기 위한 초집중 루틴",
+                            style = WizdumTheme.typography.body1
+                        )
+                        Text(
+                            text = "- 결심에서 행동으로 즉시 전환하는 '2초 실행법'",
+                            style = WizdumTheme.typography.body1
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Text(text = "결심은 약하다. 행동만이 너를 강하게 만든다!")
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(text = "멘트링 스타일")
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!")
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(text = "배울점")
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "- 작심삼일을 극복하는 스파르타식 마인드셋")
-                Text(text = "- 작심삼일을 극복하는 스파르타식 마인드셋")
-                Text(text = "- 작심삼일을 극복하는 스파르타식 마인드셋")
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(text = "강의 리스트")
+                Text(text = "강의 리스트", style = WizdumTheme.typography.body1_semib)
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     items(3) {
@@ -152,8 +183,8 @@ private fun QuestCard() {
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
-            Text(text = "1강")
-            Text(text = "결심을 넘어\n행동으로")
+            Text(text = "1강", style = WizdumTheme.typography.body2)
+            Text(text = "결심을 넘어\n행동으로", style = WizdumTheme.typography.body1_semib)
         }
     }
 }
@@ -167,5 +198,7 @@ fun QuestCardPreview() {
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 fun MentorDetailScreenPreview() {
-    MentorDetailScreen()
+    WizdumTheme {
+        MentorDetailScreen() {}
+    }
 }

@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.teamwizdum.wizdum.designsystem.theme.WizdumandroidTheme
+import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         // splashScreen.setKeepOnScreenCondition { true }
 
         setContent {
-            WizdumandroidTheme {
+            WizdumTheme {
                 val naviController = rememberNavController()
 
                 WizdumNavHost(navController = naviController, viewModel = onboardingViewModel)

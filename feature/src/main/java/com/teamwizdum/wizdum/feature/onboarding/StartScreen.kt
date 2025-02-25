@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
 fun StartScreen(clickNext: () -> Unit) {
@@ -27,11 +27,17 @@ fun StartScreen(clickNext: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 20.dp)
         ) {
-            Text(text = "과거와 미래가\n만나는 곳,\n당신만의 AI 멘토링", fontSize = 32.sp)
+            Spacer(modifier = Modifier.height(96.dp))
+            Text(
+                text = "과거와 미래가\n만나는 곳,\n당신만의 AI 멘토링",
+                style = WizdumTheme.typography.h1
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "당신의 하루를 특별하게 만들어줄\n시간을 초월한 멘토와의 대화")
+            Text(
+                text = "당신의 하루를 특별하게 만들어줄\n시간을 초월한 멘토와의 대화",
+                style = WizdumTheme.typography.body1
+            )
             Spacer(modifier = Modifier.weight(1f))
             Box(modifier = Modifier
                 .fillMaxWidth()
@@ -53,5 +59,7 @@ fun StartScreen(clickNext: () -> Unit) {
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 fun StartScreenPreview() {
-    StartScreen() {}
+    WizdumTheme {
+        StartScreen() {}
+    }
 }

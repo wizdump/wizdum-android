@@ -27,14 +27,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import timber.log.Timber
+import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
 fun KeywordSelectionScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
     clickNext: () -> Unit,
 ) {
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1 = Unit) {
         viewModel.getKeyword()
     }
 
@@ -42,9 +42,16 @@ fun KeywordSelectionScreen(
 
     Box(modifier = Modifier.padding(top = 24.dp, start = 32.dp, end = 32.dp)) {
         Column {
-            Spacer(modifier = Modifier.height(40.dp))
-            Text(text = "어떤 하루를 보내고 싶나요?")
-            Text(text = "1개 선택 가능")
+            Box(
+                modifier = Modifier
+                    .width(20.dp)
+                    .height(20.dp)
+                    .background(color = Color.Black)
+            )
+            Spacer(modifier = Modifier.height(48.dp))
+            Text(text = "어떤 하루를 보내고 싶나요?", style = WizdumTheme.typography.h3)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "1개 선택 가능", style = WizdumTheme.typography.body1)
             Spacer(modifier = Modifier.height(32.dp))
 
             LazyVerticalGrid(
@@ -76,36 +83,43 @@ fun KeywordSelectionScreen(
 
 @Composable
 private fun KeywordCard(title: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color.Gray)
-            .padding(top = 24.dp, bottom = 24.dp, start = 32.dp, end = 32.dp),
-        contentAlignment = Alignment.Center
+    WizdumTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.Gray)
+                .padding(top = 24.dp, bottom = 24.dp, start = 32.dp, end = 32.dp),
+            contentAlignment = Alignment.Center
 
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .background(Color.Black)
-                    .width(72.dp)
-                    .height(72.dp)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(text = title, modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
-        }
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(Color.Black)
+                        .width(72.dp)
+                        .height(72.dp)
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = title,
+                    style = WizdumTheme.typography.h3,
+                    modifier = Modifier.fillMaxSize(),
+                    textAlign = TextAlign.Center
+                )
+            }
 
+        }
     }
 }
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 fun KeywordSelectionScreenPreview() {
-    KeywordSelectionScreen {
-
+    WizdumTheme {
+        KeywordSelectionScreen {}
     }
 }
