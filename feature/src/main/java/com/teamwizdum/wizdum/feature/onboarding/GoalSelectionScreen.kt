@@ -15,15 +15,27 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun GoalSelectionScreen(clickNext: () -> Unit) {
+fun GoalSelectionScreen(
+    viewModel: OnboardingViewModel = hiltViewModel(),
+    clickNext: () -> Unit,
+) {
+    LaunchedEffect(Unit) {
+        viewModel.getQuestion(1)
+    }
+
+    val questions = viewModel.questions.collectAsState().value
+
     Surface(modifier = Modifier.padding(top = 24.dp, bottom = 80.dp, start = 32.dp, end = 32.dp)) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -32,9 +44,9 @@ fun GoalSelectionScreen(clickNext: () -> Unit) {
             Text(text = "1개 선택 가능")
             Spacer(modifier = Modifier.height(32.dp))
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                GoalCard()
-                GoalCard()
-                GoalCard()
+                for (question in questions) {
+                    GoalCard(question.content, question.level)
+                }
             }
             Spacer(modifier = Modifier.height(32.dp))
             Box {
@@ -58,7 +70,8 @@ fun GoalSelectionScreen(clickNext: () -> Unit) {
 }
 
 @Composable
-private fun GoalCard(title: String = "") {
+private fun GoalCard(content: String, level: String) {
+    val levelEnum = Level.fromString(level)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,11 +80,11 @@ private fun GoalCard(title: String = "") {
             .padding(vertical = 20.dp, horizontal = 12.dp)
     ) {
         Column {
-            Text(text = "누가 나를 채찍질 해줬으면 좋겠어요")
+            Text(text = content)
             Row {
                 Text(text = "레벨")
-                Text(text = "⭐️⭐⭐")
-                Text(text = "극강의 몰입 모드 ON!")
+                Text(text = levelEnum.rating)
+                Text(text = levelEnum.comment)
             }
         }
 
@@ -83,5 +96,22 @@ private fun GoalCard(title: String = "") {
 fun GoalSelectionScreenPreview() {
     GoalSelectionScreen {
 
+    }
+}
+
+enum class Level(val rating: String, val comment: String) {
+    HIGH("⭐⭐⭐", "극강의 몰입 모드 ON!"),
+    MEDIUM("⭐⭐", "적당히 강하게!"),
+    LOW("⭐", "부담 없이 가볍게!");
+
+    companion object {
+        fun fromString(level: String): Level {
+            return when (level.uppercase()) {
+                "HIGH" -> HIGH
+                "MEDIUM" -> MEDIUM
+                "LOW" -> LOW
+                else -> LOW  // 기본값
+            }
+        }
     }
 }

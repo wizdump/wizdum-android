@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
-fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
+fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel: OnboardingViewModel) {
     composable(route = "ONBOARDING") {
         StartScreen() {
             navController.navigate(route = "KEYWORD")
@@ -12,7 +12,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
     }
 
     composable(route = "KEYWORD") {
-        KeywordSelectionScreen() {
+        KeywordSelectionScreen(viewModel = viewModel) {
             navController.navigate(route = "GOAL")
         }
     }
@@ -24,6 +24,8 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
     }
 
     composable(route = "MENTOR") {
-        MentorMatchScreen()
+        MentorMatchScreen() {
+            navController.navigate(route = "LOGIN")
+        }
     }
 }

@@ -13,9 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,15 +26,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
-val items = listOf(
-    "도전적인", "차분한", "감성적인", "창의적인",
-    "사색적인", "탐구적인", "영감을 얻는", "그외 기타",
-    "사색적인", "탐구적인", "영감을 얻는", "그외 기타"
-)
+import androidx.hilt.navigation.compose.hiltViewModel
+import timber.log.Timber
 
 @Composable
-fun KeywordSelectionScreen(clickNext: () -> Unit) {
+fun KeywordSelectionScreen(
+    viewModel: OnboardingViewModel = hiltViewModel(),
+    clickNext: () -> Unit,
+) {
+    LaunchedEffect(Unit) {
+        viewModel.getKeyword()
+    }
+
+    val keywords = viewModel.keywords.collectAsState().value
+
     Box(modifier = Modifier.padding(top = 24.dp, start = 32.dp, end = 32.dp)) {
         Column {
             Spacer(modifier = Modifier.height(40.dp))
@@ -44,8 +52,8 @@ fun KeywordSelectionScreen(clickNext: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(items.size) { index ->
-                    KeywordCard(title = items[index])
+                items(keywords) { keyword ->
+                    KeywordCard(title = keyword.value)
                 }
             }
         }
