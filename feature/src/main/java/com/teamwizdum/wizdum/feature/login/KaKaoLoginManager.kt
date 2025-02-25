@@ -44,10 +44,11 @@ object KaKaoLoginManager {
     ) {
         UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
             if (token != null) {
-                Timber.tag("KAKO_TALK").d("로그인 성공 : ${token.accessToken}")
+                Timber.tag("KAKAO_TALK").d("로그인 성공 : ${token.accessToken}")
                 onSuccess(token.accessToken)
+                getKakaoUserInfo()
             } else {
-                Timber.tag("KAKO_TALK").d("로그인 실패 : ${error?.cause}")
+                Timber.tag("KAKAO_TALK").d("로그인 실패 : ${error?.cause}")
                 onFailed(error)
             }
         }
@@ -60,11 +61,36 @@ object KaKaoLoginManager {
     ) {
         UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
             if (token != null) {
-                Timber.tag("KAKO_ACCOUNT").d("로그인 성공 : ${token.accessToken}")
+                Timber.tag("KAKAO_ACCOUNT").d("로그인 성공 : ${token.accessToken}")
                 onSuccess(token.accessToken)
             } else {
-                Timber.tag("KAKO_ACCOUNT").d("로그인 실패 : ${error?.cause}")
+                Timber.tag("KAKAO_ACCOUNT").d("로그인 실패 : ${error?.cause}")
                 onFailed(error)
+            }
+        }
+    }
+
+    fun unLink() {
+        UserApiClient.instance.unlink { error ->
+            if (error != null) {
+                Timber.tag("KAKAO_UNLINK").d("연결 끊기 실패 : ${error.cause}")
+            } else {
+                Timber.tag("KAKAO_UNLINK").d("연결 끊기 성공. SDK에서 토큰 삭제 됨")
+            }
+        }
+    }
+
+    fun getKakaoUserInfo() {
+        UserApiClient.instance.me { user, error ->
+            if (error != null) {
+                Timber.tag("KAKAO_USER").d("사용자 정보 요청 실패 : ${error.cause}")
+            } else if (user != null) {
+                Timber.d(
+                    "사용자 정보 요청 성공" +
+                            "\n회원번호: ${user.id}" +
+                            "\n이메일: ${user.kakaoAccount?.email}" +
+                            "\n닉네임: ${user.kakaoAccount?.profile?.nickname}"
+                )
             }
         }
     }
