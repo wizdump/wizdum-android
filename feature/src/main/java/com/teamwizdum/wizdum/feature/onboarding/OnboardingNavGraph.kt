@@ -25,6 +25,12 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel
 
     composable(route = "MENTOR") {
         MentorMatchScreen() {
+            navController.navigate(route = "METOR_DETAIL")
+        }
+    }
+
+    composable(route = "METOR_DETAIL") {
+        MentorDetailScreen() {
             navController.navigate(route = "LOGIN")
         }
     }

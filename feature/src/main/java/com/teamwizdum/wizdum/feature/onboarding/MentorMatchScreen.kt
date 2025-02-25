@@ -32,30 +32,14 @@ fun MentorMatchScreen(clickNext: () -> Unit = {}) {
                 Text(text = "시간을 초월한\n당신만의 멘토를 찾았어요!")
             }
             Spacer(modifier = Modifier.height(38.dp))
-            MentorCard()
+            MentorCard(clickNext = { clickNext() })
             Spacer(modifier = Modifier.weight(1f))
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color.Green)
-                .clickable {
-                    clickNext()
-                }) {
-//                Text(
-//                    text = "시작하기",
-//                    modifier = Modifier
-//                        .align(Alignment.Center)
-//                        .padding(vertical = 20.dp)
-//                        .clickable {
-//                            clickNext()
-//                        }
-//                )
-            }
         }
     }
 }
 
 @Composable
-private fun MentorCard() {
+private fun MentorCard(clickNext: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -92,7 +76,9 @@ private fun MentorCard() {
                 .height(48.dp)
                 .background(Color.Green)
                 .align(Alignment.BottomCenter)
-                .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)),
+                .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)).clickable {
+                    clickNext()
+                },
             contentAlignment = Alignment.Center
         ) {
             Text(text = "강의 미리보기")
