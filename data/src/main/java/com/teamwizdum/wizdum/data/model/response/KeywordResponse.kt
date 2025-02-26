@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.data.model
+package com.teamwizdum.wizdum.data.model.response
 
 import kotlinx.serialization.Serializable
 
