@@ -18,10 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     Surface {
@@ -32,13 +33,15 @@ fun LoginScreen() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            kakaoLoginButton(context)
+            kakaoLoginButton(context = context, onKakaoSuccess = { accessToken ->
+                viewModel.login(accessToken)
+            })
         }
     }
 }
 
 @Composable
-private fun kakaoLoginButton(context: Context) {
+private fun kakaoLoginButton(context: Context, onKakaoSuccess: (String) -> Unit) {
     Box(modifier = Modifier
         .background(color = Color.Black)
         .fillMaxWidth()
@@ -46,8 +49,8 @@ private fun kakaoLoginButton(context: Context) {
         .clickable {
             KaKaoLoginManager.login(
                 context = context,
-                onSuccess = {
-
+                onSuccess = { accessToken ->
+                    onKakaoSuccess(accessToken)
                 },
                 onFailed = {
 
