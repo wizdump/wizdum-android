@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import com.teamwizdum.wizdum.feature.login.loginScreen
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.onboardingScreen
+import com.teamwizdum.wizdum.feature.quest.questScreen
 
 @Composable
 fun WizdumNavHost(
@@ -14,9 +15,10 @@ fun WizdumNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.ONBOARDING.name
+        startDestination = Routes.QUEST.name
     ) {
         loginScreen()
         onboardingScreen(navController, viewModel)
+        questScreen(navController)
     }
 }
