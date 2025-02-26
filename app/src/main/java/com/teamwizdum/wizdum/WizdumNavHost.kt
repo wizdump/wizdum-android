@@ -6,7 +6,6 @@ import androidx.navigation.compose.NavHost
 import com.teamwizdum.wizdum.feature.login.loginScreen
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
-import com.teamwizdum.wizdum.feature.onboarding.onboardingScreen
 import com.teamwizdum.wizdum.feature.quest.questScreen
 
 @Composable
