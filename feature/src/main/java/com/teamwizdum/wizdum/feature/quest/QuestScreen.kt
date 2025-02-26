@@ -1,11 +1,14 @@
 package com.teamwizdum.wizdum.feature.quest
 
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,7 +53,7 @@ fun QuestScreen() {
                 if (available.y < 0) {
                     columnHeightFraction = (columnHeightFraction + 0.05f).coerceAtMost(1f)
                 } else if (available.y > 0) {
-                    columnHeightFraction = (columnHeightFraction - 0.05f).coerceAtLeast(0.6f)
+                    columnHeightFraction = (columnHeightFraction - 0.05f).coerceAtLeast(0.6f) // TODO: 0.6f 비율 아닌 최소 길이 확보
                 }
                 return Offset.Zero
             }
@@ -61,7 +64,7 @@ fun QuestScreen() {
         Modifier
             .fillMaxSize()
             .padding(top = 24.dp)
-            .nestedScroll(nestedScrollConnection)
+            .nestedScroll(nestedScrollConnection) // TODO: 드래그 뻣뻣한 부분 수정
     ) {
         Column(Modifier.padding(start = 32.dp, end = 32.dp)) {
             Box(
@@ -94,10 +97,13 @@ fun QuestScreen() {
                 Text(text = "적당히 강하게", style = WizdumTheme.typography.body2)
             }
             Spacer(modifier = Modifier.height(32.dp))
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "목표", style = WizdumTheme.typography.body1)
-                // CustomProgressbar
-                // 숫자
+                Spacer(modifier = Modifier.width(8.dp))
+                CustomProgressBar(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "1 / 3")
+
             }
             Spacer(modifier = Modifier.height(32.dp))
         }
@@ -106,11 +112,12 @@ fun QuestScreen() {
                 .fillMaxWidth()
                 .fillMaxHeight(animatedHeight)
                 .background(color = Color.Gray)
-                .padding(top = 32.dp, start = 24.dp, end = 24.dp
+                .padding(
+                    top = 32.dp, start = 24.dp, end = 24.dp
                 )
                 .align(Alignment.BottomCenter)
         ) {
-            items(3) {
+            items(3, key = { it }) {// TODO: 드래그 뻣뻣한 부분 수정
                 it
                 QuestItem(it)
             }
@@ -147,9 +154,54 @@ fun QuestItem(index: Int) {
 }
 
 @Composable
-fun ExpandableQuestCard(onHeightChanged: (Int) -> Unit = {}) {
+fun CustomProgressBar(modifier: Modifier = Modifier, progress: Float = 0.3f) {
+    BoxWithConstraints(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(10.dp)
+            .background(color = Color.Gray, shape = RoundedCornerShape(10.dp))
+    ) {
+        val animatedProgress by animateFloatAsState(
+            targetValue = progress,
+            animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing)
+        )
+        val parentWidth = constraints.maxWidth
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(10.dp)
+                .padding(vertical = 1.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+                    .background(color = Color.Black, shape = RoundedCornerShape(10.dp))
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+                    .background(color = Color.Black, shape = RoundedCornerShape(10.dp))
+            )
+        }
+
+        // 진입 할 때 프로그래스바가 에니메이션으로 채워져야 함
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .width((animatedProgress * parentWidth).dp)
+                .background(color = Color.Black, shape = RoundedCornerShape(10.dp))
+        )
+    }
+}
+
+@Composable
+fun ExpandableQuestCard(isExpanded: Boolean = true, onHeightChanged: (Int) -> Unit = {}) {
     // 수강 완료된 강의는 축소, 아래 방향을 누르면 다시 확장시킬 수 있음
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(isExpanded) }
     val cardHeight by animateDpAsState(
         targetValue = if (isExpanded) 192.dp else 71.dp,
         label = "",
@@ -255,12 +307,32 @@ enum class QuestStatus {
     COMPLETED
 }
 
+@Preview
+@Composable
+fun CustomProgressBarPreview() {
+    WizdumTheme {
+        CustomProgressBar()
+    }
+}
 
-//@Composable
-//fun ExpandableQuestCardPreview(isExpanded: Boolean) {
-//    ExpandableQuestCard()
-//}
+@Preview(showBackground = true)
+@Composable
+fun QuestItemPreview() {
+    WizdumTheme {
+        QuestItem(index = 0)
+    }
+}
 
+@Preview
+@Composable
+fun ExpandableQuestCardPreview() {
+    WizdumTheme {
+        Column {
+            ExpandableQuestCard(isExpanded = false)
+            ExpandableQuestCard(isExpanded = true)
+        }
+    }
+}
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
