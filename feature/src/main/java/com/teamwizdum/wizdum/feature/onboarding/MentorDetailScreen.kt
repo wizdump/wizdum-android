@@ -2,7 +2,6 @@ package com.teamwizdum.wizdum.feature.onboarding
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,11 +35,30 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.teamwizdum.wizdum.designsystem.component.BasicButton
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
+import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
+import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.theme.Black100
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun MentorDetailScreen(clickNext: () -> Unit) {
+fun MentorDetailScreen(
+    viewModel: OnboardingViewModel = hiltViewModel(),
+    onNavigateNext: () -> Unit,
+) {
+    LaunchedEffect(Unit) {
+        viewModel.getMentorDetail(1)
+    }
+
+    val mentorInfo = viewModel.mentorInfo.collectAsState().value
+
+    MentorDetailContent(mentorInfo = mentorInfo, onNavigateNext = onNavigateNext)
+}
+
+@Composable
+private fun MentorDetailContent(mentorInfo: MentorDetailResponse, onNavigateNext: () -> Unit) {
     var columnHeightFraction by remember { mutableStateOf(0.76f) }
     val animatedHeight by animateFloatAsState(targetValue = columnHeightFraction, label = "")
 
@@ -55,7 +75,6 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
         }
     }
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -65,15 +84,17 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(230.dp)
-                .background(color = Color.Green)
+                .background(color = Color.White)
         )
+
+        CloseAppBar()
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(animatedHeight)
                 .background(
-                    color = Color.Gray,
+                    color = Black100,
                     shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
                 )
                 .padding(top = 32.dp, start = 32.dp)
@@ -87,7 +108,11 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
                     ) {
                         Row {
                             Text(text = "스파르타", style = WizdumTheme.typography.body1_semib)
-                            Text(text = " 멘토님", style = WizdumTheme.typography.body1)
+                            Text(
+                                text = " 멘토님",
+                                style = WizdumTheme.typography.body1,
+                                color = Black600
+                            )
                         }
                         Text(
                             text = "소요시간 16분",
@@ -97,11 +122,7 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = "작심삼일을 극복하는\n초집중력과 루틴 만들기", style = WizdumTheme.typography.h2)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "레벨", style = WizdumTheme.typography.body2)
-                        Text(text = "⭐⭐⭐", style = WizdumTheme.typography.body2)
-                        Text(text = "적당히 강하게", style = WizdumTheme.typography.body2)
-                    }
+                    // LevelInfo(level = "")
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
                         text = "결심은 약하다. 행동만이 너를 강하게 만든다!",
@@ -145,9 +166,9 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
 
         }
 
-        BasicButton(
+        WizdumFilledButton(
             title = "시작하기",
-            bodyColor = Color.Green,
+            backgroundColor = Color.Green,
             textColor = Color.Black,
             modifier = Modifier
                 .padding(
@@ -157,7 +178,7 @@ fun MentorDetailScreen(clickNext: () -> Unit) {
                 )
                 .align(Alignment.BottomCenter)
         ) {
-            clickNext()
+            onNavigateNext()
         }
     }
 }
@@ -196,10 +217,10 @@ fun QuestCardPreview() {
     QuestCard()
 }
 
-@Preview(showBackground = true, widthDp = 360, heightDp = 800)
-@Composable
-fun MentorDetailScreenPreview() {
-    WizdumTheme {
-        MentorDetailScreen() {}
-    }
-}
+//@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+//@Composable
+//fun MentorDetailScreenPreview() {
+//    WizdumTheme {
+//        MentorDetailContent(mentorInfo = ) {}
+//    }
+//}

@@ -16,7 +16,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,15 +39,15 @@ import kotlin.math.absoluteValue
 @Composable
 fun MentorMatchScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    clickNext: () -> Unit,
+    onNavigateNext: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.postMentors(1, false)
+        viewModel.getMentors(1, false)
     }
 
     val mentors = viewModel.mentors.collectAsState().value
 
-    MentorContent(mentors, clickNext)
+    MentorContent(mentors = mentors, onNavigateNext = onNavigateNext)
 }
 
 @Composable

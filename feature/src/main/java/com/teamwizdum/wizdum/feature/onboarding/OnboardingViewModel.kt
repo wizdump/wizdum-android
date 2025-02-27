@@ -3,6 +3,7 @@ package com.teamwizdum.wizdum.feature.onboarding
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
+import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.model.response.QuestionResponse
 import com.teamwizdum.wizdum.data.repository.OnboardingRepository
@@ -26,6 +27,15 @@ class OnboardingViewModel @Inject constructor(
     private val _mentors = MutableStateFlow<List<MentorsResponse>>(emptyList())
     val mentors: StateFlow<List<MentorsResponse>> = _mentors
 
+    private val _mentorInfo = MutableStateFlow<MentorDetailResponse>(
+        MentorDetailResponse(
+            mentoName = "",
+            mentoTitle = "",
+            itemLevel = "LOW"
+        )
+    )
+    val mentorInfo: StateFlow<MentorDetailResponse> = _mentorInfo
+
 
     fun getKeyword(onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
@@ -44,12 +54,19 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun postMentors(questionId: Int, useAi: Boolean) {
+    fun getMentors(questionId: Int, useAi: Boolean) {
         viewModelScope.launch {
             repository.getMentors(questionId = questionId, useAi = useAi).collect {
                 _mentors.value = it
             }
         }
+    }
 
+    fun getMentorDetail(mentorId: Int) {
+        viewModelScope.launch {
+            repository.getMentorDetail(mentorId = mentorId).collect {
+                _mentorInfo.value = it
+            }
+        }
     }
 }
