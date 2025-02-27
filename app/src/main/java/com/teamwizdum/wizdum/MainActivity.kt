@@ -25,7 +25,8 @@ class MainActivity : ComponentActivity() {
             WizdumTheme {
                 val naviController = rememberNavController()
 
-                WizdumNavHost(navController = naviController, viewModel = onboardingViewModel)
+//                WizdumNavHost(navController = naviController, viewModel = onboardingViewModel)
+                MainScreen(navController = naviController, onboardingViewModel = onboardingViewModel)
             }
         }
     }

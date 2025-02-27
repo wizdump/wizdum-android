@@ -3,6 +3,7 @@ package com.teamwizdum.wizdum.feature.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun HomeScreen() {
-    Surface(modifier = Modifier.fillMaxSize()) {
+fun HomeScreen(padding: PaddingValues) {
+    Surface(modifier = Modifier.fillMaxSize().padding(padding)) {
         Column {
             Column(
                 modifier = Modifier.padding(
@@ -173,6 +174,6 @@ fun CollectionWizCardPreview() {
 @Composable
 fun HomeScreenPreview() {
     WizdumTheme {
-        HomeScreen()
+        HomeScreen(padding = PaddingValues())
     }
 }

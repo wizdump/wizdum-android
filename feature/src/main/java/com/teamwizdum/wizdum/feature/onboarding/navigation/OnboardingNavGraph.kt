@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.feature.onboarding.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -10,7 +11,7 @@ import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.QuestionSelectionScreen
 import com.teamwizdum.wizdum.feature.onboarding.StartScreen
 
-fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel: OnboardingViewModel) {
+fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel: OnboardingViewModel, padding: PaddingValues) {
     composable(route = "ONBOARDING") {
         StartScreen() {
             navController.navigate(route = "KEYWORD")
