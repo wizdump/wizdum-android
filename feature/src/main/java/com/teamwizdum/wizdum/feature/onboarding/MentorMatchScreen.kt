@@ -26,14 +26,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
+import com.teamwizdum.wizdum.feature.R
 import kotlin.math.absoluteValue
 
 @Composable
@@ -53,7 +54,7 @@ fun MentorMatchScreen(
 @Composable
 private fun MentorContent(
     mentors: List<MentorsResponse>,
-    clickNext: () -> Unit,
+    onNavigateNext: () -> Unit,
 ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -65,11 +66,51 @@ private fun MentorContent(
                     .fillMaxWidth()
                     .padding(top = 32.dp, start = 32.dp, end = 32.dp)
             ) {
-                Text(text = "시간을 초월한\n당신만의 멘토를 찾았어요!", style = WizdumTheme.typography.h2)
+                Text(
+                    text = stringResource(R.string.mentor_title),
+                    style = WizdumTheme.typography.h2
+                )
             }
             Spacer(modifier = Modifier.height(38.dp))
-            CustomCardSlot()
+            MentorCardPager(mentors, onNavigateNext)
         }
+    }
+}
+
+
+@Composable
+fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateNext: () -> Unit) {
+    //TODO: UI 테스트 이후 서버 데이터로 변경해야 함
+    val dummyList = listOf(
+        MentorsResponse(
+            mentoName = "스파르타",
+            mentoTitle = "스파르타 코딩클럽",
+            itemLevel = "HIGH"
+        ),
+        MentorsResponse(
+            mentoName = "스파르타",
+            mentoTitle = "스파르타 코딩클럽",
+            itemLevel = "HIGH"
+        ),
+        MentorsResponse(
+            mentoName = "스파르타",
+            mentoTitle = "스파르타 코딩클럽",
+            itemLevel = "HIGH"
+        ),
+    )
+    val pagerState = rememberPagerState(pageCount = { dummyList.size }, initialPage = 1)
+
+    HorizontalPager(
+        modifier = Modifier.fillMaxWidth(),
+        state = pagerState,
+        contentPadding = PaddingValues(horizontal = 64.dp),
+    ) { page ->
+        MentorCard(
+            page = page,
+            pagerState = pagerState,
+            mentorInfo = dummyList[page],
+            onNavigateNext = onNavigateNext
+        )
     }
 }
 
@@ -78,7 +119,7 @@ private fun MentorCard(
     page: Int,
     pagerState: PagerState,
     mentorInfo: MentorsResponse,
-    clickNext: () -> Unit = {},
+    onNavigateNext: () -> Unit = {},
 ) {
     Box(modifier = Modifier.graphicsLayer {
         val pageOffset =
@@ -148,7 +189,7 @@ private fun MentorCard(
                     .align(Alignment.BottomCenter)
                     .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
                     .clickable {
-                        clickNext()
+                        onNavigateNext()
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -158,68 +199,35 @@ private fun MentorCard(
     }
 }
 
+
+@Preview
 @Composable
-fun CustomCardSlot() {
-    val dummyList = listOf(
-        MentorsResponse(
-            mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽",
-            itemLevel = "HIGH"
-        ),
-        MentorsResponse(
-            mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽",
-            itemLevel = "HIGH"
-        ),
-        MentorsResponse(
-            mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽",
-            itemLevel = "HIGH"
-        ),
+fun MentorCardPreview() {
+    val pagerState = rememberPagerState(pageCount = { 0 }, initialPage = 0)
+    WizdumTheme {
+        MentorCard(
+            page = 0,
+            pagerState = pagerState,
+            mentorInfo = MentorsResponse(
+                mentoName = "스파르타",
+                mentoTitle = "스파르타 코딩클럽",
+                itemLevel = "HIGH"
+            ),
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+fun MentorMatchScreenPreview() {
+    val mentorList = listOf(
         MentorsResponse(
             mentoName = "스파르타",
             mentoTitle = "스파르타 코딩클럽",
             itemLevel = "HIGH"
         )
-
     )
-    val pagerState = rememberPagerState(pageCount = { dummyList.size }, initialPage = 1)
-
-    HorizontalPager(
-        modifier = Modifier.fillMaxWidth(),
-        state = pagerState,
-        contentPadding = PaddingValues(horizontal = 64.dp),
-    ) { page ->
-        MentorCard(page = page, pagerState = pagerState, mentorInfo = dummyList[page])
+    WizdumTheme {
+        MentorContent(mentors = mentorList) {}
     }
-}
-
-//@Preview
-//@Composable
-//fun MentorCardPreview() {
-//    WizdumTheme {
-//        MentorCard(
-//            mentorInfo = MentorsResponse(
-//                1,
-//                "스파르타",
-//                "스파르타 전사들과 함께하는 나약함은 용납되지 않는다!",
-//                "강인한 정신력과 철저한 자기 훈련을 통해 목표를 달성하는 스파르타식 도전"
-//            )
-//        )
-//    }
-
-//}
-
-@Preview(showBackground = true, widthDp = 360, heightDp = 800)
-@Composable
-fun MentorMatchScreenPreview() {
-//    WizdumTheme {
-//        MentorContent(
-//            mentors = MentorDetailResponse(
-//                mentoName = "스파르타",
-//                mentoTitle = "스파르타 코딩클럽",
-//                itemLevel = "HIGH"
-//            )
-//        ) {}
-//    }
 }
