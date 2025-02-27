@@ -13,6 +13,16 @@ import com.teamwizdum.wizdum.designsystem.R
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
+fun TitleAppbar(modifier: Modifier = Modifier, title: String = "") {
+    BasicAppBar(
+        modifier = modifier,
+        title = {
+            Text(text = title, style = WizdumTheme.typography.body1_semib)
+        }
+    )
+}
+
+@Composable
 fun BackAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
@@ -22,7 +32,7 @@ fun BackAppBar(
         modifier = modifier,
         startIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_back_arrow),
+                painter = painterResource(id = R.drawable.ic_btn_arrow_back),
                 contentDescription = "뒤로가기",
                 modifier = modifier
                     .clickable {
@@ -50,7 +60,7 @@ fun CloseAppBar(
         },
         actions = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_close),
+                painter = painterResource(id = R.drawable.ic_btn_close),
                 contentDescription = "취소",
                 modifier = modifier
                     .clickable {

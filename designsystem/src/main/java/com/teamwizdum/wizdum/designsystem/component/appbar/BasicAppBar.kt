@@ -27,10 +27,15 @@ fun BasicAppBar(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .padding(top = 8.dp, start = 16.dp, end = 16.dp),
+            .padding(top = 8.dp),
         contentAlignment = Alignment.Center
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             startIcon()
             Spacer(modifier = modifier.weight(1f))
             actions()
