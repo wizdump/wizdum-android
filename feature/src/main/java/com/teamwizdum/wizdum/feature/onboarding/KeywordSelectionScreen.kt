@@ -43,7 +43,9 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
+import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
@@ -80,7 +82,9 @@ private fun KeywordContent(
                             append("1개")
                         }
                         append(" 선택 가능")
-                    }, style = WizdumTheme.typography.body1
+                    },
+                    style = WizdumTheme.typography.body1,
+                    color = Black500
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -181,11 +185,11 @@ private fun KeywordCard(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = title,
-                    style = WizdumTheme.typography.h3_semib,
+                    style = if (isSelected) WizdumTheme.typography.h3_semib else WizdumTheme.typography.h3,
+                    color = if (isSelected) Black700 else Black600,
                     textAlign = TextAlign.Center
                 )
             }
-
         }
     }
 }

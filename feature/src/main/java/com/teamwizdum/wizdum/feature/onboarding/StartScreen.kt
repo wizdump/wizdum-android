@@ -15,6 +15,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -46,7 +47,8 @@ fun StartScreen(onNavigateNext: () -> Unit) {
                     }
                     append(" 멘토와의 대화")
                 },
-                style = WizdumTheme.typography.body1
+                style = WizdumTheme.typography.body1,
+                color = Black600
             )
             Spacer(modifier = Modifier.weight(1f))
             WizdumFilledButton(
