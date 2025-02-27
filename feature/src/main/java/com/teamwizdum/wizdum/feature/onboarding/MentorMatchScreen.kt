@@ -33,7 +33,7 @@ fun MentorMatchScreen(
     clickNext: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.postMentors(1, true)
+        viewModel.postMentors(1, false)
     }
 
     val mentors = viewModel.mentors.collectAsState().value
@@ -53,7 +53,9 @@ fun MentorMatchScreen(
                 Text(text = "시간을 초월한\n당신만의 멘토를 찾았어요!", style = WizdumTheme.typography.h2)
             }
             Spacer(modifier = Modifier.height(38.dp))
-            MentorCard(mentorInfo = mentors, clickNext = { clickNext() })
+            if (mentors != null) {
+                MentorCard(mentorInfo = mentors, clickNext = { clickNext() })
+            }
 //            LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 //                items(1) {
 //                    MentorCard(clickNext = { clickNext() })
@@ -83,7 +85,7 @@ private fun MentorCard(mentorInfo: MentorsResponse, clickNext: () -> Unit = {}) 
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = mentorInfo.name, style = WizdumTheme.typography.h3_semib)
+                Text(text = mentorInfo.mentoName, style = WizdumTheme.typography.h3_semib)
                 Text(text = " 멘토님", style = WizdumTheme.typography.body1)
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -95,7 +97,7 @@ private fun MentorCard(mentorInfo: MentorsResponse, clickNext: () -> Unit = {}) 
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = mentorInfo.title,
+                text = mentorInfo.mentoTitle,
                 style = WizdumTheme.typography.h3_semib,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -123,20 +125,20 @@ private fun MentorCard(mentorInfo: MentorsResponse, clickNext: () -> Unit = {}) 
     }
 }
 
-@Preview
-@Composable
-fun MentorCardPreview() {
-    WizdumTheme {
-        MentorCard(
-            mentorInfo = MentorsResponse(
-                1,
-                "스파르타",
-                "스파르타 전사들과 함께하는 나약함은 용납되지 않는다!",
-                "강인한 정신력과 철저한 자기 훈련을 통해 목표를 달성하는 스파르타식 도전"
-            )
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun MentorCardPreview() {
+//    WizdumTheme {
+//        MentorCard(
+//            mentorInfo = MentorsResponse(
+//                1,
+//                "스파르타",
+//                "스파르타 전사들과 함께하는 나약함은 용납되지 않는다!",
+//                "강인한 정신력과 철저한 자기 훈련을 통해 목표를 달성하는 스파르타식 도전"
+//            )
+//        )
+//    }
+//}
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable

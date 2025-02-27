@@ -23,8 +23,8 @@ class OnboardingViewModel @Inject constructor(
     private val _questions = MutableStateFlow<List<QuestionResponse>>(emptyList())
     val questions: StateFlow<List<QuestionResponse>> = _questions
 
-    private val _mentors = MutableStateFlow<MentorsResponse>(MentorsResponse(1, "아무개", "아무개씨의 특강", "유익할까요"))
-    val mentors: StateFlow<MentorsResponse> = _mentors
+    private val _mentors = MutableStateFlow<MentorsResponse?>(null)
+    val mentors: StateFlow<MentorsResponse?> = _mentors
 
 
     fun getKeyword(onSuccess: () -> Unit = {}) {
@@ -46,7 +46,7 @@ class OnboardingViewModel @Inject constructor(
 
     fun postMentors(questionId: Int, useAi: Boolean) {
         viewModelScope.launch {
-            repository.postMentors(questionId = questionId, useAi = useAi).collect {
+            repository.getMentors(questionId = questionId, useAi = useAi).collect {
                 _mentors.value = it
             }
         }

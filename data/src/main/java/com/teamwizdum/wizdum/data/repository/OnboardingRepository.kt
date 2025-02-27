@@ -1,7 +1,6 @@
 package com.teamwizdum.wizdum.data.repository
 
 import com.teamwizdum.wizdum.data.api.OnboardingApi
-import com.teamwizdum.wizdum.data.model.request.MentorsRequest
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.model.response.QuestionResponse
@@ -20,15 +19,9 @@ class OnboardingRepository @Inject constructor(
         emit(onboardingApi.getQuestions(keywordId))
     }
 
-    suspend fun postMentors(questionId: Int, useAi: Boolean): Flow<MentorsResponse> = flow {
+    suspend fun getMentors(questionId: Int, useAi: Boolean): Flow<MentorsResponse> = flow {
         emit(
-            onboardingApi.postMentors(
-                mentorsRequest = MentorsRequest(
-                    questionId = questionId,
-                    aiRecommendation = useAi
-
-                )
-            )
+            onboardingApi.getMentors(categoryId = questionId, useAiMentor = useAi)
         )
     }
 }
