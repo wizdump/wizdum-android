@@ -2,6 +2,7 @@ package com.teamwizdum.wizdum.data.repository
 
 import com.teamwizdum.wizdum.data.api.OnboardingApi
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
+import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.model.response.QuestionResponse
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,7 @@ class OnboardingRepository @Inject constructor(
         emit(onboardingApi.getQuestions(keywordId))
     }
 
-    suspend fun getMentors(questionId: Int, useAi: Boolean): Flow<MentorsResponse> = flow {
+    suspend fun getMentors(questionId: Int, useAi: Boolean): Flow<List<MentorsResponse>> = flow {
         emit(
             onboardingApi.getMentors(categoryId = questionId, useAiMentor = useAi)
         )

@@ -23,8 +23,8 @@ class OnboardingViewModel @Inject constructor(
     private val _questions = MutableStateFlow<List<QuestionResponse>>(emptyList())
     val questions: StateFlow<List<QuestionResponse>> = _questions
 
-    private val _mentors = MutableStateFlow<MentorsResponse?>(null)
-    val mentors: StateFlow<MentorsResponse?> = _mentors
+    private val _mentors = MutableStateFlow<List<MentorsResponse>>(emptyList())
+    val mentors: StateFlow<List<MentorsResponse>> = _mentors
 
 
     fun getKeyword(onSuccess: () -> Unit = {}) {

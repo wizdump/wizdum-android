@@ -1,6 +1,7 @@
 package com.teamwizdum.wizdum.data.api
 
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
+import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.model.response.QuestionResponse
 import retrofit2.http.GET
@@ -19,5 +20,5 @@ interface OnboardingApi {
     suspend fun getMentors(
         @Query("categoryId") categoryId: Int,
         @Query("useAiMento") useAiMentor: Boolean
-    ): MentorsResponse
+    ): List<MentorsResponse>
 }
