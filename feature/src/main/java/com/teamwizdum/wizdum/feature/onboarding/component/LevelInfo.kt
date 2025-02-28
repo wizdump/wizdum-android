@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,12 +19,14 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.onboarding.info.Level
 
 @Composable
-fun LevelInfo(level: Level) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun LevelInfo(level: String) {
+    val levelEnum = Level.fromString(level)
+
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(text = "레벨", style = WizdumTheme.typography.body2, color = Black500)
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = level.rating,
+            text = levelEnum.rating,
             style = WizdumTheme.typography.body2,
             color = Black500
         )
@@ -35,7 +38,7 @@ fun LevelInfo(level: Level) {
                 .background(color = Black500, shape = CircleShape)
         )
         Text(
-            text = level.comment,
+            text = levelEnum.comment,
             style = WizdumTheme.typography.body2,
             color = Black500
         )

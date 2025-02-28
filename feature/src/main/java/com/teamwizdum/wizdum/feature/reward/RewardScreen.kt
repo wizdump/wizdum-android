@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.teamwizdum.wizdum.designsystem.component.BasicButton
+import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -50,9 +50,9 @@ fun RewardScreen() {
                         .background(color = Color.Black)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                BasicButton(
+                WizdumFilledButton(
                     title = "나의 승리 공유하기",
-                    bodyColor = Color.Green,
+                    backgroundColor = Color.Green,
                     textColor = Color.Black,
                 ) {
                     // TODO : 공유로 넘어가면 창 종료, 복귀 시 메인 화면으로 이동

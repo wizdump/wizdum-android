@@ -32,8 +32,10 @@ import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 import kotlin.math.absoluteValue
 
 @Composable
@@ -55,7 +57,7 @@ private fun MentorContent(
     mentors: List<MentorsResponse>,
     onNavigateNext: () -> Unit,
 ) {
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -83,17 +85,17 @@ fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateNext: () -> Uni
     val dummyList = listOf(
         MentorsResponse(
             mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽",
+            mentoTitle = "스파르타 코딩클럽\n시작해보자",
             itemLevel = "HIGH"
         ),
         MentorsResponse(
             mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽",
+            mentoTitle = "스파르타 코딩클럽\n시작해보자",
             itemLevel = "HIGH"
         ),
         MentorsResponse(
             mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽",
+            mentoTitle = "스파르타 코딩클럽\n시작해보자",
             itemLevel = "HIGH"
         ),
     )
@@ -102,7 +104,7 @@ fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateNext: () -> Uni
     HorizontalPager(
         modifier = Modifier.fillMaxWidth(),
         state = pagerState,
-        contentPadding = PaddingValues(horizontal = 64.dp),
+        contentPadding = PaddingValues(horizontal = 50.dp),
     ) { page ->
         MentorCard(
             page = page,
@@ -134,7 +136,7 @@ private fun MentorCard(
         }
 
         alpha = lerp(
-            start = 0.2f,
+            start = 0.8f,
             stop = 1f,
             fraction = 1f - pageOffset.absoluteValue.coerceIn(0f, 1f)
         )
@@ -145,7 +147,7 @@ private fun MentorCard(
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(20.dp))
                 .height(418.dp)
-                .background(color = Color.Gray)
+                .background(color = Color.White)
         ) {
             Column(
                 modifier = Modifier
@@ -158,7 +160,7 @@ private fun MentorCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = mentorInfo.mentoName, style = WizdumTheme.typography.h3_semib)
-                    Text(text = " 멘토님", style = WizdumTheme.typography.body1)
+                    Text(text = " 멘토님", style = WizdumTheme.typography.body1, color = Black600)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
@@ -174,17 +176,13 @@ private fun MentorCard(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "레벨", style = WizdumTheme.typography.body2)
-                    Text(text = "⭐⭐⭐", style = WizdumTheme.typography.body2)
-                    Text(text = "적당히 강하게", style = WizdumTheme.typography.body2)
-                }
+                LevelInfo(level = mentorInfo.itemLevel)
             }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .background(Color.Green)
+                    .background(color = WizdumTheme.colorScheme.primary)
                     .align(Alignment.BottomCenter)
                     .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
                     .clickable {
@@ -192,7 +190,7 @@ private fun MentorCard(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "강의 미리보기", style = WizdumTheme.typography.body1)
+                Text(text = "강의 미리보기", style = WizdumTheme.typography.body1, color = Color.White)
             }
         }
     }
@@ -209,7 +207,7 @@ fun MentorCardPreview() {
             pagerState = pagerState,
             mentorInfo = MentorsResponse(
                 mentoName = "스파르타",
-                mentoTitle = "스파르타 코딩클럽",
+                mentoTitle = "스파르타 코딩클럽\n시작해보자",
                 itemLevel = "HIGH"
             ),
         )

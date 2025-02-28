@@ -116,7 +116,6 @@ private fun QuestionCard(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    val levelEnum = Level.fromString(level)
 
     Box(
         modifier = Modifier
@@ -143,7 +142,7 @@ private fun QuestionCard(
                     color = if (isSelected) Black700 else Black600
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                LevelInfo(level = levelEnum)
+                LevelInfo(level = level)
             }
             if (isSelected)
                 Icon(

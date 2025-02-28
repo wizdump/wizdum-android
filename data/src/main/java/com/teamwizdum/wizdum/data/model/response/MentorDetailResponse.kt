@@ -16,7 +16,7 @@ data class MentorDetailResponse(
 
 @Serializable
 data class Lecture(
-    val lectureId: Int,
+    val lectureId: Int = 0,
     val orderSeq: Int,
     val title: String
 )
