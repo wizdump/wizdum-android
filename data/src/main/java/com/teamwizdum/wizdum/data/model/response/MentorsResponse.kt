@@ -4,8 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class MentorsResponse(
-    val id: Int,
-    val name: String,
-    val title: String,
-    val description: String
+    val mentoId: Int = 0,
+    val mentoName: String,
+    val mentoTitle: String,
+    val filePath: String? = "",
+    val itemLevel: String
 )
