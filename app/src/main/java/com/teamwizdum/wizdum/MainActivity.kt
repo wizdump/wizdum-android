@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
+import com.teamwizdum.wizdum.feature.login.LoginViewModel
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val onboardingViewModel: OnboardingViewModel by viewModels()
+    private val loginViewModel: LoginViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -25,7 +27,11 @@ class MainActivity : ComponentActivity() {
             WizdumTheme {
                 val naviController = rememberNavController()
 
-                WizdumNavHost(navController = naviController, viewModel = onboardingViewModel)
+                WizdumNavHost(
+                    navController = naviController,
+                    loginViewModel = loginViewModel,
+                    onBoardingViewModel = onboardingViewModel
+                )
             }
         }
     }
