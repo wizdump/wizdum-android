@@ -65,18 +65,18 @@ import com.teamwizdum.wizdum.feature.quest.component.StatusCircle
 import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
 
 @Composable
-fun QuestScreen(navController: NavHostController, viewModel: QuestViewModel) {
+fun QuestScreen(viewModel: QuestViewModel, onNavigateNext: () -> Unit) {
     LaunchedEffect(Unit) {
         viewModel.getQuest(1)
     }
 
     val questInfo = viewModel.quests.collectAsState().value
 
-    QuestContent(questInfo)
+    QuestContent(questInfo, onNavigateNext)
 }
 
 @Composable
-private fun QuestContent(questInfo: QuestResponse) {
+private fun QuestContent(questInfo: QuestResponse, onNavigateNext: () -> Unit) {
     var columnHeightFraction by remember { mutableStateOf(0.6f) }
     val animatedHeight by animateFloatAsState(targetValue = columnHeightFraction, label = "")
 
@@ -160,14 +160,14 @@ private fun QuestContent(questInfo: QuestResponse) {
             itemsIndexed(
                 questInfo.lectures,
                 key = { index, item -> item.lectureId }) { index, item ->
-                QuestItem(item)
+                QuestItem(lecture = item, onNavigateNext = { onNavigateNext() })
             }
         }
     }
 }
 
 @Composable
-private fun QuestItem(lecture: LectureDetail) {
+private fun QuestItem(lecture: LectureDetail, onNavigateNext: () -> Unit) {
     var rowHeight by remember { mutableStateOf(71) }
 
     Row {
@@ -182,9 +182,11 @@ private fun QuestItem(lecture: LectureDetail) {
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        ExpandableQuestCard(lecture) { newHeight ->
-            rowHeight = newHeight
-        }
+        ExpandableQuestCard(
+            lecture = lecture,
+            onHeightChanged = { newHeight -> rowHeight = newHeight },
+            onNavigateNext = { onNavigateNext() }
+        )
     }
 }
 
@@ -193,6 +195,7 @@ private fun QuestItem(lecture: LectureDetail) {
 fun ExpandableQuestCard(
     lecture: LectureDetail,
     onHeightChanged: (Int) -> Unit = {},
+    onNavigateNext: () -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(lecture.isInProgress) }
     val cardHeight by animateDpAsState(
@@ -253,13 +256,13 @@ fun ExpandableQuestCard(
             if (lecture.lectureStatus == QuestStatus.DONE.name) {
                 QuestRetryButton(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    onNavigateNext = {},
+                    onNavigateNext = { onNavigateNext() },
                     onClick = {}
                 )
             } else {
                 QuestStartButton(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    onNavigateNext = {}
+                    onNavigateNext = { onNavigateNext() }
                 )
             }
         } else {
@@ -414,7 +417,7 @@ fun ExpandableQuestCardPreview() {
                     isInProgress = true,
                     isFinished = false
                 )
-            )
+            ) {}
         }
     }
 }
@@ -423,6 +426,6 @@ fun ExpandableQuestCardPreview() {
 @Composable
 fun QuestScreenPreview() {
     WizdumTheme {
-        QuestContent(questInfo = QuestResponse())
+        QuestContent(questInfo = QuestResponse()) {}
     }
 }

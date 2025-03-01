@@ -6,6 +6,8 @@ import androidx.navigation.compose.composable
 
 fun NavGraphBuilder.questScreen(navController: NavHostController, viewModel: QuestViewModel) {
     composable(route = "QUEST") {
-        QuestScreen(navController = navController, viewModel = viewModel)
+        QuestScreen(viewModel = viewModel) {
+            navController.navigate("CHAT")
+        }
     }
 }
