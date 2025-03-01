@@ -1,14 +1,12 @@
 package com.teamwizdum.wizdum.feature.quest
 
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,19 +40,29 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.teamwizdum.wizdum.data.model.response.Lecture
 import com.teamwizdum.wizdum.data.model.response.LectureDetail
 import com.teamwizdum.wizdum.data.model.response.QuestResponse
-import com.teamwizdum.wizdum.designsystem.component.TextBadge
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
+import com.teamwizdum.wizdum.designsystem.component.badge.TextBadge
 import com.teamwizdum.wizdum.designsystem.theme.Black100
-import com.teamwizdum.wizdum.designsystem.theme.Black700
+import com.teamwizdum.wizdum.designsystem.theme.Black300
+import com.teamwizdum.wizdum.designsystem.theme.Black600
+import com.teamwizdum.wizdum.designsystem.theme.Green100
+import com.teamwizdum.wizdum.designsystem.theme.Green200
+import com.teamwizdum.wizdum.designsystem.theme.Success
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
+import com.teamwizdum.wizdum.feature.quest.component.QuestProgressBar
+import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
+import com.teamwizdum.wizdum.feature.quest.component.StatusCircle
+import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
 
 @Composable
 fun QuestScreen(navController: NavHostController, viewModel: QuestViewModel) {
@@ -121,11 +128,23 @@ private fun QuestContent(questInfo: QuestResponse) {
                 Spacer(modifier = Modifier.width(8.dp))
                 QuestProgressBar(modifier = Modifier.weight(1f))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "1 / 3")
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = Black300)) {
+                            append("0")
+                        }
+                        append(" / 3")
+                    },
+                    style = WizdumTheme.typography.body1,
+                    color = Black600
+                )
 
             }
             Spacer(modifier = Modifier.height(32.dp))
         }
+
+        BackAppBar()
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,56 +157,12 @@ private fun QuestContent(questInfo: QuestResponse) {
                 .align(Alignment.BottomCenter)
         ) {
 
-            itemsIndexed(questInfo.lectures, key = { index, item -> item.lectureId }) { index, item ->
+            itemsIndexed(
+                questInfo.lectures,
+                key = { index, item -> item.lectureId }) { index, item ->
                 QuestItem(item)
             }
         }
-        BackAppBar()
-    }
-}
-
-@Composable
-private fun QuestProgressBar(modifier: Modifier = Modifier, progress: Float = 0.3f) {
-    BoxWithConstraints(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(10.dp)
-            .background(color = Color.Gray, shape = RoundedCornerShape(10.dp))
-    ) {
-        val animatedProgress by animateFloatAsState(
-            targetValue = progress,
-            animationSpec = tween(durationMillis = 1000, easing = LinearOutSlowInEasing)
-        )
-        val parentWidth = constraints.maxWidth
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(10.dp)
-                .padding(vertical = 1.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(2.dp)
-                    .background(color = Color.Black, shape = RoundedCornerShape(10.dp))
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(2.dp)
-                    .background(color = Color.Black, shape = RoundedCornerShape(10.dp))
-            )
-        }
-
-        // 진입 할 때 프로그래스바가 에니메이션으로 채워져야 함
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .width((animatedProgress * parentWidth).dp)
-                .background(color = Color.Black, shape = RoundedCornerShape(10.dp))
-        )
     }
 }
 
@@ -197,50 +172,31 @@ private fun QuestItem(lecture: LectureDetail) {
 
     Row {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            StatusCircle(isFocused = false, status = 1)
+            StatusCircle(isInProgress = lecture.isInProgress, status = lecture.lectureStatus)
             Spacer(modifier = Modifier.height(8.dp))
             Box(
                 Modifier
                     .height(with(LocalDensity.current) { rowHeight.toDp() })
                     .width(1.dp)
-                    .background(color = Color.Black) //포커스이거나 or 진행중인 경우 초록색 아니면 검은색
+                    .background(color = if (lecture.isInProgress || lecture.lectureStatus != QuestStatus.WAIT.name) Green200 else Black300)
             )
-
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         ExpandableQuestCard(lecture) { newHeight ->
             rowHeight = newHeight
         }
     }
 }
 
-@Composable
-private fun StatusCircle(isFocused: Boolean, status: Int) {
-    var imageResource = painterResource(id = R.drawable.ic_quest_start)
-
-    // 포커스된 강의가 아닐 때
-    if (!isFocused) {
-        if (status == 1) {
-            // 완료일 때
-            imageResource = painterResource(id = R.drawable.ic_not_completed)
-
-        } else {
-            // 미완료일 때
-            imageResource = painterResource(id = R.drawable.ic_quest_finished)
-        }
-    }
-
-    Icon(painter = imageResource, contentDescription = "퀘스트 상태")
-}
-
-
 
 @Composable
-fun ExpandableQuestCard(lecture: LectureDetail, isExpanded: Boolean = true, onHeightChanged: (Int) -> Unit = {}) {
-    // 수강 완료된 강의는 축소, 아래 방향을 누르면 다시 확장시킬 수 있음
-    var isExpanded by remember { mutableStateOf(isExpanded) }
+fun ExpandableQuestCard(
+    lecture: LectureDetail,
+    onHeightChanged: (Int) -> Unit = {},
+) {
+    var isExpanded by remember { mutableStateOf(lecture.isInProgress) }
     val cardHeight by animateDpAsState(
-        targetValue = if (isExpanded) 192.dp else 71.dp,
+        targetValue = if (isExpanded) 186.dp else if (!isExpanded && lecture.lectureStatus == QuestStatus.WAIT.name) 95.dp else 71.dp,
         label = "",
         finishedListener = { } // 애니메이션이 끝났을 때 높이
     )
@@ -258,22 +214,25 @@ fun ExpandableQuestCard(lecture: LectureDetail, isExpanded: Boolean = true, onHe
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(top = 8.dp, start = 16.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextBadge(title = "수강 전", modifier = Modifier
-                    .align(Alignment.End)
-                    .clickable {
-                        isExpanded = false // 임시조치
-                    })
-                Text(
-                    text = "소요시간 ${lecture.courseTime}분",
-                    style = WizdumTheme.typography.body3,
-                    modifier = Modifier.fillMaxWidth()
+                QuestStatusBadge(
+                    status = lecture.lectureStatus,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .clickable {
+                            isExpanded = false // 임시조치
+                        }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    TextBadge("1강")
+                    TextBadge(
+                        "1강",
+                        backgroundColor = Green100,
+                        borderColor = Green100,
+                        textColor = WizdumTheme.colorScheme.primary,
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(text = lecture.title, style = WizdumTheme.typography.h3_semib)
                 }
@@ -283,17 +242,26 @@ fun ExpandableQuestCard(lecture: LectureDetail, isExpanded: Boolean = true, onHe
                     style = WizdumTheme.typography.body3,
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = lecture.preview,
                     style = WizdumTheme.typography.body3_semib,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            QuestStartButton(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                isFinished = true,
-                onNavigateNext = {}
-            )
+
+            if (lecture.lectureStatus == QuestStatus.DONE.name) {
+                QuestRetryButton(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    onNavigateNext = {},
+                    onClick = {}
+                )
+            } else {
+                QuestStartButton(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    onNavigateNext = {}
+                )
+            }
         } else {
             Row(
                 modifier = Modifier
@@ -305,21 +273,40 @@ fun ExpandableQuestCard(lecture: LectureDetail, isExpanded: Boolean = true, onHe
                 Column {
                     Row {
                         Text(text = "1강", style = WizdumTheme.typography.body3)
-                        Text(text = " 수강완료", style = WizdumTheme.typography.body3_semib)
+
+                        if (lecture.lectureStatus == QuestStatus.DONE.name) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = " 수강완료",
+                                    style = WizdumTheme.typography.body3_semib,
+                                    color = Success
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_badge_done),
+                                    contentDescription = "수강완료"
+                                )
+                            }
+                        } else {
+                            Text(text = " 수강 전", style = WizdumTheme.typography.body3_semib)
+                        }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "결심을 넘어 행동으로", style = WizdumTheme.typography.body2_semib)
+                    Text(text = lecture.title, style = WizdumTheme.typography.body2_semib)
+
+                    if (lecture.lectureStatus == QuestStatus.WAIT.name) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = lecture.preview, style = WizdumTheme.typography.body3)
+                    }
                 }
 
-                Box(
-                    modifier = Modifier
-                        .width(20.dp)
-                        .height(20.dp)
-                        .background(color = Color.Black)
-                        .clickable {
-                            isExpanded = true
-                        }
-                )
+                if (lecture.lectureStatus != QuestStatus.WAIT.name) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_btn_arrow_down),
+                        contentDescription = "펼치기",
+                        modifier = Modifier.clickable { isExpanded = true }
+                    )
+                }
             }
         }
     }
@@ -328,67 +315,71 @@ fun ExpandableQuestCard(lecture: LectureDetail, isExpanded: Boolean = true, onHe
 @Composable
 private fun QuestStartButton(
     modifier: Modifier,
-    isFinished: Boolean,
     onNavigateNext: () -> Unit,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(color = if (isFinished) Color.White else WizdumTheme.colorScheme.primary)
+            .background(color = WizdumTheme.colorScheme.primary)
             .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
             .clickable {
                 onNavigateNext()
             },
         contentAlignment = Alignment.Center
     ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = if (isFinished) "다시하기" else "시작하기",
-                style = WizdumTheme.typography.body1,
-                color = if (isFinished) Black700 else Color.White,
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.ic_btn_arrow_up),
-                contentDescription = "접기",
-                modifier = Modifier.clickable {
-
-                }
-            )
-        }
+        Text(
+            text = "시작하기",
+            style = WizdumTheme.typography.body1,
+            color = Color.White,
+        )
     }
 }
 
-//@Composable
-//private fun QuestRetryButton() {
-//    Box(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .height(48.dp)
-//            .background(color = if (isFinished) Color.White else WizdumTheme.colorScheme.primary)
-//            .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
-//            .clickable {
-//                onNavigateNext()
-//            },
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Row(modifier = Modifier.padding(16.dp)) {
-//            Text(
-//                text = if (isFinished) "다시하기" else "시작하기",
-//                style = WizdumTheme.typography.body1,
-//                color = if (isFinished) Black700 else Color.White,
-//            )
-//            Icon(
-//                painter = painterResource(id = R.drawable.ic_btn_arrow_up),
-//                contentDescription = "접기",
-//                modifier = Modifier.clickable {
-//
-//                }
-//            )
-//        }
-//    }
-//
-//}
+@Composable
+private fun QuestRetryButton(
+    modifier: Modifier,
+    onNavigateNext: () -> Unit,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(54.dp)
+            .background(color = Color.White)
+            .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
+            .clickable {
+                onClick()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Column {
+            HorizontalDivider(thickness = 1.dp, color = Black300)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "다시하기",
+                    style = WizdumTheme.typography.body1,
+                    modifier = modifier.clickable {
+                        onNavigateNext()
+                    }
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_btn_arrow_up),
+                    contentDescription = "접기",
+                    modifier = Modifier.clickable {
+                        onClick()
+                    }
+                )
+            }
+        }
+    }
+}
 
 @Preview
 @Composable
@@ -406,21 +397,32 @@ fun CustomProgressBarPreview() {
 //    }
 //}
 //
-//@Preview
-//@Composable
-//fun ExpandableQuestCardPreview() {
-//    WizdumTheme {
-//        Column {
-//            ExpandableQuestCard(isExpanded = false)
-//            ExpandableQuestCard(isExpanded = true)
-//        }
-//    }
-//}
 
-//@Preview(showBackground = true, widthDp = 360, heightDp = 800)
-//@Composable
-//fun QuestScreenPreview() {
-//    WizdumTheme {
-//        QuestContent()
-//    }
-//}
+@Preview
+@Composable
+fun ExpandableQuestCardPreview() {
+    WizdumTheme {
+        Column {
+            ExpandableQuestCard(
+                lecture = LectureDetail(
+                    lectureId = 1,
+                    orderSeq = 1,
+                    courseTime = 6,
+                    title = "결심을 넘어 행동으로!",
+                    preview = "즉각적인 실행력과 지속적인 루틴을 구축할거에요.",
+                    lectureStatus = "IN_PROGRESS",
+                    isInProgress = true,
+                    isFinished = false
+                )
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+fun QuestScreenPreview() {
+    WizdumTheme {
+        QuestContent(questInfo = QuestResponse())
+    }
+}
