@@ -2,6 +2,7 @@ package com.teamwizdum.wizdum.feature.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -40,8 +42,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.teamwizdum.wizdum.data.model.ChatMessage
+import com.teamwizdum.wizdum.data.model.MessageContent
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.designsystem.theme.robotoFontFamily
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
@@ -61,7 +67,8 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
                 .fillMaxSize()
         ) {
             ChatMessages(
-                modifier = Modifier
+                modifier = Modifier,
+                message
             )
         }
     }
@@ -89,21 +96,37 @@ fun ChatTopBar() {
 }
 
 @Composable
-fun ChatMessages(modifier: Modifier) {
+fun ChatMessages(modifier: Modifier, messageList: List<ChatMessage>) {
     // 최신 메세지가 아래에서부터 쌓이도록 설정
-    LazyColumn(modifier = Modifier.padding(top = 16.dp, start = 12.dp, end = 12.dp)) {
-        items(10) {
-            ChatWithProfileBubble()
+    LazyColumn(
+        modifier = Modifier.padding(top = 16.dp, start = 12.dp, end = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        items(messageList) {message ->
+            when(message.type) {
+                "USER_REQUEST" -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        message.message.content?.let {
+                            ChatBubble(message = it, modifier)
+                        }
+                    }
+                }
+                "MENTOR_RESPONSE" -> {
+                    message.message.content?.let { ChatWithProfileBubble(message = it) }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun ChatBubble(message: String) {
-    // 채팅 Id? or isSentByMe와 같은 상태에 따라 나-멘토 체팅 구분, 정렬
+fun ChatBubble(message: String, modifier: Modifier) {
     Text(
-        text = "반갑다 유니. 반갑다 유니. 반갑다 유니",
-        modifier = Modifier
+        text = message,
+        modifier = modifier
             .background(
                 color = Color.Gray,
                 shape = RoundedCornerShape(10.dp)
@@ -116,7 +139,7 @@ fun ChatBubble(message: String) {
 }
 
 @Composable
-fun ChatWithProfileBubble() {
+fun ChatWithProfileBubble(message: String) {
     Row {
         Box(
             modifier = Modifier
@@ -129,14 +152,14 @@ fun ChatWithProfileBubble() {
             Text(text = "스파르타", style = WizdumTheme.typography.body2_semib)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "반갑다 유니. 반갑다 유니. 반갑다 유니",
+                text = message,
                 modifier = Modifier
                     .background(
                         color = Color.Gray,
                         shape = RoundedCornerShape(10.dp)
                     )
                     .padding(8.dp)
-                    .widthIn(max = 130.dp),
+                    .widthIn(max = 150.dp),
                 style = WizdumTheme.typography.body2,
                 softWrap = true
             )
@@ -182,19 +205,57 @@ fun ChatTextField(viewModel: ChatViewModel) {
                 .height(40.dp)
                 .background(color = Color.Black)
                 .clickable {
-                    viewModel.sendMessage(1, text)
+                    if (viewModel.isFirst) {
+                        val message = ChatMessage(
+                            type = "USER_REQUEST",
+                            name = "유니",
+                            timestamp = LocalDate
+                                .now()
+                                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                            accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiLjhYXjhYciLCJhdXRoIjpbXSwiaWQiOjE2LCJuYW1lIjoi44WF44WHIiwicGFzc3dvcmQiOiIiLCJpYXQiOjE3NDA3OTYyODAsImV4cCI6MTc0MzM4ODI4MH0.5R87Fmqa4KnPHBY9GQJ7CVn4nwpsFYDtV88sIxIsFYU",
+                            lectureId = 1,
+                            message = MessageContent(
+                                content = "",
+                                isFinish = false,
+                                isLast = false
+                            ),
+                            isHide = true,
+                        )
+                        viewModel.isFirst = false
+                        viewModel.sendMessage(message)
+                        text = ""
+                    } else {
+                        val message = ChatMessage(
+                            type = "USER_REQUEST",
+                            name = "",
+                            timestamp = System
+                                .currentTimeMillis()
+                                .toString(),
+                            accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiLjhYXjhYciLCJhdXRoIjpbXSwiaWQiOjE2LCJuYW1lIjoi44WF44WHIiwicGFzc3dvcmQiOiIiLCJpYXQiOjE3NDA3OTcxNjAsImV4cCI6MTc0MzM4OTE2MH0._hEeo0mCNgp2be2sbmuF7APAqGghZfdMncUxiCUzhpk",
+                            lectureId = 1,
+                            message = MessageContent(
+                                content = text,
+                                isFinish = false,
+                                isLast = false
+                            ),
+                            isHide = false,
+                        )
+                        viewModel.sendMessage(message)
+                        text = ""
+                    }
+
                 }
         )
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ChatBubblePreview() {
-    WizdumTheme {
-        ChatWithProfileBubble()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ChatBubblePreview() {
+//    WizdumTheme {
+//        ChatWithProfileBubble()
+//    }
+//}
 
 //@Preview(showBackground = true)
 //@Composable

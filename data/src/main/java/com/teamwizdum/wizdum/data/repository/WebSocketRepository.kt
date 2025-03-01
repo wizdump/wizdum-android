@@ -1,8 +1,11 @@
 package com.teamwizdum.wizdum.data.repository
 
+import com.teamwizdum.wizdum.data.model.ChatMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -25,7 +28,7 @@ class WebSocketRepository @Inject constructor() {
         .build()
 
     private var webSocket: WebSocket? = null
-    private val messageChannel = Channel<String>(Channel.BUFFERED)
+    private val messageChannel = Channel<ChatMessage>(Channel.BUFFERED)
 
     fun connect() {
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
@@ -38,7 +41,12 @@ class WebSocketRepository @Inject constructor() {
                 super.onMessage(webSocket, text)
                 Timber.tag("CHAT").d("socket message: $text")
 
-                messageChannel.trySend(text).isSuccess
+                try {
+                    val message = Json.decodeFromString<ChatMessage>(text)
+                    messageChannel.trySend(message).isSuccess
+                } catch (e: Exception) {
+                    Timber.tag("CHAT").d("Parsing error: $e")
+                }
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
@@ -53,10 +61,10 @@ class WebSocketRepository @Inject constructor() {
         })
     }
 
-    fun sendMessage(questId: Int, message: String) {
-        val jsonMessage = """{"questId":$questId, "message":"$message"}"""
+    fun sendMessage(messageData: ChatMessage) {
+        val jsonMessage = Json.encodeToString(messageData)
         webSocket?.send(jsonMessage)
-        Timber.tag("CHAT").d("메세지 전송 : $message")
+        Timber.tag("CHAT").d("메세지 전송 : $jsonMessage")
     }
 
     fun close() {
@@ -64,5 +72,5 @@ class WebSocketRepository @Inject constructor() {
         webSocket = null
     }
 
-    fun observeMessage(): Flow<String> = messageChannel.receiveAsFlow()
+    fun observeMessage(): Flow<ChatMessage> = messageChannel.receiveAsFlow()
 }
