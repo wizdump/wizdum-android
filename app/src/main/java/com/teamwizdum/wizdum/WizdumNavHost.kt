@@ -7,13 +7,15 @@ import com.teamwizdum.wizdum.feature.login.LoginViewModel
 import com.teamwizdum.wizdum.feature.login.loginScreen
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
+import com.teamwizdum.wizdum.feature.quest.QuestViewModel
 import com.teamwizdum.wizdum.feature.quest.questScreen
 
 @Composable
 fun WizdumNavHost(
     navController: NavHostController,
     loginViewModel: LoginViewModel,
-    onBoardingViewModel: OnboardingViewModel
+    onBoardingViewModel: OnboardingViewModel,
+    questViewModel: QuestViewModel
 ) {
     NavHost(
         navController = navController,
@@ -21,6 +23,6 @@ fun WizdumNavHost(
     ) {
         loginScreen(navController, loginViewModel)
         onboardingScreen(navController, onBoardingViewModel)
-        questScreen(navController)
+        questScreen(navController, questViewModel)
     }
 }

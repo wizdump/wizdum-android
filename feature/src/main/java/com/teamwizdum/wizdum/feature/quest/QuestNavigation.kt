@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
-fun NavGraphBuilder.questScreen(navController: NavHostController) {
+fun NavGraphBuilder.questScreen(navController: NavHostController, viewModel: QuestViewModel) {
     composable(route = "QUEST") {
-        QuestScreen()
+        QuestScreen(navController = navController, viewModel = viewModel)
     }
 }
