@@ -27,6 +27,6 @@ fun WizdumNavHost(
         loginScreen(navController, loginViewModel)
         onboardingScreen(navController, onBoardingViewModel)
         questScreen(navController, questViewModel)
-        chatScreen(chatViewModel)
+        chatScreen(navController, chatViewModel)
     }
 }

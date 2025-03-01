@@ -16,15 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
+import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
 fun QuestAllClearScreen() {
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        CloseAppBar()
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 176.dp, start = 32.dp, end = 32.dp, bottom = 80.dp),
+                .padding(top = 150.dp, start = 32.dp, end = 32.dp, bottom = 80.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -40,13 +43,10 @@ fun QuestAllClearScreen() {
             )
             Spacer(modifier = Modifier.height(48.dp))
             Spacer(modifier = Modifier.weight(1f))
-//            BasicButton(
-//                title = "리워드 받기",
-//                bodyColor = Color.Green,
-//                textColor = Color.Black,
-//            ) {
-//                // TODO : 리워드 화면으로 이동
-//            }
+
+            WizdumFilledButton(title = "리워드 받기") {
+                
+            }
         }
     }
 }

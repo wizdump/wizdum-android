@@ -65,7 +65,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
+fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), onNavigateToClear: () -> Unit) {
 
 
     LaunchedEffect(Unit) {
@@ -74,11 +74,15 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
 
     val message = viewModel.message.collectAsState().value
 
-    ChantContent(message, viewModel)
+    ChantContent(message, viewModel, onNavigateToClear)
 }
 
 @Composable
-private fun ChantContent(message: List<ChatMessage>, viewModel: ChatViewModel) {
+private fun ChantContent(
+    message: List<ChatMessage>,
+    viewModel: ChatViewModel,
+    onNavigateToClear: () -> Unit,
+) {
     val listState = rememberLazyListState()
 
     LaunchedEffect(message.size) {
@@ -98,14 +102,15 @@ private fun ChantContent(message: List<ChatMessage>, viewModel: ChatViewModel) {
                 .fillMaxWidth()
                 .weight(1f),
             messageList = message,
-            listState = listState
+            listState = listState,
+            onNavigateToClear = onNavigateToClear
         )
         ChatTextField(viewModel = viewModel)
     }
 }
 
 @Composable
-fun ChatMessages(modifier: Modifier, messageList: List<ChatMessage>, listState: LazyListState) {
+fun ChatMessages(modifier: Modifier, messageList: List<ChatMessage>, listState: LazyListState, onNavigateToClear: () -> Unit) {
     LazyColumn(
         modifier = modifier
             .padding(start = 16.dp, end = 16.dp)
@@ -137,7 +142,7 @@ fun ChatMessages(modifier: Modifier, messageList: List<ChatMessage>, listState: 
             }
 
             if (message.message.isFinish) { // 완료된 학습 방이 아니고, 마지막 메세지가 isFinish인 경우
-                ChatSelectionBox()
+                ChatSelectionBox(onNavigateToClear)
             }
         }
     }
@@ -207,7 +212,7 @@ fun ChatHeader(mentorName: String) {
 }
 
 @Composable
-private fun ChatSelectionBox() {
+private fun ChatSelectionBox(onNavigateToClear: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -231,7 +236,7 @@ private fun ChatSelectionBox() {
         WizdumFilledButton(
             title = "강의를 완료할게요",
             textStyle = WizdumTheme.typography.body3_semib
-        ) { /*강의 종료 -> 계속하기 화면 or 리워드 가기 화면 */ }
+        ) { /*강의 종료 -> 계속하기 화면 or 리워드 가기 화면 */ onNavigateToClear() }
         Spacer(modifier = Modifier.height(8.dp))
         WizdumBorderButton(
             title = "더 물어볼래요",
@@ -311,7 +316,7 @@ fun ChatTextField(viewModel: ChatViewModel) {
 @Composable
 fun ChatSelectionBoxPreview() {
     WizdumTheme {
-        ChatSelectionBox()
+        ChatSelectionBox() {}
     }
 }
 
