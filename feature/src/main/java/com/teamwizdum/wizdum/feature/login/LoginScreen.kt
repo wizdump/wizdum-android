@@ -29,12 +29,15 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) {
-    LoginContent(viewModel)
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onNavigateNext: () -> Unit,
+) {
+    LoginContent(viewModel, onNavigateNext)
 }
 
 @Composable
-private fun LoginContent(viewModel: LoginViewModel) {
+private fun LoginContent(viewModel: LoginViewModel, onNavigateNext: () -> Unit) {
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -59,7 +62,9 @@ private fun LoginContent(viewModel: LoginViewModel) {
             Text(text = "맞춤형 멘토추천과 학습기록 저장이 가능해요!", style = WizdumTheme.typography.body1)
             Spacer(modifier = Modifier.height(32.dp))
             kakaoLoginButton(context = context, onKakaoSuccess = { accessToken ->
-                viewModel.login(accessToken)
+                viewModel.login(accessToken = accessToken, onSuccess = {
+                    onNavigateNext()
+                })
             })
         }
     }

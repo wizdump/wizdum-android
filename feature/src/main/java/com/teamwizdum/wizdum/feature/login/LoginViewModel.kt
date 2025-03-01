@@ -15,13 +15,23 @@ class LoginViewModel @Inject constructor(
     private val userRepository: UserRepository,
 ) : ViewModel() {
 
-    fun login(accessToken: String) {
+    fun login(accessToken: String, onSuccess: () -> Unit) {
         viewModelScope.launch {
+            // 임시 자동 로그인
+            val token = tokenRepository.getAccessToken()
+
+            if (!token.isNullOrEmpty()) {
+                onSuccess()
+                return@launch
+            }
+
             userRepository.login(accessToken).collect {
                 tokenRepository.saveTokens(
                     accessToken = it.accessToken,
                     refreshToken = it.refreshToken
                 )
+
+                onSuccess()
 
                 Timber.d("accessToken 저장됨 : ${tokenRepository.getAccessToken()}")
             }

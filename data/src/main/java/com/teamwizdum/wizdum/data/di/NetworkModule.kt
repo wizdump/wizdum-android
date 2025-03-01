@@ -1,6 +1,7 @@
 package com.teamwizdum.wizdum.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.teamwizdum.wizdum.data.network.TokenInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,8 +46,10 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideOkHttpClient(
+        tokenInterceptor: TokenInterceptor,
         loggingInterceptor: HttpLoggingInterceptor,
     ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(tokenInterceptor)
         .addInterceptor(loggingInterceptor)
         .build()
 
