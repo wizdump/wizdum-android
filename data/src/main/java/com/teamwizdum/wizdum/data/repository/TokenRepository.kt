@@ -1,10 +1,11 @@
 package com.teamwizdum.wizdum.data.repository
 
-import android.content.Context
+import android.app.Application
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import javax.inject.Inject
 
-class TokenRepository(context: Context) {
+class TokenRepository @Inject constructor(context: Application) {
 
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)

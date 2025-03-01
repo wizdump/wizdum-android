@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.hilt.navigation.compose)
     implementation(libs.timber)
+    implementation(libs.coil.compose)
 
     implementation(libs.kakao.sdk.user)
 

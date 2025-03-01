@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class QuestionResponse(
+    val questionId: Int = 0,
     val content: String,
     val level: String,
-    val questionId: Int
 )
