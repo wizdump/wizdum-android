@@ -21,7 +21,9 @@ class LoginViewModel @Inject constructor(
             val token = tokenRepository.getAccessToken()
 
             if (!token.isNullOrEmpty()) {
-                onSuccess()
+                startQuest(1) {
+                    onSuccess()
+                }
                 return@launch
             }
 
@@ -34,6 +36,14 @@ class LoginViewModel @Inject constructor(
                 onSuccess()
 
                 Timber.d("accessToken 저장됨 : ${tokenRepository.getAccessToken()}")
+            }
+        }
+    }
+
+    fun startQuest(mentorId: Int, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            userRepository.startQuest(mentorId = mentorId).collect {
+                onSuccess()
             }
         }
     }

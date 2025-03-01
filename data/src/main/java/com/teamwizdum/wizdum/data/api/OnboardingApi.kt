@@ -4,8 +4,9 @@ import com.teamwizdum.wizdum.data.model.response.KeywordResponse
 import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.model.response.QuestionResponse
-import retrofit2.http.Body
+import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -18,7 +19,7 @@ interface OnboardingApi {
         @Query("keywordId") keywordId: Int,
     ): List<QuestionResponse>
 
-    @GET("/mentos")
+    @GET("mentos")
     suspend fun getMentors(
         @Query("categoryId") categoryId: Int,
         @Query("useAiMento") useAiMentor: Boolean
@@ -29,4 +30,9 @@ interface OnboardingApi {
         @Path("mentoId") pathMentorId: Int,
         @Query("mentoId") queryMentorId: Int
     ): MentorDetailResponse
+
+    @POST("lectures")
+    suspend fun startQuest(
+        @Query("mentoId") mentorId: Int
+    ): Response<Unit>
 }
