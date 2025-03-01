@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.teamwizdum.wizdum.designsystem.component.BasicButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -41,13 +40,13 @@ fun QuestAllClearScreen() {
             )
             Spacer(modifier = Modifier.height(48.dp))
             Spacer(modifier = Modifier.weight(1f))
-            BasicButton(
-                title = "리워드 받기",
-                bodyColor = Color.Green,
-                textColor = Color.Black,
-            ) {
-                // TODO : 리워드 화면으로 이동
-            }
+//            BasicButton(
+//                title = "리워드 받기",
+//                bodyColor = Color.Green,
+//                textColor = Color.Black,
+//            ) {
+//                // TODO : 리워드 화면으로 이동
+//            }
         }
     }
 }

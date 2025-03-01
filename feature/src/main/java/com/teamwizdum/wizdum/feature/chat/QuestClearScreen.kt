@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.teamwizdum.wizdum.designsystem.component.BasicButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -43,13 +42,13 @@ fun QuestClearScreen() {
             Spacer(modifier = Modifier.height(48.dp))
             MentorCommentBox()
             Spacer(modifier = Modifier.weight(1f))
-            BasicButton(
-                title = "계속하기",
-                bodyColor = Color.Green,
-                textColor = Color.Black,
-            ) {
-                // TODO : 퀘스트 목록 화면으로 이동
-            }
+//            BasicButton(
+//                title = "계속하기",
+//                bodyColor = Color.Green,
+//                textColor = Color.Black,
+//            ) {
+//                // TODO : 퀘스트 목록 화면으로 이동
+//            }
         }
     }
 }
