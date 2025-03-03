@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.feature.onboarding
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +40,6 @@ import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
-import com.teamwizdum.wizdum.feature.onboarding.info.Level
 
 @Composable
 fun QuestionSelectionScreen(
@@ -145,10 +144,9 @@ private fun QuestionCard(
                 LevelInfo(level = level)
             }
             if (isSelected)
-                Icon(
+                Image(
                     painter = painterResource(id = R.drawable.ic_checked),
                     contentDescription = "체크 아이콘",
-                    tint = WizdumTheme.colorScheme.primary // TODO: 체크 리소스 이상함. 재요청 필요
                 )
         }
     }

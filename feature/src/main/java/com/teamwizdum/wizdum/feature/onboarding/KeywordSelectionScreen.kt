@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.feature.onboarding
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -148,7 +148,7 @@ private fun KeywordCard(
             .clip(RoundedCornerShape(10.dp))
             .background(color = Color.White)
             .border(
-                width = 1.dp,
+                width = 2.dp,
                 color = if (isSelected) WizdumTheme.colorScheme.primary else Color.White,
                 shape = RoundedCornerShape(10.dp)
             )
@@ -177,10 +177,9 @@ private fun KeywordCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (isSelected)
-                    Icon(
+                    Image(
                         painter = painterResource(id = R.drawable.ic_checked),
                         contentDescription = "체크 아이콘",
-                        tint = WizdumTheme.colorScheme.primary // TODO: 체크 리소스 이상함. 재요청 필요
                     )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
@@ -211,7 +210,7 @@ fun KeywordSelectionScreenPreview() {
     WizdumTheme {
         val keywordList = listOf(
             KeywordResponse(value = "도전적인"),
-            KeywordResponse(value = "차분한"),
+            KeywordResponse(value = "성취 지향적인"),
             KeywordResponse(value = "감성적인"),
             KeywordResponse(value = "창의적인"),
             KeywordResponse(value = "사색적인"),
