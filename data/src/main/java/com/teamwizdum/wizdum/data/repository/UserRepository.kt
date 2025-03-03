@@ -11,14 +11,9 @@ import javax.inject.Inject
 
 class UserRepository @Inject constructor(
     private val authApi: AuthApi,
-    private val onboardingApi: OnboardingApi,
 ) {
 
     suspend fun login(accessToken: String): Flow<TokenResponse> = flow {
         emit(authApi.login(TokenRequest(accessToken = accessToken)))
-    }
-
-    suspend fun startQuest(mentorId: Int): Flow<Response<Unit>> = flow {
-        emit(onboardingApi.startQuest(mentorId = mentorId))
     }
 }

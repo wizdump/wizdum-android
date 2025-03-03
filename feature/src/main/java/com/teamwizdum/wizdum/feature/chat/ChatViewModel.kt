@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.data.model.MessageContent
+import com.teamwizdum.wizdum.data.repository.QuestRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import com.teamwizdum.wizdum.data.repository.WebSocketRepository
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
+import com.teamwizdum.wizdum.feature.chat.info.QuestClearData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val repository: WebSocketRepository,
-    private val tokenRepository: TokenRepository
+    private val webSocketRepository: WebSocketRepository,
+    private val tokenRepository: TokenRepository,
+    private val questRepository: QuestRepository,
 ) : ViewModel() {
 
     private val token = tokenRepository.getAccessToken() ?: ""
@@ -28,12 +31,15 @@ class ChatViewModel @Inject constructor(
 
     private var receivedMessage = StringBuilder()
 
+    var questClearData = QuestClearData()
+
     fun initialize() {
-        repository.connect()
+        webSocketRepository.connect()
 
         viewModelScope.launch(Dispatchers.Main) {
+            //getChatList(1)
 
-            repository.observeMessage().collect { message ->
+            webSocketRepository.observeMessage().collect { message ->
                 if (!message.message.isLast) {
                     receivedMessage.append(message.message.content)
 
@@ -58,12 +64,34 @@ class ChatViewModel @Inject constructor(
             message = MessageContent(content = message),
             isHide = false,
         )
-        repository.sendMessage(senderMessage)
+        webSocketRepository.sendMessage(senderMessage)
         _message.value += senderMessage
+    }
+
+    fun getChatList(lectureId: Int) {
+        viewModelScope.launch {
+            questRepository.getChatList(lectureId).collect {
+                questRepository.getChatList(lectureId).collect {
+                    _message.value = it
+                }
+            }
+        }
+    }
+
+    fun finishQuest(lectureId: Int, onSuccess: (String) -> Unit) {
+        viewModelScope.launch {
+            questRepository.finishQuest(lectureId).collect {
+                onSuccess(it.encouragement)
+            }
+        }
+    }
+
+    fun updateQuestClearData(data: QuestClearData) {
+        questClearData = data
     }
 
     override fun onCleared() {
         super.onCleared()
-        repository.close()
+        webSocketRepository.close()
     }
 }

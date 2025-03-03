@@ -12,7 +12,6 @@ data class ChatMessage(
     val message: MessageContent,
     val isHide: Boolean? = true, // 첫 대화 여부 (첫 대화인 경우 true)
     val timestamp: String = LocalDate.now().toString(),
-
 )
 
 @Serializable

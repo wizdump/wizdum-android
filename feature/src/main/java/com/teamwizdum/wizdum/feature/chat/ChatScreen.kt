@@ -60,12 +60,16 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.designsystem.theme.robotoFontFamily
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
+import com.teamwizdum.wizdum.feature.chat.info.QuestClearData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun ChatScreen(viewModel: ChatViewModel = hiltViewModel(), onNavigateToClear: () -> Unit) {
+fun ChatScreen(
+    viewModel: ChatViewModel = hiltViewModel(),
+    onNavigateToClear: () -> Unit,
+) {
 
 
     LaunchedEffect(Unit) {
@@ -103,14 +107,30 @@ private fun ChantContent(
                 .weight(1f),
             messageList = message,
             listState = listState,
-            onNavigateToClear = onNavigateToClear
+            onNavigateToClear = {
+                viewModel.finishQuest(1) { encouragement ->
+                    viewModel.updateQuestClearData(QuestClearData(
+                        lectureId = 1,
+                        orderSeq = 1,
+                        lectureName = "결심을 넘어서 행동으로",
+                        mentorName = "스파르타",
+                        encouragement = encouragement
+                    ))
+                    onNavigateToClear()
+                }
+            }
         )
         ChatTextField(viewModel = viewModel)
     }
 }
 
 @Composable
-fun ChatMessages(modifier: Modifier, messageList: List<ChatMessage>, listState: LazyListState, onNavigateToClear: () -> Unit) {
+fun ChatMessages(
+    modifier: Modifier,
+    messageList: List<ChatMessage>,
+    listState: LazyListState,
+    onNavigateToClear: () -> Unit,
+) {
     LazyColumn(
         modifier = modifier
             .padding(start = 16.dp, end = 16.dp)
@@ -236,7 +256,11 @@ private fun ChatSelectionBox(onNavigateToClear: () -> Unit) {
         WizdumFilledButton(
             title = "강의를 완료할게요",
             textStyle = WizdumTheme.typography.body3_semib
-        ) { /*강의 종료 -> 계속하기 화면 or 리워드 가기 화면 */ onNavigateToClear() }
+        ) {
+            /*강의 종료 -> 계속하기 화면*/
+            onNavigateToClear() // TODO: 마지막 강의 여부 Flag 필요한가?
+
+        }
         Spacer(modifier = Modifier.height(8.dp))
         WizdumBorderButton(
             title = "더 물어볼래요",
