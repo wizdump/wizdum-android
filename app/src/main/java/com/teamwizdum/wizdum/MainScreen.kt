@@ -6,11 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,7 +34,11 @@ import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 
 @Composable
-fun MainScreen(navController: NavHostController, onboardingViewModel: OnboardingViewModel, homeViewModel: HomeViewModel) {
+fun MainScreen(
+    navController: NavHostController,
+    onboardingViewModel: OnboardingViewModel,
+    homeViewModel: HomeViewModel,
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         content = { innerPadding ->
@@ -47,17 +55,21 @@ fun MainScreen(navController: NavHostController, onboardingViewModel: Onboarding
         bottomBar = {
             WizdumBottomBar(navController = navController)
         },
+        // Material3에서는 isFloatingActionButtonDocked 옵션 미제공
+        // https://stackoverflow.com/questions/73841364/how-to-make-cradled-fab-in-jetpack-compose-material-3
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("ONBOARDING") },
                 modifier = Modifier
-                    .width(40.dp)
-                    .height(40.dp),
+                    .width(50.dp)
+                    .height(50.dp)
+                    .offset(y = 40.dp),
                 shape = CircleShape, // TODO: 위치 조정 필요
             ) {
                 // TODO: 검색 아이콘 추가
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center,
     )
 }
 
@@ -70,29 +82,42 @@ private fun WizdumBottomBar(navController: NavHostController) {
             .background(color = Color.White),
         contentAlignment = Alignment.Center
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Column(modifier = Modifier.clickable {
-                navController.navigate("HOME")
-            }) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate("HOME")
+                    }
+                    .padding(horizontal = 16.dp)
+            ) {
                 Box(
                     modifier = Modifier
                         .width(32.dp)
                         .height(32.dp)
                         .background(color = Color.Black)
                 )
-                Text(text = "홈")
+                Text(text = "홈", style = WizdumTheme.typography.body3)
             }
-
-            Column(modifier = Modifier.clickable {
-                navController.navigate("MYPAGE")
-            }) {
+            Spacer(modifier = Modifier.width(46.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate("MYPAGE")
+                    }
+                    .padding(horizontal = 16.dp)
+            ) {
                 Box(
                     modifier = Modifier
                         .width(32.dp)
                         .height(32.dp)
                         .background(color = Color.Black)
                 )
-                Text(text = "마이페이지")
+                Text(text = "마이페이지", style = WizdumTheme.typography.body3)
             }
         }
     }
