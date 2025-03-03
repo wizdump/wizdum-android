@@ -31,6 +31,7 @@ hilt = "2.50"
 hilt-navigation-compose = "1.2.0"
 timber = "5.0.1"
 glide = "4.14.2"
+coil = "2.4.0"
 
 appcompat = "1.7.0"
 material = "1.12.0"
@@ -56,6 +57,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-splash-screen" }
 androidx-security = { group = "androidx.security", name = "security-crypto", version.ref = "androidx-security" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }

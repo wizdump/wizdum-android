@@ -1,12 +1,13 @@
 package com.teamwizdum.wizdum.data.api
 
-import com.teamwizdum.wizdum.data.model.request.MentorsRequest
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
+import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.model.response.QuestionResponse
-import retrofit2.http.Body
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface OnboardingApi {
@@ -18,8 +19,20 @@ interface OnboardingApi {
         @Query("keywordId") keywordId: Int,
     ): List<QuestionResponse>
 
-    @POST("/mentos")
-    suspend fun postMentors(
-        @Body mentorsRequest: MentorsRequest
-    ): MentorsResponse
+    @GET("mentos")
+    suspend fun getMentors(
+        @Query("categoryId") categoryId: Int,
+        @Query("useAiMento") useAiMentor: Boolean
+    ): List<MentorsResponse>
+
+    @GET("mentos/{mentoId}")
+    suspend fun getMentorDetail(
+        @Path("mentoId") pathMentorId: Int,
+        @Query("mentoId") queryMentorId: Int
+    ): MentorDetailResponse
+
+    @POST("lectures")
+    suspend fun startQuest(
+        @Query("mentoId") mentorId: Int
+    ): Response<Unit>
 }

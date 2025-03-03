@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class KeywordResponse(
-    val keywordId: Int,
-    val value: String
+    val keywordId: Int = 0,
+    val value: String,
+    val fileUrl: String? = ""
 )

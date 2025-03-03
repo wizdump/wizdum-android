@@ -21,6 +21,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel
     composable(route = "KEYWORD") {
         KeywordSelectionScreen(viewModel = viewModel) {
             navController.navigate(route = "GOAL")
+            //navController.navigate(route = "CHAT")
         }
     }
 
