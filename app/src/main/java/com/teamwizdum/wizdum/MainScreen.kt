@@ -23,18 +23,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
+import com.teamwizdum.wizdum.feature.home.HomeViewModel
 import com.teamwizdum.wizdum.feature.home.homeScreen
 import com.teamwizdum.wizdum.feature.mypage.myPageScreen
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 
 @Composable
-fun MainScreen(navController: NavHostController, onboardingViewModel: OnboardingViewModel) {
+fun MainScreen(navController: NavHostController, onboardingViewModel: OnboardingViewModel, homeViewModel: HomeViewModel) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         content = { innerPadding ->
             NavHost(navController = navController, startDestination = Routes.HOME.name) {
-                homeScreen(padding = innerPadding)
+                homeScreen(padding = innerPadding, homeViewModel = homeViewModel)
                 myPageScreen(padding = innerPadding)
                 onboardingScreen(
                     navController = navController,

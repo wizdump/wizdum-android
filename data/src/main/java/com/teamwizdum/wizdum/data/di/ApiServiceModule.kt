@@ -1,6 +1,7 @@
 package com.teamwizdum.wizdum.data.di
 
 import com.teamwizdum.wizdum.data.api.AuthApi
+import com.teamwizdum.wizdum.data.api.HomeApi
 import com.teamwizdum.wizdum.data.api.OnboardingApi
 import com.teamwizdum.wizdum.data.api.QuestApi
 import dagger.Module
@@ -30,5 +31,11 @@ object ApiServiceModule {
     @Provides
     fun provideQuestApi(retrofit: Retrofit): QuestApi {
         return retrofit.create(QuestApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideHomeApi(retrofit: Retrofit): HomeApi {
+        return retrofit.create(HomeApi::class.java)
     }
 }

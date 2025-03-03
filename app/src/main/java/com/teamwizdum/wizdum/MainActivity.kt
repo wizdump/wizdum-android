@@ -5,10 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.login.LoginViewModel
 import com.teamwizdum.wizdum.feature.chat.ChatViewModel
+import com.teamwizdum.wizdum.feature.home.HomeViewModel
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.quest.QuestViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,6 +22,7 @@ class MainActivity : ComponentActivity() {
     private val loginViewModel: LoginViewModel by viewModels()
     private val questViewModel: QuestViewModel by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -39,7 +42,11 @@ class MainActivity : ComponentActivity() {
 //                    chatViewModel = chatViewModel
 //                )
 
-                MainScreen(navController = naviController, onboardingViewModel = onboardingViewModel)
+                MainScreen(
+                    navController = naviController,
+                    onboardingViewModel = onboardingViewModel,
+                    homeViewModel = homeViewModel
+                )
             }
         }
     }

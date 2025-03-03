@@ -44,3 +44,18 @@ fun LevelInfo(level: String) {
         )
     }
 }
+
+@Composable
+fun LevelStarRating(level: String) {
+    val levelEnum = Level.fromString(level)
+
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(text = "레벨", style = WizdumTheme.typography.body2, color = Black500)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = levelEnum.rating,
+            style = WizdumTheme.typography.body2,
+            color = Black500
+        )
+    }
+}
