@@ -25,10 +25,9 @@ fun WizdumNavHost(
         startDestination = Routes.ONBOARDING.name
     ) {
         loginScreen(navController, loginViewModel)
-        onboardingScreen(navController, onBoardingViewModel)
+        //onboardingScreen(navController, onBoardingViewModel)
         questScreen(navController, questViewModel)
         chatScreen(navController, chatViewModel)
-        loginScreen()
         //onboardingScreen(navController, viewModel)
     }
 }

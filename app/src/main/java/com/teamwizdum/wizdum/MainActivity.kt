@@ -31,14 +31,14 @@ class MainActivity : ComponentActivity() {
             WizdumTheme {
                 val naviController = rememberNavController()
 
-                WizdumNavHost(
-                    navController = naviController,
-                    loginViewModel = loginViewModel,
-                    onBoardingViewModel = onboardingViewModel,
-                    questViewModel = questViewModel,
-                    chatViewModel = chatViewModel
-                )
-//                WizdumNavHost(navController = naviController, viewModel = onboardingViewModel)
+//                WizdumNavHost(
+//                    navController = naviController,
+//                    loginViewModel = loginViewModel,
+//                    onBoardingViewModel = onboardingViewModel,
+//                    questViewModel = questViewModel,
+//                    chatViewModel = chatViewModel
+//                )
+
                 MainScreen(navController = naviController, onboardingViewModel = onboardingViewModel)
             }
         }
