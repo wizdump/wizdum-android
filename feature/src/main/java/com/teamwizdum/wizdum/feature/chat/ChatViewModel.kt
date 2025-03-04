@@ -37,7 +37,8 @@ class ChatViewModel @Inject constructor(
         webSocketRepository.connect()
 
         viewModelScope.launch(Dispatchers.Main) {
-            //getChatList(1)
+
+            getChatList(1)
 
             webSocketRepository.observeMessage().collect { message ->
                 if (!message.message.isLast) {

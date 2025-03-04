@@ -11,6 +11,7 @@ import com.teamwizdum.wizdum.feature.login.LoginViewModel
 import com.teamwizdum.wizdum.feature.chat.ChatViewModel
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.quest.QuestViewModel
+import com.teamwizdum.wizdum.feature.reward.RewardViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,6 +21,8 @@ class MainActivity : ComponentActivity() {
     private val loginViewModel: LoginViewModel by viewModels()
     private val questViewModel: QuestViewModel by viewModels()
     private val chatViewModel: ChatViewModel by viewModels()
+    private val rewardViewModel: RewardViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,7 +39,8 @@ class MainActivity : ComponentActivity() {
                     loginViewModel = loginViewModel,
                     onBoardingViewModel = onboardingViewModel,
                     questViewModel = questViewModel,
-                    chatViewModel = chatViewModel
+                    chatViewModel = chatViewModel,
+                    rewardViewModel = rewardViewModel
                 )
             }
         }

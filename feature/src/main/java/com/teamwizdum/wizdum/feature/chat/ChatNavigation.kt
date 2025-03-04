@@ -3,6 +3,7 @@ package com.teamwizdum.wizdum.feature.chat
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import com.teamwizdum.wizdum.feature.quest.QuestAllClearScreen
 
 fun NavGraphBuilder.chatScreen(navController: NavHostController, viewModel: ChatViewModel) {
     composable(route = "CHAT") {
@@ -17,7 +18,9 @@ fun NavGraphBuilder.chatScreen(navController: NavHostController, viewModel: Chat
         })
     }
 
-    composable(route = "ALL_CLEAR") {
-        QuestAllClearScreen()
-    }
+//    composable(route = "ALL_CLEAR") {
+//        QuestAllClearScreen(onNavigateNext = {
+//            navController.navigate("REWARD")
+//        })
+//    }
 }

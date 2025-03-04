@@ -45,11 +45,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.teamwizdum.wizdum.data.model.response.LectureDetail
 import com.teamwizdum.wizdum.data.model.response.QuestResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.badge.TextBadge
+import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black300
 import com.teamwizdum.wizdum.designsystem.theme.Black600
@@ -65,18 +65,26 @@ import com.teamwizdum.wizdum.feature.quest.component.StatusCircle
 import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
 
 @Composable
-fun QuestScreen(viewModel: QuestViewModel, onNavigateNext: () -> Unit) {
+fun QuestScreen(
+    viewModel: QuestViewModel,
+    onNavigateToChat: () -> Unit,
+    onNavigateToQuestALlClear: (Int, String) -> Unit,
+) {
     LaunchedEffect(Unit) {
         viewModel.getQuest(1)
     }
 
     val questInfo = viewModel.quests.collectAsState().value
 
-    QuestContent(questInfo, onNavigateNext)
+    QuestContent(questInfo, onNavigateToChat, onNavigateToQuestALlClear)
 }
 
 @Composable
-private fun QuestContent(questInfo: QuestResponse, onNavigateNext: () -> Unit) {
+private fun QuestContent(
+    questInfo: QuestResponse,
+    onNavigateToChat: () -> Unit,
+    onNavigateToReward: (Int, String) -> Unit,
+) {
     var columnHeightFraction by remember { mutableStateOf(0.6f) }
     val animatedHeight by animateFloatAsState(targetValue = columnHeightFraction, label = "")
 
@@ -160,14 +168,23 @@ private fun QuestContent(questInfo: QuestResponse, onNavigateNext: () -> Unit) {
             itemsIndexed(
                 questInfo.lectures,
                 key = { index, item -> item.lectureId }) { index, item ->
-                QuestItem(lecture = item, onNavigateNext = { onNavigateNext() })
+                QuestItem(lecture = item, onNavigateToChat = { onNavigateToChat() })
             }
+        }
+
+        WizdumFilledButton(
+            title = "리워드 받기",
+            modifier = Modifier
+                .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
+                .align(Alignment.BottomCenter)
+        ) {
+            onNavigateToReward(questInfo.mentoId, questInfo.mentoName)
         }
     }
 }
 
 @Composable
-private fun QuestItem(lecture: LectureDetail, onNavigateNext: () -> Unit) {
+private fun QuestItem(lecture: LectureDetail, onNavigateToChat: () -> Unit) {
     var rowHeight by remember { mutableStateOf(71) }
 
     Row {
@@ -185,7 +202,7 @@ private fun QuestItem(lecture: LectureDetail, onNavigateNext: () -> Unit) {
         ExpandableQuestCard(
             lecture = lecture,
             onHeightChanged = { newHeight -> rowHeight = newHeight },
-            onNavigateNext = { onNavigateNext() }
+            onNavigateToChat = { onNavigateToChat() }
         )
     }
 }
@@ -195,7 +212,7 @@ private fun QuestItem(lecture: LectureDetail, onNavigateNext: () -> Unit) {
 fun ExpandableQuestCard(
     lecture: LectureDetail,
     onHeightChanged: (Int) -> Unit = {},
-    onNavigateNext: () -> Unit,
+    onNavigateToChat: () -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(lecture.isInProgress) }
     val cardHeight by animateDpAsState(
@@ -256,13 +273,13 @@ fun ExpandableQuestCard(
             if (lecture.lectureStatus == QuestStatus.DONE.name) {
                 QuestRetryButton(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    onNavigateNext = { onNavigateNext() },
+                    onNavigateToChat = { onNavigateToChat() },
                     onClick = {}
                 )
             } else {
                 QuestStartButton(
                     modifier = Modifier.align(Alignment.BottomCenter),
-                    onNavigateNext = { onNavigateNext() }
+                    onNavigateToChat = { onNavigateToChat() }
                 )
             }
         } else {
@@ -318,7 +335,7 @@ fun ExpandableQuestCard(
 @Composable
 private fun QuestStartButton(
     modifier: Modifier,
-    onNavigateNext: () -> Unit,
+    onNavigateToChat: () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -327,7 +344,7 @@ private fun QuestStartButton(
             .background(color = WizdumTheme.colorScheme.primary)
             .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
             .clickable {
-                onNavigateNext()
+                onNavigateToChat()
             },
         contentAlignment = Alignment.Center
     ) {
@@ -342,7 +359,7 @@ private fun QuestStartButton(
 @Composable
 private fun QuestRetryButton(
     modifier: Modifier,
-    onNavigateNext: () -> Unit,
+    onNavigateToChat: () -> Unit,
     onClick: () -> Unit,
 ) {
     Box(
@@ -369,7 +386,7 @@ private fun QuestRetryButton(
                     text = "다시하기",
                     style = WizdumTheme.typography.body1,
                     modifier = modifier.clickable {
-                        onNavigateNext()
+                        onNavigateToChat()
                     }
                 )
                 Image(
@@ -426,6 +443,10 @@ fun ExpandableQuestCardPreview() {
 @Composable
 fun QuestScreenPreview() {
     WizdumTheme {
-        QuestContent(questInfo = QuestResponse()) {}
+        QuestContent(
+            questInfo = QuestResponse(),
+            onNavigateToChat = {},
+            onNavigateToReward = { _, _ -> }
+        )
     }
 }
