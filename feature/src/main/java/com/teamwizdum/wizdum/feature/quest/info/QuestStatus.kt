@@ -29,7 +29,7 @@ enum class QuestStatus(
     ),
     IN_PROGRESS(
         text = "수강중",
-        textColor = Warning,
+        textColor = Green200,
         borderColor = Green200,
         backgroundColor = Green50,
         badgeIconRes = R.drawable.ic_badge_in_progress,
