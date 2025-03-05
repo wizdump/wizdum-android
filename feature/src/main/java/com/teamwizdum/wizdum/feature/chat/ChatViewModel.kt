@@ -33,12 +33,12 @@ class ChatViewModel @Inject constructor(
 
     var questClearData = QuestClearData()
 
-    fun initialize() {
+    fun initialize(lectureId: Int) {
         webSocketRepository.connect()
 
         viewModelScope.launch(Dispatchers.Main) {
 
-            getChatList(1)
+            getChatList(lectureId)
 
             webSocketRepository.observeMessage().collect { message ->
                 if (!message.message.isLast) {

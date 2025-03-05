@@ -19,10 +19,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,7 +48,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.LectureDetail
@@ -62,9 +59,7 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black300
-import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
-import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.Green100
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.Success
@@ -74,7 +69,9 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 import com.teamwizdum.wizdum.feature.quest.component.QuestProgressBar
 import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
 import com.teamwizdum.wizdum.feature.quest.component.StatusCircle
+import com.teamwizdum.wizdum.feature.quest.info.ChatRoomInfo
 import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
+import timber.log.Timber
 
 @Composable
 fun QuestScreen(
@@ -87,14 +84,33 @@ fun QuestScreen(
     }
 
     val questInfo = viewModel.quests.collectAsState().value
+    Timber.d("### viewModel: ${viewModel.hashCode()}")
 
-    QuestContent(questInfo, onNavigateToChat, onNavigateToQuestALlClear)
+    QuestContent(
+        questInfo = questInfo,
+        onNavigateToChat = { lectureId, orderSeq, lectureStatus ->
+            viewModel.updateChatRoomInfo(
+                ChatRoomInfo(
+                    mentorName = questInfo.mentoName,
+                    mentorImgUrl = questInfo.filePath ?: "",
+                    userName = questInfo.userName,
+                    lectureTitle = questInfo.mentoLectureTitle,
+                    lectureId = lectureId,
+                    orderSeq = orderSeq,
+                    lectureStatus = lectureStatus,
+                    isLastLecture = questInfo.isLastLecture(orderSeq),
+                )
+            )
+            onNavigateToChat()
+        },
+        onNavigateToQuestALlClear
+    )
 }
 
 @Composable
 fun QuestContent(
     questInfo: QuestResponse,
-    onNavigateToChat: () -> Unit,
+    onNavigateToChat: (Int, Int, String) -> Unit,
     onNavigateToReward: (Int, String) -> Unit,
 ) {
     val minHeightPx = with(LocalDensity.current) { 310.dp.toPx() } // 상단 정보를 보여주기 위한 최소 높이
@@ -217,8 +233,16 @@ fun QuestContent(
                 .align(Alignment.BottomCenter)
         ) {
             items(questInfo.lectures, key = { it.lectureId }) { lecture ->
-                QuestItem(lecture = lecture, onNavigateToChat = { onNavigateToChat() })
-
+                QuestItem(
+                    lecture = lecture,
+                    onNavigateToChat = {
+                        onNavigateToChat(
+                            lecture.lectureId,
+                            lecture.orderSeq,
+                            lecture.lectureStatus
+                        )
+                    }
+                )
             }
         }
 
@@ -534,7 +558,7 @@ fun QuestScreenPreview() {
                     )
                 )
             ),
-            onNavigateToChat = {},
+            onNavigateToChat = { _, _, _ -> },
             onNavigateToReward = { _, _ -> }
         )
     }

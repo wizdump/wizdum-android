@@ -10,6 +10,7 @@ import com.teamwizdum.wizdum.feature.login.loginScreen
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 import com.teamwizdum.wizdum.feature.quest.QuestViewModel
+import com.teamwizdum.wizdum.feature.quest.info.ChatRoomInfo
 import com.teamwizdum.wizdum.feature.quest.navigation.questScreen
 import com.teamwizdum.wizdum.feature.reward.RewardViewModel
 import com.teamwizdum.wizdum.feature.reward.rewardScreen
@@ -21,7 +22,7 @@ fun WizdumNavHost(
     onBoardingViewModel: OnboardingViewModel,
     questViewModel: QuestViewModel,
     chatViewModel: ChatViewModel,
-    rewardViewModel: RewardViewModel
+    rewardViewModel: RewardViewModel,
 ) {
     NavHost(
         navController = navController,

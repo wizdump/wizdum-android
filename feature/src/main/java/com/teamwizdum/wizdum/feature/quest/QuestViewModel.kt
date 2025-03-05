@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.response.QuestResponse
 import com.teamwizdum.wizdum.data.repository.QuestRepository
 import com.teamwizdum.wizdum.data.repository.RewardRepository
+import com.teamwizdum.wizdum.feature.quest.info.ChatRoomInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +21,8 @@ class QuestViewModel @Inject constructor(
     private val _quests = MutableStateFlow<QuestResponse>(QuestResponse())
     val quests: StateFlow<QuestResponse> = _quests
 
+    var chatRoomInfo = ChatRoomInfo()
+
     fun getQuest(mentorId: Int) {
         viewModelScope.launch {
             questRepository.getQuests(mentorId).collect {
@@ -34,5 +37,9 @@ class QuestViewModel @Inject constructor(
                 onSuccess()
             }
         }
+    }
+
+    fun updateChatRoomInfo(info: ChatRoomInfo) {
+        chatRoomInfo = info
     }
 }

@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.feature.quest.navigation
 
+import android.net.Uri
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -13,7 +14,9 @@ fun NavGraphBuilder.questScreen(navController: NavHostController, viewModel: Que
     composable(route = "QUEST") {
         QuestScreen(
             viewModel = viewModel,
-            onNavigateToChat = { navController.navigate("CHAT") },
+            onNavigateToChat = {
+                navController.navigate("CHAT/${viewModel.chatRoomInfo.lectureId}/${viewModel.chatRoomInfo.orderSeq}/${Uri.encode(viewModel.chatRoomInfo.lectureTitle)}/${viewModel.chatRoomInfo.lectureStatus}/${viewModel.chatRoomInfo.isLastLecture}/${Uri.encode(viewModel.chatRoomInfo.mentorName)}/${Uri.encode(viewModel.chatRoomInfo.mentorImgUrl)}/${viewModel.chatRoomInfo.userName}")
+            },
             onNavigateToQuestALlClear = { lectureId, mentorName ->
                 navController.navigate("QUEST_ALL_CLEAR/$lectureId/$mentorName")
             }

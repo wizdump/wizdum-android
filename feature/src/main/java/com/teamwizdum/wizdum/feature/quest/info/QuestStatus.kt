@@ -43,15 +43,4 @@ enum class QuestStatus(
         badgeIconRes = R.drawable.ic_badge_done,
         questIconRes = R.drawable.ic_quest_done
     );
-
-    companion object {
-        fun fromString(level: String): QuestStatus {
-            return when (level.uppercase()) {
-                "WAIT" -> QuestStatus.WAIT
-                "IN_PROGRESS" -> QuestStatus.IN_PROGRESS
-                "DONE" -> QuestStatus.DONE
-                else -> QuestStatus.WAIT
-            }
-        }
-    }
 }

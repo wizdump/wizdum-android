@@ -17,13 +17,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.HorizontalDivider
@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumBorderButton
@@ -54,6 +57,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black300
 import com.teamwizdum.wizdum.designsystem.theme.Black50
 import com.teamwizdum.wizdum.designsystem.theme.Black500
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
@@ -68,21 +72,49 @@ import java.util.Locale
 @Composable
 fun ChatScreen(
     viewModel: ChatViewModel = hiltViewModel(),
+    lectureId: Int,
+    orderSeq: Int,
+    lectureTitle: String,
+    lectureStatus: String,
+    isLastLecture: Boolean,
+    mentorName: String,
+    mentorImgUrl: String,
+    userName: String,
     onNavigateToClear: () -> Unit,
 ) {
 
 
     LaunchedEffect(Unit) {
-        viewModel.initialize()
+        viewModel.initialize(lectureId)
     }
 
     val message = viewModel.message.collectAsState().value
 
-    ChantContent(message, viewModel, onNavigateToClear)
+    ChantContent(
+        lectureId,
+        orderSeq,
+        lectureTitle,
+        lectureStatus,
+        isLastLecture,
+        mentorName,
+        mentorImgUrl,
+        userName,
+        message,
+        viewModel,
+        onNavigateToClear
+    )
 }
 
 @Composable
 private fun ChantContent(
+    lectureId: Int,
+    orderSeq: Int,
+    lectureTitle: String,
+    lectureStatus: String,
+    isLastLecture: Boolean,
+    mentorName: String,
+    mentorImgUrl: String,
+    userName: String,
     message: List<ChatMessage>,
     viewModel: ChatViewModel,
     onNavigateToClear: () -> Unit,
@@ -99,23 +131,27 @@ private fun ChantContent(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        BackAppBar(title = "결심을 넘어 행동으로")
+        BackAppBar(title = "${orderSeq}강 - ${lectureTitle}")
         HorizontalDivider(thickness = 1.dp, color = Black300)
         ChatMessages(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
+            mentorName = mentorName,
+            mentorImgUrl = mentorImgUrl,
             messageList = message,
             listState = listState,
             onNavigateToClear = {
                 viewModel.finishQuest(1) { encouragement ->
-                    viewModel.updateQuestClearData(QuestClearData(
-                        lectureId = 1,
-                        orderSeq = 1,
-                        lectureName = "결심을 넘어서 행동으로",
-                        mentorName = "스파르타",
-                        encouragement = encouragement
-                    ))
+                    viewModel.updateQuestClearData(
+                        QuestClearData(
+                            lectureId = lectureId,
+                            orderSeq = orderSeq,
+                            lectureName = lectureTitle,
+                            mentorName = mentorName,
+                            encouragement = encouragement
+                        )
+                    )
                     onNavigateToClear()
                 }
             }
@@ -127,6 +163,8 @@ private fun ChantContent(
 @Composable
 fun ChatMessages(
     modifier: Modifier,
+    mentorName: String,
+    mentorImgUrl: String,
     messageList: List<ChatMessage>,
     listState: LazyListState,
     onNavigateToClear: () -> Unit,
@@ -140,7 +178,7 @@ fun ChatMessages(
     ) {
         item {
             // 신규 채팅이 아닌 경우 고려
-            ChatHeader(mentorName = "스파르타")
+            ChatHeader(mentorName = mentorName)
         }
 
         items(messageList) { message ->
@@ -157,7 +195,12 @@ fun ChatMessages(
                 }
 
                 MessageType.MENTOR_RESPONSE.name -> {
-                    message.message.content?.let { ChatWithProfileBubble(message = it) }
+                    message.message.content?.let {
+                        ChatWithProfileBubble(
+                            message = it,
+                            imgUrl = mentorImgUrl
+                        )
+                    }
                 }
             }
 
@@ -186,13 +229,17 @@ fun ChatBubble(message: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ChatWithProfileBubble(message: String) {
+fun ChatWithProfileBubble(message: String, imgUrl: String) {
     Row {
-        Box(
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imgUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "멘토 프로필 사진",
             modifier = Modifier
-                .width(32.dp)
-                .height(32.dp)
-                .background(color = Color.Green, shape = CircleShape)
+                .size(32.dp)
+                .background(color = Black600)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column {
