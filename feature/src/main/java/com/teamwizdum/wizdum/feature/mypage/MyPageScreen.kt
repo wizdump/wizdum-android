@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
@@ -22,18 +23,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.UserResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.TitleAppbar
 import com.teamwizdum.wizdum.designsystem.theme.Black100
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun MyPageScreen(viewModel: MyPageViewModel) {
+fun MyPageScreen(padding: PaddingValues, viewModel: MyPageViewModel) {
 
     LaunchedEffect(Unit) {
         viewModel.getUserInfo()
@@ -56,12 +62,17 @@ private fun MyPageContent(userInfo: UserResponse, onNavigateToTerm: () -> Unit) 
             Column(
                 modifier = Modifier.padding(32.dp)
             ) {
-                Row() {
-                    Box(
+                Row {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(userInfo.profileImageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "유저 프로필 사진",
                         modifier = Modifier
-                            .width(40.dp)
-                            .height(40.dp)
-                            .background(color = Color.Green, shape = CircleShape)
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(color = Black600)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {

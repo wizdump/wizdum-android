@@ -11,6 +11,7 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.login.LoginViewModel
 import com.teamwizdum.wizdum.feature.chat.ChatViewModel
 import com.teamwizdum.wizdum.feature.home.HomeViewModel
+import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.quest.QuestViewModel
 import com.teamwizdum.wizdum.feature.reward.RewardViewModel
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
     private val chatViewModel: ChatViewModel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels()
     private val rewardViewModel: RewardViewModel by viewModels()
+    private val myPageViewModel: MyPageViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +51,8 @@ class MainActivity : ComponentActivity() {
                 MainScreen(
                     navController = naviController,
                     onboardingViewModel = onboardingViewModel,
-                    homeViewModel = homeViewModel
+                    homeViewModel = homeViewModel,
+                    myPageViewModel = myPageViewModel
                 )
             }
         }

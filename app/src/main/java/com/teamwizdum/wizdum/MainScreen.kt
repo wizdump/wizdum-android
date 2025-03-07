@@ -29,6 +29,7 @@ import androidx.navigation.compose.NavHost
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.home.HomeViewModel
 import com.teamwizdum.wizdum.feature.home.homeScreen
+import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel
 import com.teamwizdum.wizdum.feature.mypage.myPageScreen
 import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
@@ -38,17 +39,17 @@ fun MainScreen(
     navController: NavHostController,
     onboardingViewModel: OnboardingViewModel,
     homeViewModel: HomeViewModel,
+    myPageViewModel: MyPageViewModel
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         content = { innerPadding ->
             NavHost(navController = navController, startDestination = Routes.HOME.name) {
                 homeScreen(padding = innerPadding, homeViewModel = homeViewModel)
-                myPageScreen(padding = innerPadding)
+                myPageScreen(padding = innerPadding, myPageViewModel = myPageViewModel)
                 onboardingScreen(
                     navController = navController,
                     viewModel = onboardingViewModel,
-                    padding = innerPadding
                 )
             }
         },

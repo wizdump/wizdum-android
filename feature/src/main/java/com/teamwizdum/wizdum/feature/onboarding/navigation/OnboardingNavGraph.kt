@@ -11,7 +11,7 @@ import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.QuestionSelectionScreen
 import com.teamwizdum.wizdum.feature.onboarding.StartScreen
 
-fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel: OnboardingViewModel, padding: PaddingValues) {
+fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel: OnboardingViewModel) {
     composable(route = "ONBOARDING") {
         StartScreen() {
             navController.navigate(route = "KEYWORD")
