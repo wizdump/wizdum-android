@@ -29,7 +29,7 @@ enum class QuestStatus(
     ),
     IN_PROGRESS(
         text = "수강중",
-        textColor = Warning,
+        textColor = Green200,
         borderColor = Green200,
         backgroundColor = Green50,
         badgeIconRes = R.drawable.ic_badge_in_progress,
@@ -43,15 +43,4 @@ enum class QuestStatus(
         badgeIconRes = R.drawable.ic_badge_done,
         questIconRes = R.drawable.ic_quest_done
     );
-
-    companion object {
-        fun fromString(level: String): QuestStatus {
-            return when (level.uppercase()) {
-                "WAIT" -> QuestStatus.WAIT
-                "IN_PROGRESS" -> QuestStatus.IN_PROGRESS
-                "DONE" -> QuestStatus.DONE
-                else -> QuestStatus.WAIT
-            }
-        }
-    }
 }

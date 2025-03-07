@@ -2,6 +2,7 @@ package com.teamwizdum.wizdum.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.teamwizdum.wizdum.data.repository.QuestRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import com.teamwizdum.wizdum.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
     private val userRepository: UserRepository,
+    private val questRepository: QuestRepository,
 ) : ViewModel() {
 
     fun login(accessToken: String, onSuccess: () -> Unit) {
@@ -42,7 +44,7 @@ class LoginViewModel @Inject constructor(
 
     fun startQuest(mentorId: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            userRepository.startQuest(mentorId = mentorId).collect {
+            questRepository.startQuest(mentorId = mentorId).collect {
                 onSuccess()
             }
         }

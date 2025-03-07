@@ -8,15 +8,13 @@ import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
 
 @Composable
 fun StatusCircle(isInProgress: Boolean, status: String) {
-    val statusEnum = QuestStatus.fromString(status)
     var resId = R.drawable.ic_quest_in_progress
 
-    // 포커스된 강의가 아닐 때
     if (!isInProgress) {
-        resId = when(statusEnum) {
-            QuestStatus.WAIT -> R.drawable.ic_quest_wait
-            QuestStatus.DONE -> R.drawable.ic_quest_done
-            else -> R.drawable.ic_quest_in_progress
+        resId = when(status) {
+            QuestStatus.WAIT.name -> QuestStatus.WAIT.questIconRes
+            QuestStatus.DONE.name -> QuestStatus.DONE.questIconRes
+            else -> QuestStatus.IN_PROGRESS.questIconRes
         }
     }
 

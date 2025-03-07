@@ -30,9 +30,4 @@ interface OnboardingApi {
         @Path("mentoId") pathMentorId: Int,
         @Query("mentoId") queryMentorId: Int
     ): MentorDetailResponse
-
-    @POST("lectures")
-    suspend fun startQuest(
-        @Query("mentoId") mentorId: Int
-    ): Response<Unit>
 }

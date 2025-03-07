@@ -31,8 +31,4 @@ class OnboardingRepository @Inject constructor(
             onboardingApi.getMentorDetail(pathMentorId = mentorId, queryMentorId = mentorId)
         )
     }
-
-    suspend fun startQuest(mentorId: Int) {
-        onboardingApi.startQuest(mentorId = mentorId)
-    }
 }

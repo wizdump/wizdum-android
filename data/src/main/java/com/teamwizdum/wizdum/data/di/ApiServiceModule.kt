@@ -4,6 +4,8 @@ import com.teamwizdum.wizdum.data.api.AuthApi
 import com.teamwizdum.wizdum.data.api.HomeApi
 import com.teamwizdum.wizdum.data.api.OnboardingApi
 import com.teamwizdum.wizdum.data.api.QuestApi
+import com.teamwizdum.wizdum.data.api.RewardApi
+import com.teamwizdum.wizdum.data.api.UserApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,5 +39,17 @@ object ApiServiceModule {
     @Provides
     fun provideHomeApi(retrofit: Retrofit): HomeApi {
         return retrofit.create(HomeApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideRewardApi(retrofit: Retrofit): RewardApi {
+        return retrofit.create(RewardApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserApi(retrofit: Retrofit): UserApi {
+        return retrofit.create(UserApi::class.java)
     }
 }

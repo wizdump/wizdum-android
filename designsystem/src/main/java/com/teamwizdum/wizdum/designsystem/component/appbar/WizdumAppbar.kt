@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.designsystem.component.appbar
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -26,13 +27,16 @@ fun TitleAppbar(modifier: Modifier = Modifier, title: String = "") {
 fun BackAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
+    isDark: Boolean = false,
     onNavigateBack: () -> Unit = {},
 ) {
+    val resId = if (isDark) R.drawable.ic_btn_back_white else R.drawable.ic_btn_back
+
     BasicAppBar(
         modifier = modifier,
         startIcon = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_btn_arrow_back),
+            Image(
+                painter = painterResource(id = resId),
                 contentDescription = "뒤로가기",
                 modifier = modifier
                     .clickable {
@@ -51,16 +55,19 @@ fun BackAppBar(
 fun CloseAppBar(
     modifier: Modifier = Modifier,
     title: String = "",
+    isDark: Boolean = false,
     onClose: () -> Unit = {},
 ) {
+    val resId = if (isDark) R.drawable.ic_btn_close_white else R.drawable.ic_btn_close
+
     BasicAppBar(
         modifier = modifier,
         title = {
             Text(text = title, style = WizdumTheme.typography.body1_semib)
         },
         actions = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_btn_close),
+            Image(
+                painter = painterResource(id = resId),
                 contentDescription = "취소",
                 modifier = modifier
                     .clickable {
