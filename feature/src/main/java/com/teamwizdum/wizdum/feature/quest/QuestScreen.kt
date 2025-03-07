@@ -88,13 +88,13 @@ fun QuestScreen(
 
     QuestContent(
         questInfo = questInfo,
-        onNavigateToChat = { lectureId, orderSeq, lectureStatus ->
+        onNavigateToChat = { lectureId, orderSeq, lectureStatus, lectureTitle ->
             viewModel.updateChatRoomInfo(
                 ChatRoomInfo(
                     mentorName = questInfo.mentoName,
-                    mentorImgUrl = questInfo.filePath ?: "",
+                    mentorImgUrl = questInfo.logoImageFilePath ?: "dd",
                     userName = questInfo.userName,
-                    lectureTitle = questInfo.mentoLectureTitle,
+                    lectureTitle = lectureTitle,
                     lectureId = lectureId,
                     orderSeq = orderSeq,
                     lectureStatus = lectureStatus,
@@ -110,7 +110,7 @@ fun QuestScreen(
 @Composable
 fun QuestContent(
     questInfo: QuestResponse,
-    onNavigateToChat: (Int, Int, String) -> Unit,
+    onNavigateToChat: (Int, Int, String, String) -> Unit,
     onNavigateToReward: (Int, String) -> Unit,
 ) {
     val minHeightPx = with(LocalDensity.current) { 310.dp.toPx() } // 상단 정보를 보여주기 위한 최소 높이
@@ -143,7 +143,7 @@ fun QuestContent(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(questInfo.filePath)
+                .data(questInfo.backgroundImageFilePath)
                 .crossfade(true)
                 .build(),
             contentDescription = "강의 배경 이미지",
@@ -157,7 +157,7 @@ fun QuestContent(
             Row {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(questInfo.filePath)
+                        .data(questInfo.logoImageFilePath)
                         .crossfade(true)
                         .build(),
                     contentDescription = "멘토 프로필 이미지",
@@ -239,7 +239,8 @@ fun QuestContent(
                         onNavigateToChat(
                             lecture.lectureId,
                             lecture.orderSeq,
-                            lecture.lectureStatus
+                            lecture.lectureStatus,
+                            lecture.title
                         )
                     }
                 )
@@ -558,7 +559,7 @@ fun QuestScreenPreview() {
                     )
                 )
             ),
-            onNavigateToChat = { _, _, _ -> },
+            onNavigateToChat = { _, _, _, _ -> },
             onNavigateToReward = { _, _ -> }
         )
     }

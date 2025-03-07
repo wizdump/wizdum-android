@@ -29,6 +29,9 @@ class ChatViewModel @Inject constructor(
     private val _message = MutableStateFlow<List<ChatMessage>>(emptyList())
     val message: StateFlow<List<ChatMessage>> = _message.asStateFlow()
 
+    private val _isReceiving = MutableStateFlow(false)
+    val isReceiving: StateFlow<Boolean> = _isReceiving
+
     private var receivedMessage = StringBuilder()
 
     var questClearData = QuestClearData()
@@ -41,21 +44,36 @@ class ChatViewModel @Inject constructor(
             getChatList(lectureId)
 
             webSocketRepository.observeMessage().collect { message ->
-                if (!message.message.isLast) {
-                    receivedMessage.append(message.message.content)
-
-                } else {
-                    val totalMessage = message
-                    totalMessage.message.content = receivedMessage.toString()
-                    _message.value += totalMessage
+                if (message.message.isLast) {
+                    message.message.content = receivedMessage.toString()
+                    _message.value += message
 
                     receivedMessage.clear()
+                    _isReceiving.value = false
+                } else {
+                    if (!_isReceiving.value) {
+                        receivedMessage.clear()
+                    }
+                    receivedMessage.append(message.message.content)
+                    _isReceiving.value = true
                 }
+//                if (!message.message.isLast) {
+//                    receivedMessage.append(message.message.content)
+//                    _isReceiving.value = true
+//
+//                } else {
+//                    val totalMessage = message
+//                    totalMessage.message.content = receivedMessage.toString()
+//                    _message.value += totalMessage
+//
+//                    receivedMessage.clear()
+//                    _isReceiving.value = false
+//                }
             }
         }
     }
 
-    fun sendMessage(name: String, lectureId: Int, message: String) {
+    fun sendMessage(name: String, lectureId: Int, message: String, isHide: Boolean = false) {
         // TODO: 토큰 만료되는 경우 생각해보기
         val senderMessage = ChatMessage(
             type = MessageType.USER_REQUEST.name,
@@ -63,10 +81,13 @@ class ChatViewModel @Inject constructor(
             name = name,
             accessToken = token,
             message = MessageContent(content = message),
-            isHide = false,
+            isHide = isHide,
         )
         webSocketRepository.sendMessage(senderMessage)
-        _message.value += senderMessage
+
+        if (!isHide) {
+            _message.value += senderMessage
+        }
     }
 
     fun getChatList(lectureId: Int) {
@@ -85,6 +106,10 @@ class ChatViewModel @Inject constructor(
                 onSuccess(it.encouragement)
             }
         }
+    }
+
+    fun setReceiving(isReceiving: Boolean) {
+        _isReceiving.value = isReceiving
     }
 
     fun updateQuestClearData(data: QuestClearData) {

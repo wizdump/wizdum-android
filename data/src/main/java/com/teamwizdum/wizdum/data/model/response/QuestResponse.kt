@@ -7,7 +7,8 @@ data class QuestResponse(
     val mentoId: Int = 1,
     val mentoName: String = "",
     val userName: String = "",
-    val filePath: String? = "", // TODO: 배경, 프로필사진 따로 받아야 함
+    val logoImageFilePath: String? = "",
+    val backgroundImageFilePath: String? = "",
     val mentoLectureTitle: String = "",
     val level: String = "",
     val lectures: List<LectureDetail> = emptyList(),
