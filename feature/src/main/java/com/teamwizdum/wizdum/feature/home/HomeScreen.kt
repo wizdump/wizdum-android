@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.feature.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -24,15 +26,28 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.BeforeAndInProgressLecture
 import com.teamwizdum.wizdum.data.model.response.FinishLecture
 import com.teamwizdum.wizdum.data.model.response.HomeResponse
 import com.teamwizdum.wizdum.designsystem.component.badge.TextWithIconBadge
 import com.teamwizdum.wizdum.designsystem.theme.Black100
+import com.teamwizdum.wizdum.designsystem.theme.Black500
+import com.teamwizdum.wizdum.designsystem.theme.Black600
+import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
+import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelStarRating
 import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
 
@@ -68,12 +83,24 @@ private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
                 Text(
-                    text = "유니님은 지금까지\n총 ${homeInfo.myWizCount}개의 Wiz를\n습득하셨어요",
+                    text = buildAnnotatedString {
+                        append("${homeInfo.username}님은 지금까지\n총 ")
+                        withStyle(style = SpanStyle(color = WizdumTheme.colorScheme.primary)) {
+                            append("${homeInfo.myWizCount}")
+                        }
+                        append("개의 Wiz를\n습득하셨어요")
+                    },
                     style = WizdumTheme.typography.h2
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "총 ${homeInfo.friendWithLectureCount}명 의 친구들이 같이 수강중이에요",
+                    text = buildAnnotatedString {
+                        append("\uD83D\uDCAA 총 ")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                            append("${homeInfo.friendWithLectureCount}명")
+                        }
+                        append(" 의 친구들이 같이 수강중이에요")
+                    },
                     style = WizdumTheme.typography.body2
                 )
             }
@@ -132,7 +159,9 @@ private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
                             )
                         }
                     } else {
-                        CollectionWizCard()
+                        for (lecture in homeInfo.finishLectures) {
+                            CollectionWizCard(lecture)
+                        }
                     }
                 }
             }
@@ -144,14 +173,14 @@ private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
 fun TodayWizCard() {
     Box(
         modifier = Modifier
-            .width(156.dp)
+            .width(170.dp)
             .height(194.dp)
     ) {
         Box(
             modifier = Modifier
                 .width(140.dp)
                 .height(166.dp)
-                .background(color = Color.Black, shape = RoundedCornerShape(20.dp))
+                .background(color = Green200, shape = RoundedCornerShape(20.dp))
                 .padding(24.dp)
                 .align(Alignment.BottomStart)
         ) {
@@ -179,12 +208,15 @@ fun TodayWizCard() {
         ) {
             Box(
                 modifier = Modifier
-                    .width(54.dp)
-                    .height(54.dp)
-                    .background(color = Color.Black, shape = CircleShape)
-                    .align(Alignment.Center)
+                    .size(54.dp)
+                    .background(color = Green200, shape = CircleShape)
+                    .align(Alignment.Center),
+                contentAlignment = Alignment.Center
             ) {
-
+                Image(
+                    painter = painterResource(id = R.drawable.ic_btn_search),
+                    contentDescription = "탐색"
+                )
             }
         }
     }
@@ -199,11 +231,15 @@ fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
             .padding(16.dp)
     ) {
-        Box(
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(inProgressLecture.mentoFilePath)
+                .crossfade(true)
+                .build(),
+            contentDescription = "멘토 상징 이미지",
             modifier = Modifier
-                .width(48.dp)
-                .height(48.dp)
-                .background(color = Color.Green)
+                .size(48.dp)
+                .background(color = Black600)
                 .align(Alignment.End)
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -212,7 +248,7 @@ fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
         Text(text = "${inProgressLecture.mentoName} 멘토님", style = WizdumTheme.typography.body3)
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+            text = inProgressLecture.mentoLectureTitle,
             style = WizdumTheme.typography.body1_semib
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -221,7 +257,7 @@ fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
 }
 
 @Composable
-fun CollectionWizCard() {
+fun CollectionWizCard(finishedLecture: FinishLecture) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -233,24 +269,43 @@ fun CollectionWizCard() {
                 .width(29.dp)
                 .height(32.dp)
                 .background(
-                    color = Color.Black,
+                    color = Green200,
                     shape = RoundedCornerShape(bottomStart = 50.dp, bottomEnd = 50.dp)
                 )
-                .align(Alignment.TopEnd)
+                .align(Alignment.TopEnd),
+            contentAlignment = Alignment.Center
         ) {
-            // TODO: 아이콘 추가
+            Image(
+                painter = painterResource(id = R.drawable.ic_certificated),
+                contentDescription = "인증"
+            )
         }
 
         Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                        append(finishedLecture.mentoName)
+                    }
+                    append(" 멘토님")
+                },
+                style = WizdumTheme.typography.body3
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = finishedLecture.mentoLectureTitle,
+                style = WizdumTheme.typography.body2_semib
+            )
+            Spacer(modifier = Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "스파르타", style = WizdumTheme.typography.body3_semib)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "멘토님", style = WizdumTheme.typography.body3)
+                Image(
+                    painter = painterResource(id = R.drawable.ic_checked),
+                    contentDescription = "완료",
+                    modifier = Modifier.size(10.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = finishedLecture.completedAt, style = WizdumTheme.typography.body3)
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "작심삼일을 극복하는 초집중력과 루틴 만들기", style = WizdumTheme.typography.body2_semib)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "2025년 2월 23일 완료", style = WizdumTheme.typography.body3)
         }
     }
 }
@@ -270,25 +325,28 @@ fun TodayWizCardPreview() {
 //        InProgressWizCard()
 //    }
 //}
-
-@Preview
-@Composable
-fun CollectionWizCardPreview() {
-    WizdumTheme {
-        CollectionWizCard()
-    }
-}
+//
+//@Preview
+//@Composable
+//fun CollectionWizCardPreview() {
+//    WizdumTheme {
+//        CollectionWizCard()
+//    }
+//}
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
 fun HomeScreenPreview() {
     val homeResponse = HomeResponse(
+        username = "유니",
         myWizCount = 2,
         friendWithLectureCount = 365,
         beforeAndInProgressLectures = listOf(
             BeforeAndInProgressLecture(
                 mentoId = 1,
                 mentoName = "스파르타",
+                mentoFilePath = "",
+                mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 lectureId = 1,
                 lectureStatus = "WAIT",
                 itemLevel = "MEDIUM"
@@ -298,6 +356,7 @@ fun HomeScreenPreview() {
             FinishLecture(
                 mentoId = 2,
                 mentoName = "윈스턴 처칠",
+                mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 lectureId = 2,
                 completedAt = "2023-10-27 10:00:00"
             )

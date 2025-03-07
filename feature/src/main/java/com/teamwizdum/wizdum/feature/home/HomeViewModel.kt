@@ -16,7 +16,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _homeData =
-        MutableStateFlow<HomeResponse>(HomeResponse(myWizCount = 0, friendWithLectureCount = 0))
+        MutableStateFlow<HomeResponse>(HomeResponse(username = "", myWizCount = 0, friendWithLectureCount = 0))
     val homeData: StateFlow<HomeResponse> = _homeData
 
     fun getHomeData() {
