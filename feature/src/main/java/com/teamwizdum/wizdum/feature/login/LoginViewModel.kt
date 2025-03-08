@@ -23,7 +23,7 @@ class LoginViewModel @Inject constructor(
             val token = tokenRepository.getAccessToken()
 
             if (!token.isNullOrEmpty()) {
-                startQuest(1) {
+                startQuest(2) {
                     onSuccess()
                 }
                 return@launch
@@ -42,9 +42,9 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun startQuest(mentorId: Int, onSuccess: () -> Unit) {
+    fun startQuest(classId: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            questRepository.startQuest(mentorId = mentorId).collect {
+            questRepository.startQuest(classId = classId).collect {
                 onSuccess()
             }
         }

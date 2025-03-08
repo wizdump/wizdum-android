@@ -44,7 +44,7 @@ fun MentorMatchScreen(
     onNavigateNext: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getMentors(1, false)
+        viewModel.getMentors(7, false)
     }
 
     val mentors = viewModel.mentors.collectAsState().value

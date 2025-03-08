@@ -62,9 +62,9 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun getMentorDetail(mentorId: Int) {
+    fun getMentorDetail(classId: Int) {
         viewModelScope.launch {
-            repository.getMentorDetail(mentorId = mentorId).collect {
+            repository.getMentorDetail(classId = classId).collect {
                 _mentorInfo.value = it
             }
         }

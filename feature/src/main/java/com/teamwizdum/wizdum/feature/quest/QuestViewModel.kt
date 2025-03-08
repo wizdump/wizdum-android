@@ -23,9 +23,9 @@ class QuestViewModel @Inject constructor(
 
     var chatRoomInfo = ChatRoomInfo()
 
-    fun getQuest(mentorId: Int) {
+    fun getQuest(classId: Int) {
         viewModelScope.launch {
-            questRepository.getQuests(mentorId).collect {
+            questRepository.getQuests(classId).collect {
                 _quests.value = it
             }
         }

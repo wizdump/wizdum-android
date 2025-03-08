@@ -47,7 +47,7 @@ fun QuestionSelectionScreen(
     onNavigateNext: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getQuestion(1)
+        viewModel.getQuestion(2)
     }
 
     val questions = viewModel.questions.collectAsState().value

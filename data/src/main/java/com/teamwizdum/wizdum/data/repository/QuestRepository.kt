@@ -12,12 +12,12 @@ import javax.inject.Inject
 class QuestRepository @Inject constructor(
     private val questApi: QuestApi,
 ) {
-    suspend fun startQuest(mentorId: Int): Flow<Response<Unit>> = flow {
-        emit(questApi.startQuest(mentorId = mentorId))
+    suspend fun startQuest(classId: Int): Flow<Response<Unit>> = flow {
+        emit(questApi.startQuest(classId = classId))
     }
 
-    suspend fun getQuests(mentorId: Int): Flow<QuestResponse> = flow {
-        emit(questApi.getQuests(mentorId))
+    suspend fun getQuests(classId: Int): Flow<QuestResponse> = flow {
+        emit(questApi.getQuests(classId))
     }
 
     suspend fun finishQuest(lectureId: Int): Flow<FinishQuestResponse> = flow {

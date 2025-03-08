@@ -26,9 +26,9 @@ class OnboardingRepository @Inject constructor(
         )
     }
 
-    suspend fun getMentorDetail(mentorId: Int): Flow<MentorDetailResponse> = flow {
+    suspend fun getMentorDetail(classId: Int): Flow<MentorDetailResponse> = flow {
         emit(
-            onboardingApi.getMentorDetail(pathMentorId = mentorId, queryMentorId = mentorId)
+            onboardingApi.getMentorDetail(pathClassId = classId, queryClassId = classId)
         )
     }
 }

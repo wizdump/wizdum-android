@@ -12,10 +12,10 @@ import retrofit2.http.Query
 
 interface QuestApi {
     @POST("lectures")
-    suspend fun startQuest(@Query("mentoId") mentorId: Int): Response<Unit>
+    suspend fun startQuest(@Query("classId") classId: Int): Response<Unit>
 
     @GET("lectures")
-    suspend fun getQuests(@Query("mentoId") mentorId: Int): QuestResponse
+    suspend fun getQuests(@Query("classId") classId: Int): QuestResponse
 
     @PATCH("lectures/{lectureId}")
     suspend fun finishQuest(@Path("lectureId") lectureId: Int): FinishQuestResponse

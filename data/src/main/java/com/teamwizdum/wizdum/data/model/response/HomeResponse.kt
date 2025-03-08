@@ -15,7 +15,7 @@ data class HomeResponse(
 data class BeforeAndInProgressLecture(
     val mentoId: Int,
     val mentoName: String,
-    val mentoFilePath: String,
+    val logoFilePath: String,
     val lectureId: Int,
     val mentoLectureTitle: String,
     val lectureStatus: String,

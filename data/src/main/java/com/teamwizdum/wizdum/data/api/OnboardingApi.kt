@@ -25,9 +25,9 @@ interface OnboardingApi {
         @Query("useAiMento") useAiMentor: Boolean
     ): List<MentorsResponse>
 
-    @GET("mentos/{mentoId}")
+    @GET("mentos/{classId}")
     suspend fun getMentorDetail(
-        @Path("mentoId") pathMentorId: Int,
-        @Query("mentoId") queryMentorId: Int
+        @Path("classId") pathClassId: Int,
+        @Query("classId") queryClassId: Int
     ): MentorDetailResponse
 }

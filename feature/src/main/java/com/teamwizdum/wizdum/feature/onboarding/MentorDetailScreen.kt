@@ -57,7 +57,7 @@ fun MentorDetailScreen(
     onNavigateNext: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getMentorDetail(1)
+        viewModel.getMentorDetail(2)
     }
 
     val mentorInfo = viewModel.mentorInfo.collectAsState().value

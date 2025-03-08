@@ -233,7 +233,7 @@ fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(inProgressLecture.mentoFilePath)
+                .data(inProgressLecture.logoFilePath)
                 .crossfade(true)
                 .build(),
             contentDescription = "멘토 상징 이미지",
@@ -345,7 +345,7 @@ fun HomeScreenPreview() {
             BeforeAndInProgressLecture(
                 mentoId = 1,
                 mentoName = "스파르타",
-                mentoFilePath = "",
+                logoFilePath = "",
                 mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 lectureId = 1,
                 lectureStatus = "WAIT",

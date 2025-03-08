@@ -80,7 +80,7 @@ fun QuestScreen(
     onNavigateToQuestALlClear: (Int, String) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getQuest(1)
+        viewModel.getQuest(2)
     }
 
     val questInfo = viewModel.quests.collectAsState().value
