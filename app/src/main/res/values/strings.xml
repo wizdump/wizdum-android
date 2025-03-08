@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">wizdum-android</string>
+    <string name="bottom_navigation_label_home">홈</string>
+    <string name="bottom_navigation_label_mypage">마이페이지</string>
 </resources>

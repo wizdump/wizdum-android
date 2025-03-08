@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.BeforeAndInProgressLecture
@@ -52,7 +53,7 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelStarRating
 import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
 
 @Composable
-fun HomeScreen(padding: PaddingValues, viewModel: HomeViewModel) {
+fun HomeScreen(padding: PaddingValues, viewModel: HomeViewModel = hiltViewModel()) {
     LaunchedEffect(Unit) {
         viewModel.getHomeData()
     }
@@ -236,10 +237,9 @@ fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
                 .data(inProgressLecture.logoFilePath)
                 .crossfade(true)
                 .build(),
-            contentDescription = "멘토 상징 이미지",
+            contentDescription = "멘토 상징 로고",
             modifier = Modifier
                 .size(48.dp)
-                .background(color = Black600)
                 .align(Alignment.End)
         )
         Spacer(modifier = Modifier.height(24.dp))

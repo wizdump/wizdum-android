@@ -11,7 +11,7 @@ import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.QuestionSelectionScreen
 import com.teamwizdum.wizdum.feature.onboarding.StartScreen
 
-fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel: OnboardingViewModel) {
+fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
     composable(route = "ONBOARDING") {
         StartScreen() {
             navController.navigate(route = "KEYWORD")
@@ -19,27 +19,27 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController, viewModel
     }
 
     composable(route = "KEYWORD") {
-        KeywordSelectionScreen(viewModel = viewModel) {
+        KeywordSelectionScreen() {
             navController.navigate(route = "GOAL")
             //navController.navigate(route = "CHAT")
         }
     }
 
-    composable(route = "GOAL") {
-        QuestionSelectionScreen(viewModel = viewModel) {
-            navController.navigate(route = "MENTOR")
-        }
-    }
-
-    composable(route = "MENTOR") {
-        MentorMatchScreen(viewModel = viewModel) {
-            navController.navigate(route = "METOR_DETAIL")
-        }
-    }
-
-    composable(route = "METOR_DETAIL") {
-        MentorDetailScreen() {
-            navController.navigate(route = "LOGIN")
-        }
-    }
+//    composable(route = "GOAL") {
+//        QuestionSelectionScreen(viewModel = viewModel) {
+//            navController.navigate(route = "MENTOR")
+//        }
+//    }
+//
+//    composable(route = "MENTOR") {
+//        MentorMatchScreen(viewModel = viewModel) {
+//            navController.navigate(route = "METOR_DETAIL")
+//        }
+//    }
+//
+//    composable(route = "METOR_DETAIL") {
+//        MentorDetailScreen() {
+//            navController.navigate(route = "LOGIN")
+//        }
+//    }
 }

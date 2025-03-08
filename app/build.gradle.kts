@@ -62,6 +62,7 @@ android {
 dependencies {
 
     implementation(project(":designsystem"))
+    implementation(project(":data"))
     implementation(project(":feature"))
 
     implementation(libs.androidx.core.ktx)

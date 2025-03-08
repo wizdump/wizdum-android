@@ -1,7 +1,14 @@
 package com.teamwizdum.wizdum
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FabPosition
@@ -19,115 +27,140 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
-import com.teamwizdum.wizdum.feature.home.HomeViewModel
+import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.home.homeScreen
-import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel
 import com.teamwizdum.wizdum.feature.mypage.myPageScreen
-import com.teamwizdum.wizdum.feature.onboarding.OnboardingViewModel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    onboardingViewModel: OnboardingViewModel,
-    homeViewModel: HomeViewModel,
-    myPageViewModel: MyPageViewModel
+    mainViewModel: MainViewModel,
 ) {
+    val mainNavigator = MainNavigator(navController)
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         content = { innerPadding ->
-            NavHost(navController = navController, startDestination = Routes.HOME.name) {
-                homeScreen(padding = innerPadding, homeViewModel = homeViewModel)
-                myPageScreen(padding = innerPadding, myPageViewModel = myPageViewModel)
+            NavHost(
+                navController = navController,
+                startDestination = "HOME"
+            ) {
                 onboardingScreen(
                     navController = navController,
-                    viewModel = onboardingViewModel,
                 )
+                homeScreen(padding = innerPadding)
+                myPageScreen(padding = innerPadding)
             }
         },
         bottomBar = {
-            WizdumBottomBar(navController = navController)
+            WizdumBottomBar(
+                visible = mainNavigator.shouldShowBottomBar(),
+                currentTab = mainNavigator.currentTab,
+                onClick = { tab -> mainNavigator.navigate(tab) }
+            )
         },
+
         // Material3에서는 isFloatingActionButtonDocked 옵션 미제공
         // https://stackoverflow.com/questions/73841364/how-to-make-cradled-fab-in-jetpack-compose-material-3
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("ONBOARDING") },
-                modifier = Modifier
-                    .width(50.dp)
-                    .height(50.dp)
-                    .offset(y = 40.dp),
-                shape = CircleShape, // TODO: 위치 조정 필요
-            ) {
-                // TODO: 검색 아이콘 추가
-            }
+            if (mainNavigator.shouldShowBottomBar())
+                FloatingActionButton(
+                    onClick = { navController.navigate("ONBOARDING") },
+                    modifier = Modifier
+                        .size(50.dp)
+                        .offset(y = 40.dp),
+                    shape = CircleShape,
+                    containerColor = Green200
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_btn_search),
+                        contentDescription = "탐색"
+                    )
+                }
         },
         floatingActionButtonPosition = FabPosition.Center,
     )
 }
 
 @Composable
-private fun WizdumBottomBar(navController: NavHostController) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(88.dp)
-            .background(color = Color.White),
-        contentAlignment = Alignment.Center
+private fun WizdumBottomBar(
+    visible: Boolean,
+    currentTab: MainNavigationTab?,
+    onClick: (MainNavigationTab) -> Unit,
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + slideIn { IntOffset(0, it.height) },
+        exit = fadeOut() + slideOut { IntOffset(0, it.height) },
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .background(color = Color.White),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .clickable {
-                        navController.navigate("HOME")
-                    }
-                    .padding(horizontal = 16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Box(
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(32.dp)
-                        .background(color = Color.Black)
+                val isHomeSelected = (currentTab == MainNavigationTab.HOME)
+                val isMyPageSelected = (currentTab == MainNavigationTab.MYPAGE)
+
+                NavigationItem(
+                    navTab = MainNavigationTab.HOME,
+                    isSelected = isHomeSelected,
+                    onClick = { onClick(MainNavigationTab.HOME) }
                 )
-                Text(text = "홈", style = WizdumTheme.typography.body3)
-            }
-            Spacer(modifier = Modifier.width(46.dp))
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .clickable {
-                        navController.navigate("MYPAGE")
-                    }
-                    .padding(horizontal = 16.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(32.dp)
-                        .background(color = Color.Black)
+                Spacer(modifier = Modifier.width(46.dp))
+                NavigationItem(
+                    navTab = MainNavigationTab.MYPAGE,
+                    isSelected = isMyPageSelected,
+                    onClick = { onClick(MainNavigationTab.MYPAGE) }
                 )
-                Text(text = "마이페이지", style = WizdumTheme.typography.body3)
             }
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun WizdumBottomBarPreview() {
-    WizdumTheme {
-        //WizdumBottomBar()
+private fun NavigationItem(
+    navTab: MainNavigationTab,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clickable(interactionSource = interactionSource, indication = null) { onClick() }
+            .padding(horizontal = 16.dp)
+    ) {
+        val iconResId = if (isSelected) navTab.selectedResId else navTab.unSelectedResId
+        Image(
+            painter = painterResource(id = iconResId),
+            contentDescription = stringResource(id = navTab.label)
+        )
+        Text(
+            text = stringResource(id = navTab.label),
+            style = if (isSelected) WizdumTheme.typography.body3_semib else WizdumTheme.typography.body3
+        )
     }
 }

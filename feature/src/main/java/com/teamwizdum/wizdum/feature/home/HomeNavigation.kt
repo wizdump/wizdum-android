@@ -4,8 +4,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 
-fun NavGraphBuilder.homeScreen(padding: PaddingValues, homeViewModel: HomeViewModel) {
+fun NavGraphBuilder.homeScreen(padding: PaddingValues) {
     composable(route = "HOME") {
-        HomeScreen(padding = padding, viewModel = homeViewModel)
+        HomeScreen(padding = padding)
     }
+}
+
+object HomeRoute {
+    const val HOME = "HOME"
 }
