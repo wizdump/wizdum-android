@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class MentorDetailResponse(
     val mentoId: Int = 0,
     val mentoName: String,
-    val mentoTitle: String,
+    val classTitle: String,
     val filePath: String? = "",
     val itemLevel: String,
     val wiseSaying: String= "",

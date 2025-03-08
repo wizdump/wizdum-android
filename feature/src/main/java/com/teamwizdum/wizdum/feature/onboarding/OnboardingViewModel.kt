@@ -30,7 +30,7 @@ class OnboardingViewModel @Inject constructor(
     private val _mentorInfo = MutableStateFlow<MentorDetailResponse>(
         MentorDetailResponse(
             mentoName = "",
-            mentoTitle = "",
+            classTitle = "",
             itemLevel = "LOW"
         )
     )
@@ -54,9 +54,9 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun getMentors(questionId: Int, useAi: Boolean) {
+    fun getMentors(categoryId: Int, useAi: Boolean) {
         viewModelScope.launch {
-            repository.getMentors(questionId = questionId, useAi = useAi).collect {
+            repository.getMentors(questionId = categoryId, useAi = useAi).collect {
                 _mentors.value = it
             }
         }

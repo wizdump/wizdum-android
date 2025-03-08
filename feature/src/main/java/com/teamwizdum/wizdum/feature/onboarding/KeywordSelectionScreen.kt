@@ -52,7 +52,7 @@ import com.teamwizdum.wizdum.feature.R
 @Composable
 fun KeywordSelectionScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    onNavigateNext: () -> Unit,
+    onNavigateToQuestion: (Int) -> Unit,
 ) {
     LaunchedEffect(key1 = Unit) {
         viewModel.getKeyword()
@@ -60,13 +60,16 @@ fun KeywordSelectionScreen(
 
     val keywords = viewModel.keywords.collectAsState().value
 
-    KeywordContent(keywords = keywords, onNavigateNext = onNavigateNext)
+    KeywordContent(
+        keywords = keywords,
+        onNavigateToQuestion = { onNavigateToQuestion(it) }
+    )
 }
 
 @Composable
 private fun KeywordContent(
     keywords: List<KeywordResponse>,
-    onNavigateNext: () -> Unit,
+    onNavigateToQuestion: (Int) -> Unit,
 ) {
     val selectedIndex = remember { mutableStateOf(-1) }
 
@@ -96,7 +99,7 @@ private fun KeywordContent(
                     items(keywords.size, key = { it }) { index ->
                         KeywordCard(
                             title = keywords[index].value,
-                            imageUrl = "",
+                            imageUrl = keywords[index].fileUrl,
                             isSelected = selectedIndex.value == index,
                             onClick = {
                                 selectedIndex.value =
@@ -129,7 +132,7 @@ private fun KeywordContent(
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateNext()
+                onNavigateToQuestion(keywords[selectedIndex.value].keywordId)
             }
     }
 }

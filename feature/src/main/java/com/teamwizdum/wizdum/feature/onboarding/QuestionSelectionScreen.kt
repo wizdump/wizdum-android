@@ -44,21 +44,22 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 @Composable
 fun QuestionSelectionScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    onNavigateNext: () -> Unit,
+    keywordId: Int,
+    onNavigateToMentor: (Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getQuestion(2)
+        viewModel.getQuestion(keywordId)
     }
 
     val questions = viewModel.questions.collectAsState().value
 
-    QuestionContent(questions = questions, onNavigateNext = onNavigateNext)
+    QuestionContent(questions = questions, onNavigateToMentor = { onNavigateToMentor(it) })
 }
 
 @Composable
 private fun QuestionContent(
     questions: List<QuestionResponse>,
-    onNavigateNext: () -> Unit,
+    onNavigateToMentor: (Int) -> Unit,
 ) {
     val selectedIndex = remember { mutableStateOf(-1) }
 
@@ -101,7 +102,7 @@ private fun QuestionContent(
 
                 if (selectedIndex.value != -1)
                     WizdumFilledButton(title = "멘토 추천받기") {
-                        onNavigateNext()
+                        onNavigateToMentor(questions[selectedIndex.value].questionId)
                     }
             }
         }

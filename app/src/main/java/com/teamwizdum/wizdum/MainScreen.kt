@@ -27,19 +27,16 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
@@ -48,10 +45,7 @@ import com.teamwizdum.wizdum.feature.mypage.myPageScreen
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 
 @Composable
-fun MainScreen(
-    navController: NavHostController,
-    mainViewModel: MainViewModel,
-) {
+fun MainScreen(navController: NavHostController) {
     val mainNavigator = MainNavigator(navController)
 
     Scaffold(
@@ -61,9 +55,7 @@ fun MainScreen(
                 navController = navController,
                 startDestination = "HOME"
             ) {
-                onboardingScreen(
-                    navController = navController,
-                )
+                onboardingScreen(navController = navController)
                 homeScreen(padding = innerPadding)
                 myPageScreen(padding = innerPadding)
             }
@@ -81,7 +73,7 @@ fun MainScreen(
         floatingActionButton = {
             if (mainNavigator.shouldShowBottomBar())
                 FloatingActionButton(
-                    onClick = { navController.navigate("ONBOARDING") },
+                    onClick = { navController.navigate("KEYWORD") },
                     modifier = Modifier
                         .size(50.dp)
                         .offset(y = 40.dp),

@@ -41,21 +41,22 @@ import kotlin.math.absoluteValue
 @Composable
 fun MentorMatchScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    onNavigateNext: () -> Unit,
+    categoryId: Int,
+    onNavigateToMentorDetail: (Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getMentors(7, false)
+        viewModel.getMentors(categoryId, false)
     }
 
     val mentors = viewModel.mentors.collectAsState().value
 
-    MentorContent(mentors = mentors, onNavigateNext = onNavigateNext)
+    MentorContent(mentors = mentors, onNavigateToDetail = onNavigateToMentorDetail)
 }
 
 @Composable
 private fun MentorContent(
     mentors: List<MentorsResponse>,
-    onNavigateNext: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -73,33 +74,15 @@ private fun MentorContent(
                 )
             }
             Spacer(modifier = Modifier.height(38.dp))
-            MentorCardPager(mentors, onNavigateNext)
+            MentorCardPager(mentors, onNavigateToDetail)
         }
     }
 }
 
 
 @Composable
-fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateNext: () -> Unit) {
-    //TODO: UI 테스트 이후 서버 데이터로 변경해야 함
-    val dummyList = listOf(
-        MentorsResponse(
-            mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽\n시작해보자",
-            itemLevel = "HIGH"
-        ),
-        MentorsResponse(
-            mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽\n시작해보자",
-            itemLevel = "HIGH"
-        ),
-        MentorsResponse(
-            mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽\n시작해보자",
-            itemLevel = "HIGH"
-        ),
-    )
-    val pagerState = rememberPagerState(pageCount = { dummyList.size }, initialPage = 1)
+fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateToDetail: (Int) -> Unit) {
+    val pagerState = rememberPagerState(pageCount = { mentorList.size }, initialPage = 1)
 
     HorizontalPager(
         modifier = Modifier.fillMaxWidth(),
@@ -109,8 +92,8 @@ fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateNext: () -> Uni
         MentorCard(
             page = page,
             pagerState = pagerState,
-            mentorInfo = dummyList[page],
-            onNavigateNext = onNavigateNext
+            mentorInfo = mentorList[page],
+            onNavigateToDetail = onNavigateToDetail
         )
     }
 }
@@ -120,7 +103,7 @@ private fun MentorCard(
     page: Int,
     pagerState: PagerState,
     mentorInfo: MentorsResponse,
-    onNavigateNext: () -> Unit = {},
+    onNavigateToDetail: (Int) -> Unit = {},
 ) {
     Box(modifier = Modifier.graphicsLayer {
         val pageOffset =
@@ -171,7 +154,7 @@ private fun MentorCard(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = mentorInfo.mentoTitle,
+                    text = mentorInfo.classTitle,
                     style = WizdumTheme.typography.h3_semib,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -186,7 +169,7 @@ private fun MentorCard(
                     .align(Alignment.BottomCenter)
                     .clip(shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp))
                     .clickable {
-                        onNavigateNext()
+                        onNavigateToDetail(mentorInfo.classId)
                     },
                 contentAlignment = Alignment.Center
             ) {
@@ -207,7 +190,7 @@ fun MentorCardPreview() {
             pagerState = pagerState,
             mentorInfo = MentorsResponse(
                 mentoName = "스파르타",
-                mentoTitle = "스파르타 코딩클럽\n시작해보자",
+                classTitle = "스파르타 코딩클럽\n시작해보자",
                 itemLevel = "HIGH"
             ),
         )
@@ -220,7 +203,7 @@ fun MentorMatchScreenPreview() {
     val mentorList = listOf(
         MentorsResponse(
             mentoName = "스파르타",
-            mentoTitle = "스파르타 코딩클럽",
+            classTitle = "스파르타 코딩클럽",
             itemLevel = "HIGH"
         )
     )

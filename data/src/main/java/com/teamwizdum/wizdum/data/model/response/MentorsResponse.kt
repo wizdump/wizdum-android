@@ -7,7 +7,7 @@ data class MentorsResponse(
     val classId: Int = 0,
     val mentoId: Int = 0,
     val mentoName: String,
-    val mentoTitle: String,
+    val classTitle: String,
     val filePath: String? = "",
     val itemLevel: String
 )

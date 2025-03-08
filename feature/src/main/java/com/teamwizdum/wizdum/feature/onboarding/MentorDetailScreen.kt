@@ -54,10 +54,11 @@ import com.teamwizdum.wizdum.feature.onboarding.info.Level
 @Composable
 fun MentorDetailScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
+    classId: Int,
     onNavigateNext: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getMentorDetail(2)
+        viewModel.getMentorDetail(classId)
     }
 
     val mentorInfo = viewModel.mentorInfo.collectAsState().value
@@ -122,14 +123,9 @@ private fun MentorDetailContent(mentorInfo: MentorDetailResponse, onNavigateNext
                                 color = Black600
                             )
                         }
-                        // TODO : 미확정
-//                        Text(
-//                            text = "소요시간 16분",
-//                            style = WizdumTheme.typography.body1
-//                        )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = mentorInfo.mentoTitle, style = WizdumTheme.typography.h2)
+                    Text(text = mentorInfo.classTitle, style = WizdumTheme.typography.h2)
                     Spacer(modifier = Modifier.height(8.dp))
                     LevelInfo(level = mentorInfo.itemLevel)
                     Spacer(modifier = Modifier.height(24.dp))
@@ -249,7 +245,7 @@ fun MentorDetailScreenPreview() {
         MentorDetailContent(
             mentorInfo = MentorDetailResponse(
                 mentoName = "스파르타",
-                mentoTitle = "스파르타 코딩클럽",
+                classTitle = "스파르타 코딩클럽",
                 itemLevel = "HIGH",
                 wiseSaying = "강인한 정신력과 철저한 자기 훈련을 통해 목표를 달성하는 스파르타식 도전!",
                 benefits = listOf(

@@ -19,7 +19,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun StartScreen(onNavigateNext: () -> Unit) {
+fun StartScreen(onNavigateToKeyword: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +54,7 @@ fun StartScreen(onNavigateNext: () -> Unit) {
             WizdumFilledButton(
                 title = "멘토 찾으러 떠나기",
             ) {
-                onNavigateNext()
+                onNavigateToKeyword()
             }
         }
     }
