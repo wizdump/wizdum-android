@@ -11,6 +11,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.home.HomeRoute
+import com.teamwizdum.wizdum.feature.onboarding.navigation.OnboardingRoute
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
                 LaunchedEffect(mainState) {
                     when (mainState) {
-                        MainState.Onboarding -> navController.navigate("ONBOARDING") { popUpTo(0) }
+                        MainState.Onboarding -> navController.navigate(OnboardingRoute.START) { popUpTo(0) }
                         MainState.Login -> navController.navigate("LOGIN") { popUpTo(0) }
                         MainState.Home -> navController.navigate(HomeRoute.HOME) { popUpTo(0) }
                         else -> {}
