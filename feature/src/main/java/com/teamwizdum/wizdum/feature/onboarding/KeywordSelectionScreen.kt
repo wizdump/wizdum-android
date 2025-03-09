@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,7 +52,7 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun KeywordSelectionScreen(
+fun KeywordSelectionRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
     onNavigateToQuestion: (Int) -> Unit,
 ) {
@@ -60,14 +62,14 @@ fun KeywordSelectionScreen(
 
     val keywords = viewModel.keywords.collectAsState().value
 
-    KeywordContent(
+    KeywordSelectionScreen(
         keywords = keywords,
         onNavigateToQuestion = { onNavigateToQuestion(it) }
     )
 }
 
 @Composable
-private fun KeywordContent(
+private fun KeywordSelectionScreen(
     keywords: List<KeywordResponse>,
     onNavigateToQuestion: (Int) -> Unit,
 ) {
@@ -77,7 +79,7 @@ private fun KeywordContent(
         Column {
             BackAppBar()
             Column(modifier = Modifier.padding(top = 32.dp, start = 32.dp, end = 32.dp)) {
-                Text(text = "어떤 하루를 보내고 싶나요?", style = WizdumTheme.typography.h2)
+                Text(text = "어떠한 나로 성장하고 싶나요?", style = WizdumTheme.typography.h2)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = buildAnnotatedString {
@@ -91,14 +93,14 @@ private fun KeywordContent(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2), modifier = Modifier.fillMaxSize(),
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(keywords.size, key = { it }) { index ->
                         KeywordCard(
                             title = keywords[index].value,
+                            description = keywords[index].description,
                             imageUrl = keywords[index].fileUrl,
                             isSelected = selectedIndex.value == index,
                             onClick = {
@@ -140,58 +142,55 @@ private fun KeywordContent(
 @Composable
 private fun KeywordCard(
     title: String,
+    description: String,
     imageUrl: String,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(170.dp)
-            .clip(RoundedCornerShape(10.dp))
-            .background(color = Color.White)
+            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
             .border(
                 width = 2.dp,
                 color = if (isSelected) WizdumTheme.colorScheme.primary else Color.White,
                 shape = RoundedCornerShape(10.dp)
             )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(imageUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = "키워드 이미지",
-                modifier = Modifier
-                    .width(72.dp)
-                    .height(72.dp)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .crossfade(true)
+                .build(),
+            contentDescription = "키워드 이미지",
+            modifier = Modifier.size(32.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(
+                    text = title,
+                    style = if (isSelected) WizdumTheme.typography.body1_semib else WizdumTheme.typography.body1,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.width(4.dp))
                 if (isSelected)
                     Image(
                         painter = painterResource(id = R.drawable.ic_checked),
                         contentDescription = "체크 아이콘",
                     )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = title,
-                    style = if (isSelected) WizdumTheme.typography.h3_semib else WizdumTheme.typography.h3,
-                    color = if (isSelected) Black700 else Black600,
-                    textAlign = TextAlign.Center
-                )
             }
+            Text(
+                text = description,
+                style = WizdumTheme.typography.body3,
+                color = Black600,
+            )
         }
     }
 }
@@ -200,11 +199,20 @@ private fun KeywordCard(
 @Composable
 fun KeywordCardPreview() {
     Column {
-        KeywordCard(title = "도전적인", imageUrl = "", isSelected = true, onClick = {})
+        KeywordCard(
+            title = "도전적인",
+            imageUrl = "",
+            description = "새로운 목표에 도전하고, 극복하는 힘을 기르고 싶어요",
+            isSelected = true,
+            onClick = {})
         Spacer(modifier = Modifier.height(50.dp))
-        KeywordCard(title = "도전적인", imageUrl = "", isSelected = false, onClick = {})
+        KeywordCard(
+            title = "도전적인",
+            imageUrl = "",
+            description = "새로운 목표에 도전하고, 극복하는 힘을 기르고 싶어요",
+            isSelected = false,
+            onClick = {})
     }
-
 }
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
@@ -212,15 +220,27 @@ fun KeywordCardPreview() {
 fun KeywordSelectionScreenPreview() {
     WizdumTheme {
         val keywordList = listOf(
-            KeywordResponse(value = "도전적인"),
-            KeywordResponse(value = "성취 지향적인"),
-            KeywordResponse(value = "감성적인"),
-            KeywordResponse(value = "창의적인"),
-            KeywordResponse(value = "사색적인"),
-            KeywordResponse(value = "탐구적인"),
-            KeywordResponse(value = "논리적인"),
-            KeywordResponse(value = "건강한")
+            KeywordResponse(
+                value = "도전적인",
+                description = "새로운 목표에 도전하고, 극복하는 힘을 기르고 싶어요"
+            ),
+            KeywordResponse(
+                value = "창의적인",
+                description = "틀에 얽매이지 않고, 새로운 시각과 생각을 키우고 싶어요"
+            ),
+            KeywordResponse(
+                value = "사색적인",
+                description = "깊이 있는 사고와 철학적 통찰로 삶을 바라보고 싶어요"
+            ),
+            KeywordResponse(
+                value = "분석적인",
+                description = "논리적으로 사고하고, 문제 해결 능력을 키우고 싶어요"
+            ),
+            KeywordResponse(
+                value = "건강한",
+                description = "신체적·정신적 균형을 통해 지속적인 성장을 이루고 싶어요"
+            ),
         )
-        KeywordContent(keywords = keywordList) {}
+        KeywordSelectionScreen(keywords = keywordList) {}
     }
 }

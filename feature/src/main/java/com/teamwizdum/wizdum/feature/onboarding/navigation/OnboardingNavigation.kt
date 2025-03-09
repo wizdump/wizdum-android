@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.teamwizdum.wizdum.feature.onboarding.KeywordSelectionScreen
+import com.teamwizdum.wizdum.feature.onboarding.KeywordSelectionRoute
 import com.teamwizdum.wizdum.feature.onboarding.MentorDetailScreen
 import com.teamwizdum.wizdum.feature.onboarding.MentorMatchScreen
 import com.teamwizdum.wizdum.feature.onboarding.QuestionSelectionScreen
@@ -35,7 +35,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
     }
 
     composable(route = OnboardingRoute.KEYWORD) {
-        KeywordSelectionScreen(onNavigateToQuestion = { id ->
+        KeywordSelectionRoute(onNavigateToQuestion = { id ->
             navController.navigateToQuestion(id)
         })
     }
