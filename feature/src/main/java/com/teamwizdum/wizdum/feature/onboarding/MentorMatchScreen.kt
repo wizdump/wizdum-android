@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
@@ -25,11 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.theme.Black600
@@ -39,7 +42,7 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 import kotlin.math.absoluteValue
 
 @Composable
-fun MentorMatchScreen(
+fun MentorMatchRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
     categoryId: Int,
     onNavigateToMentorDetail: (Int) -> Unit,
@@ -50,11 +53,11 @@ fun MentorMatchScreen(
 
     val mentors = viewModel.mentors.collectAsState().value
 
-    MentorContent(mentors = mentors, onNavigateToDetail = onNavigateToMentorDetail)
+    MentorMatchScreen(mentors = mentors, onNavigateToDetail = onNavigateToMentorDetail)
 }
 
 @Composable
-private fun MentorContent(
+private fun MentorMatchScreen(
     mentors: List<MentorsResponse>,
     onNavigateToDetail: (Int) -> Unit,
 ) {
@@ -146,11 +149,13 @@ private fun MentorCard(
                     Text(text = " 멘토님", style = WizdumTheme.typography.body1, color = Black600)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier
-                        .width(197.dp)
-                        .height(197.dp)
-                        .background(color = Color.Green)
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(mentorInfo.logoImageFilePath)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "멘토 프로필 이미지",
+                    modifier = Modifier.size(197.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -208,6 +213,6 @@ fun MentorMatchScreenPreview() {
         )
     )
     WizdumTheme {
-        MentorContent(mentors = mentorList) {}
+        MentorMatchScreen(mentors = mentorList) {}
     }
 }

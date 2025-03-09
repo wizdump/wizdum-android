@@ -8,6 +8,6 @@ data class MentorsResponse(
     val mentoId: Int = 0,
     val mentoName: String,
     val classTitle: String,
-    val filePath: String? = "",
+    val logoImageFilePath: String? = "",
     val itemLevel: String
 )

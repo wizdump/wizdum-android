@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.teamwizdum.wizdum.feature.onboarding.KeywordSelectionRoute
 import com.teamwizdum.wizdum.feature.onboarding.MentorDetailScreen
-import com.teamwizdum.wizdum.feature.onboarding.MentorMatchScreen
+import com.teamwizdum.wizdum.feature.onboarding.MentorMatchRoute
 import com.teamwizdum.wizdum.feature.onboarding.QuestionSelectionScreen
 import com.teamwizdum.wizdum.feature.onboarding.StartScreen
 
@@ -64,7 +64,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
     ) { backstackEntry ->
         val categoryId = backstackEntry.arguments?.getInt("categoryId") ?: 0
 
-        MentorMatchScreen(categoryId = categoryId) { id ->
+        MentorMatchRoute(categoryId = categoryId) { id ->
             navController.navigateToMentorDetail(id)
         }
     }
