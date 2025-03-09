@@ -1,7 +1,9 @@
 package com.teamwizdum.wizdum.feature.onboarding
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -34,10 +37,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.Lecture
 import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
@@ -45,14 +52,15 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
+import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
+import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
-import com.teamwizdum.wizdum.feature.onboarding.info.Level
 
 // TODO: Status Bar 영역 체크
 
 @Composable
-fun MentorDetailScreen(
+fun MentorDetailRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
     classId: Int,
     onNavigateNext: () -> Unit,
@@ -63,11 +71,11 @@ fun MentorDetailScreen(
 
     val mentorInfo = viewModel.mentorInfo.collectAsState().value
 
-    MentorDetailContent(mentorInfo = mentorInfo, onNavigateNext = onNavigateNext)
+    MentorDetailScreen(mentorInfo = mentorInfo, onNavigateNext = onNavigateNext)
 }
 
 @Composable
-private fun MentorDetailContent(mentorInfo: MentorDetailResponse, onNavigateNext: () -> Unit) {
+private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext: () -> Unit) {
     var columnHeightFraction by remember { mutableStateOf(0.76f) }
     val animatedHeight by animateFloatAsState(targetValue = columnHeightFraction, label = "")
 
@@ -89,14 +97,16 @@ private fun MentorDetailContent(mentorInfo: MentorDetailResponse, onNavigateNext
             .fillMaxSize()
             .nestedScroll(nestedScrollConnection)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(230.dp)
-                .background(color = Color.White)
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(mentorInfo.backgroundImageFilePath)
+                .crossfade(true)
+                .build(),
+            contentDescription = "멘토 프로필 이미지",
+            modifier = Modifier.fillMaxWidth()
         )
 
-        CloseAppBar()
+        CloseAppBar(isDark = true)
 
         LazyColumn(
             modifier = Modifier
@@ -116,7 +126,10 @@ private fun MentorDetailContent(mentorInfo: MentorDetailResponse, onNavigateNext
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Row {
-                            Text(text = mentorInfo.mentoName, style = WizdumTheme.typography.body1_semib)
+                            Text(
+                                text = mentorInfo.mentoName,
+                                style = WizdumTheme.typography.body1_semib
+                            )
                             Text(
                                 text = " 멘토님",
                                 style = WizdumTheme.typography.body1,
@@ -126,23 +139,42 @@ private fun MentorDetailContent(mentorInfo: MentorDetailResponse, onNavigateNext
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = mentorInfo.classTitle, style = WizdumTheme.typography.h2)
+                    
                     Spacer(modifier = Modifier.height(8.dp))
                     LevelInfo(level = mentorInfo.itemLevel)
+
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = mentorInfo.wiseSaying,
-                        style = WizdumTheme.typography.body2,
-                        textAlign = TextAlign.Center,
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(color = Color.White, shape = RoundedCornerShape(10.dp))
-                            .padding(horizontal = 32.dp, vertical = 16.dp)
-                    )
+                            .border(
+                                width = 1.dp,
+                                color = Green200,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .padding(horizontal = 32.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.img_speech_balloon),
+                            contentDescription = "멘토의 한마디",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "\"${mentorInfo.wiseSaying}\"",
+                            style = WizdumTheme.typography.body2,
+                            color = Green200,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(text = "멘토링 스타일", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
-                    // TODO: API 값 필요
                     Text(text = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!", style = WizdumTheme.typography.body1)
+
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(text = "배울점", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
@@ -162,18 +194,17 @@ private fun MentorDetailContent(mentorInfo: MentorDetailResponse, onNavigateNext
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(text = "강의 리스트", style = WizdumTheme.typography.body1_semib)
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    items(mentorInfo.lectures.size) {index ->
+                    items(mentorInfo.lectures.size) { index ->
                         QuestCard(mentorInfo.lectures[index])
                     }
                 }
                 Spacer(modifier = Modifier.height(200.dp))
-
             }
-
         }
         Box(
             modifier = Modifier
@@ -242,7 +273,7 @@ fun QuestCardPreview() {
 @Composable
 fun MentorDetailScreenPreview() {
     WizdumTheme {
-        MentorDetailContent(
+        MentorDetailScreen(
             mentorInfo = MentorDetailResponse(
                 mentoName = "스파르타",
                 classTitle = "스파르타 코딩클럽",
