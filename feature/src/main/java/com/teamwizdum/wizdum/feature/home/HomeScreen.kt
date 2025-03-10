@@ -2,6 +2,7 @@ package com.teamwizdum.wizdum.feature.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.BeforeAndInProgressLecture
 import com.teamwizdum.wizdum.data.model.response.FinishLecture
 import com.teamwizdum.wizdum.data.model.response.HomeResponse
+import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
@@ -49,18 +51,33 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelStarRating
 import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
 
 @Composable
-fun HomeRoute(padding: PaddingValues, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeRoute(
+    viewModel: HomeViewModel = hiltViewModel(),
+    padding: PaddingValues,
+    onNavigateToInterest: () -> Unit,
+    onNavigateToLecture: (Int) -> Unit,
+) {
     LaunchedEffect(Unit) {
         viewModel.getHomeData()
     }
 
     val homeInfo = viewModel.homeData.collectAsState().value
 
-    HomeScreen(padding, homeInfo)
+    HomeScreen(
+        padding = padding,
+        homeInfo = homeInfo,
+        onNavigateToInterest = onNavigateToInterest,
+        onNavigateToLecture = onNavigateToLecture
+    )
 }
 
 @Composable
-fun HomeScreen(padding: PaddingValues, homeInfo: HomeResponse) {
+fun HomeScreen(
+    padding: PaddingValues,
+    homeInfo: HomeResponse,
+    onNavigateToInterest: () -> Unit,
+    onNavigateToLecture: (Int) -> Unit,
+) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -121,14 +138,19 @@ fun HomeScreen(padding: PaddingValues, homeInfo: HomeResponse) {
                     }
 
                     if (homeInfo.beforeAndInProgressLectures.isEmpty()) {
-                        TodayWizCard()
+                        TodayWizCard(
+                            onNavigateToInterest = onNavigateToInterest
+                        )
                     } else {
                         LazyRow(
                             modifier = Modifier.padding(top = 16.dp, start = 32.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(homeInfo.beforeAndInProgressLectures) { quest ->
-                                InProgressWizCard(quest)
+                            items(homeInfo.beforeAndInProgressLectures) { lecture ->
+                                InProgressWizCard(
+                                    inProgressLecture = lecture,
+                                    onNavigateToLecture = { onNavigateToLecture(lecture.classId) }
+                                )
                             }
                         }
                     }
@@ -165,8 +187,11 @@ fun HomeScreen(padding: PaddingValues, homeInfo: HomeResponse) {
                             )
                         }
                     } else {
-                        for (lecture in homeInfo.finishLectures) {
-                            CollectionWizCard(lecture)
+                        homeInfo.finishLectures.forEach { lecture ->
+                            CollectionWizCard(
+                                finishedLecture = lecture,
+                                onNavigateToLecture = { onNavigateToLecture(lecture.classId) }
+                            )
                         }
                     }
                 }
@@ -176,11 +201,12 @@ fun HomeScreen(padding: PaddingValues, homeInfo: HomeResponse) {
 }
 
 @Composable
-fun TodayWizCard() {
+fun TodayWizCard(onNavigateToInterest: () -> Unit) {
     Box(
         modifier = Modifier
-            .width(170.dp)
+            .width(202.dp)
             .height(194.dp)
+            .padding(start = 32.dp)
     ) {
         Box(
             modifier = Modifier
@@ -216,7 +242,10 @@ fun TodayWizCard() {
                 modifier = Modifier
                     .size(54.dp)
                     .background(color = Green200, shape = CircleShape)
-                    .align(Alignment.Center),
+                    .align(Alignment.Center)
+                    .noRippleClickable {
+                        onNavigateToInterest()
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -229,12 +258,18 @@ fun TodayWizCard() {
 }
 
 @Composable
-fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
+fun InProgressWizCard(
+    inProgressLecture: BeforeAndInProgressLecture,
+    onNavigateToLecture: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .width(180.dp)
             .height(230.dp)
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
+            .clickable {
+                onNavigateToLecture()
+            }
             .padding(16.dp)
     ) {
         AsyncImage(
@@ -262,12 +297,18 @@ fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
 }
 
 @Composable
-fun CollectionWizCard(finishedLecture: FinishLecture) {
+fun CollectionWizCard(
+    finishedLecture: FinishLecture,
+    onNavigateToLecture: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp)
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
+            .clickable {
+                onNavigateToLecture()
+            }
     ) {
         Box(
             modifier = Modifier
@@ -320,7 +361,7 @@ fun CollectionWizCard(finishedLecture: FinishLecture) {
 @Composable
 fun TodayWizCardPreview() {
     WizdumTheme {
-        TodayWizCard()
+        TodayWizCard {}
     }
 }
 
@@ -333,12 +374,13 @@ fun InProgressWizCardPreview() {
                 mentoId = 1,
                 mentoName = "스파르타",
                 logoFilePath = "",
+                classId = 0,
                 classTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 lectureId = 1,
                 lectureStatus = "WAIT",
                 itemLevel = "MEDIUM"
             )
-        )
+        ) {}
     }
 }
 
@@ -351,10 +393,11 @@ fun CollectionWizCardPreview() {
                 mentoId = 2,
                 mentoName = "윈스턴 처칠",
                 mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+                classId = 0,
                 lectureId = 2,
                 completedAt = "2023-10-27 10:00:00"
             )
-        )
+        ) {}
     }
 }
 
@@ -370,6 +413,7 @@ fun HomeScreenPreview() {
                 mentoId = 1,
                 mentoName = "스파르타",
                 logoFilePath = "",
+                classId = 0,
                 classTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 lectureId = 1,
                 lectureStatus = "WAIT",
@@ -381,12 +425,18 @@ fun HomeScreenPreview() {
                 mentoId = 2,
                 mentoName = "윈스턴 처칠",
                 mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+                classId = 0,
                 lectureId = 2,
                 completedAt = "2023-10-27 10:00:00"
             )
         )
     )
     WizdumTheme {
-        HomeScreen(padding = PaddingValues(), homeResponse)
+        HomeScreen(
+            padding = PaddingValues(),
+            homeInfo = homeResponse,
+            onNavigateToInterest = {},
+            onNavigateToLecture = {}
+        )
     }
 }

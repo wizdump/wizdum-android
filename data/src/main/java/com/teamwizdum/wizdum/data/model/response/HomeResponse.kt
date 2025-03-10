@@ -16,6 +16,7 @@ data class BeforeAndInProgressLecture(
     val mentoId: Int,
     val mentoName: String,
     val logoFilePath: String,
+    val classId: Int,
     val lectureId: Int,
     val classTitle: String,
     val lectureStatus: String,
@@ -26,6 +27,7 @@ data class BeforeAndInProgressLecture(
 data class FinishLecture(
     val mentoId: Int,
     val mentoName: String,
+    val classId: Int,
     val lectureId: Int,
     val mentoLectureTitle: String,
     val completedAt: String,
