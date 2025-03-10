@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +38,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
+import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.theme.Black200
+import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
@@ -79,7 +85,108 @@ private fun MentorMatchScreen(
                 )
             }
             Spacer(modifier = Modifier.height(38.dp))
-            MentorCardPager(mentors, onNavigateToDetail)
+
+            /**
+             * 기존 여러 명의 멘토 추천에서 단일 멘토 추천으로 변경됨
+             */
+            LazyColumn {
+                item {
+                    mentors.forEach { mentor ->
+                        RenewalMentorCard(mentorInfo = mentor)
+                    }
+                    Spacer(modifier = Modifier.height(200.dp))
+                }
+            }
+
+            // MentorCardPager(mentors, onNavigateToDetail)
+        }
+        WizdumFilledButton(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 80.dp, start = 32.dp, end = 32.dp),
+            title = "강의 미리보기"
+        ) {
+            mentors.forEach { mentors ->
+                onNavigateToDetail(mentors.classId)
+            }
+        }
+    }
+}
+
+@Composable
+fun RenewalMentorCard(mentorInfo: MentorsResponse) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+            .clip(shape = RoundedCornerShape(20.dp))
+            .background(color = Color.White)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = mentorInfo.mentoName, style = WizdumTheme.typography.h3_semib)
+                Text(text = " 멘토님", style = WizdumTheme.typography.body1, color = Black600)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(mentorInfo.logoImageFilePath)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "멘토 프로필 이미지",
+                modifier = Modifier
+                    .size(197.dp)
+                    .background(color = Black600)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = mentorInfo.classTitle,
+                style = WizdumTheme.typography.h3_semib,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LevelInfo(level = mentorInfo.itemLevel)
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = Black200,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+
+            Column {
+                Text(
+                    text = "이 강의를 들으면 무엇이 달라질까요?",
+                    style = WizdumTheme.typography.body2_semib,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                // TODO: 서버 데이터로 변경해야 한다
+
+                val temp = listOf(
+                    "직관이 아닌 논리로 의사결정을 내리는 법을 배울 수 있어요.",
+                    "조직을 운영하는 논리적 사고 프레임워크를 구축할 수 있어요.",
+                    "상대의 행동을 예측하고, 최적의 협상 전략을 설계할 수 있어요."
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                temp.forEach {
+                    Row(verticalAlignment = Alignment.Top) {
+                        Box(
+                            modifier = Modifier
+                                .padding(6.dp)
+                                .size(2.dp)
+                                .background(color = Black500, shape = CircleShape)
+                        )
+                        Text(text = it, style = WizdumTheme.typography.body2)
+                    }
+                }
+            }
         }
     }
 }
@@ -104,7 +211,7 @@ fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateToDetail: (Int)
 }
 
 @Composable
-private fun MentorCard(
+fun MentorCard(
     page: Int,
     pagerState: PagerState,
     mentorInfo: MentorsResponse,
@@ -170,40 +277,6 @@ private fun MentorCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LevelInfo(level = mentorInfo.itemLevel)
-
-//                HorizontalDivider(
-//                    thickness = 1.dp,
-//                    color = Black200,
-//                    modifier = Modifier.padding(vertical = 16.dp)
-//                )
-
-//                Column {
-//                    Text(
-//                        text = "이 강의를 들으면 무엇이 달라질까요?",
-//                        style = WizdumTheme.typography.body2_semib,
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-//                    // TODO: 서버 데이터로 변경해야 한다
-
-//                    val temp = listOf(
-//                        "직관이 아닌 논리로 의사결정을 내리는 법을 배울 수 있어요.",
-//                        "조직을 운영하는 논리적 사고 프레임워크를 구축할 수 있어요.",
-//                        "상대의 행동을 예측하고, 최적의 협상 전략을 설계할 수 있어요."
-//                    )
-//                    Spacer(modifier = Modifier.height(8.dp))
-//                    temp.forEach {
-//                        Row(verticalAlignment = Alignment.Top) {
-//                            Box(
-//                                modifier = Modifier
-//                                    .padding(6.dp)
-//                                    .height(2.dp)
-//                                    .width(2.dp)
-//                                    .background(color = Black500, shape = CircleShape)
-//                            )
-//                            Text(text = it, style = WizdumTheme.typography.body2)
-//                        }
-//                    }
-//                }
             }
             Box(
                 modifier = Modifier
@@ -223,6 +296,19 @@ private fun MentorCard(
     }
 }
 
+@Preview
+@Composable
+fun RenewalMentorCardPreview() {
+    WizdumTheme {
+        RenewalMentorCard(
+            mentorInfo = MentorsResponse(
+                mentoName = "스파르타",
+                classTitle = "스파르타 코딩클럽\n시작해보자",
+                itemLevel = "HIGH"
+            ),
+        )
+    }
+}
 
 @Preview
 @Composable
