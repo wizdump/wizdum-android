@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
 import com.teamwizdum.wizdum.feature.home.HomeRoute
-import com.teamwizdum.wizdum.feature.mypage.MyPageRoute
+import com.teamwizdum.wizdum.feature.mypage.navigation.MyPageRoute
 
 class MainNavigator(private val navController: NavHostController) {
 
@@ -26,7 +26,7 @@ class MainNavigator(private val navController: NavHostController) {
         }
         when (tab) {
             MainNavigationTab.HOME -> navController.navigate(HomeRoute.HOME, navOption)
-            MainNavigationTab.MYPAGE -> navController.navigate(MyPageRoute.MYPAGE, navOption)
+            MainNavigationTab.MY_PAGE -> navController.navigate(MyPageRoute.MY_PAGE, navOption)
         }
     }
 

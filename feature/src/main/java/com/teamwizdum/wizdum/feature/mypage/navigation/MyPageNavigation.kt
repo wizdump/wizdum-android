@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.mypage
+package com.teamwizdum.wizdum.feature.mypage.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
@@ -7,6 +7,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.teamwizdum.wizdum.feature.login.navigation.navigateToLogin
+import com.teamwizdum.wizdum.feature.mypage.MyPageRoute
+import com.teamwizdum.wizdum.feature.mypage.TermScreen
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -20,6 +23,9 @@ fun NavGraphBuilder.myPageScreen(padding: PaddingValues, navController: NavHostC
     composable(route = MyPageRoute.MY_PAGE) {
         MyPageRoute(
             padding = padding,
+            onNavigateToLogin = {
+                navController.navigateToLogin()
+            },
             onNavigateToTerm = { title, webUrl ->
                 navController.navigateToTerm(title, webUrl)
             }

@@ -28,17 +28,20 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    fun logout() {
+    fun logout(onSuccess: () -> Unit) {
         viewModelScope.launch {
-            tokenRepository.deleteTokens()
+            userRepository.logout().collect {
+                tokenRepository.deleteTokens()
+                onSuccess()
+            }
         }
     }
 
-    fun withdraw() {
+    fun withdraw(onSuccess: () -> Unit) {
         viewModelScope.launch {
             userRepository.withdraw().collect {
                 tokenRepository.deleteTokens()
-                // TODO: 성공 시 -> 로그인 화면으로 이동
+                onSuccess()
             }
         }
     }

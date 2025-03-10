@@ -1,7 +1,6 @@
 package com.teamwizdum.wizdum.feature.mypage
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +44,7 @@ import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel.Companion.TERMS_OF_S
 fun MyPageRoute(
     padding: PaddingValues,
     viewModel: MyPageViewModel = hiltViewModel(),
+    onNavigateToLogin: () -> Unit,
     onNavigateToTerm: (String, String) -> Unit,
 ) {
 
@@ -57,6 +57,16 @@ fun MyPageRoute(
     MyPageScreen(
         padding = padding,
         userInfo = userInfo,
+        onLogout = {
+            viewModel.logout {
+                onNavigateToLogin()
+            }
+        },
+        onWithdraw = {
+            viewModel.withdraw {
+                onNavigateToLogin()
+            }
+        },
         onNavigateToTerm = onNavigateToTerm
     )
 }
@@ -65,6 +75,8 @@ fun MyPageRoute(
 private fun MyPageScreen(
     padding: PaddingValues,
     userInfo: UserResponse,
+    onLogout: () -> Unit,
+    onWithdraw: () -> Unit,
     onNavigateToTerm: (String, String) -> Unit,
 ) {
     Box(
@@ -104,21 +116,25 @@ private fun MyPageScreen(
                     .padding(top = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                MyPageWithIconSection("개인정보처리") {
-                    onNavigateToTerm("개인정보처리", PRIVACY_POLICY)
-                }
-                MyPageWithIconSection("이용약관") {
-                    onNavigateToTerm("이용약관", TERMS_OF_SERVICE)
-                }
+                MyPageWithIconSection(
+                    title = "개인정보처리",
+                    onClick = { onNavigateToTerm("개인정보처리", PRIVACY_POLICY) }
+                )
+                MyPageWithIconSection(
+                    title = "이용약관",
+                    onClick = { onNavigateToTerm("이용약관", TERMS_OF_SERVICE) }
+                )
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
                 )
-                MyPageSection(title = "로그아웃", onClick = {
-
-                })
-                MyPageSection(title = "회원탈퇴", onClick = {
-
-                })
+                MyPageSection(
+                    title = "로그아웃",
+                    onClick = { onLogout() }
+                )
+                MyPageSection(
+                    title = "회원탈퇴",
+                    onClick = { onWithdraw() }
+                )
             }
         }
     }
@@ -167,7 +183,10 @@ fun MyPageScreenPreview() {
                 email = "aaa@naver.com",
                 name = "유니",
                 password = ""
-            )
-        ) { _, _ -> }
+            ),
+            onLogout = {},
+            onWithdraw = {},
+            onNavigateToTerm = { _, _ -> }
+        )
     }
 }

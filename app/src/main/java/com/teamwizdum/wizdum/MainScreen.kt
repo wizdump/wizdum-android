@@ -44,7 +44,7 @@ import com.teamwizdum.wizdum.feature.chat.navigation.chatScreen
 import com.teamwizdum.wizdum.feature.home.HomeRoute
 import com.teamwizdum.wizdum.feature.home.homeScreen
 import com.teamwizdum.wizdum.feature.login.navigation.loginScreen
-import com.teamwizdum.wizdum.feature.mypage.myPageScreen
+import com.teamwizdum.wizdum.feature.mypage.navigation.myPageScreen
 import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToInterest
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 import com.teamwizdum.wizdum.feature.quest.navigation.lectureScreen

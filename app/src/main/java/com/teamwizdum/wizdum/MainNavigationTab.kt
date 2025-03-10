@@ -1,7 +1,7 @@
 package com.teamwizdum.wizdum
 
 import com.teamwizdum.wizdum.feature.home.HomeRoute
-import com.teamwizdum.wizdum.feature.mypage.MyPageRoute
+import com.teamwizdum.wizdum.feature.mypage.navigation.MyPageRoute
 
 enum class MainNavigationTab(
     val selectedResId: Int,
