@@ -2,7 +2,7 @@ package com.teamwizdum.wizdum.feature.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,7 +26,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,10 +41,7 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.BeforeAndInProgressLecture
 import com.teamwizdum.wizdum.data.model.response.FinishLecture
 import com.teamwizdum.wizdum.data.model.response.HomeResponse
-import com.teamwizdum.wizdum.designsystem.component.badge.TextWithIconBadge
 import com.teamwizdum.wizdum.designsystem.theme.Black100
-import com.teamwizdum.wizdum.designsystem.theme.Black500
-import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
@@ -53,18 +49,18 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelStarRating
 import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
 
 @Composable
-fun HomeScreen(padding: PaddingValues, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeRoute(padding: PaddingValues, viewModel: HomeViewModel = hiltViewModel()) {
     LaunchedEffect(Unit) {
         viewModel.getHomeData()
     }
 
     val homeInfo = viewModel.homeData.collectAsState().value
 
-    HomeContent(padding, homeInfo)
+    HomeScreen(padding, homeInfo)
 }
 
 @Composable
-private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
+fun HomeScreen(padding: PaddingValues, homeInfo: HomeResponse) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -110,10 +106,12 @@ private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = Black100)
-                    .padding(32.dp)
             ) {
                 item {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.padding(top = 32.dp, start = 32.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(text = "지금 듣고 있는 클래스", style = WizdumTheme.typography.body1_semib)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
@@ -125,7 +123,10 @@ private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
                     if (homeInfo.beforeAndInProgressLectures.isEmpty()) {
                         TodayWizCard()
                     } else {
-                        LazyRow(modifier = Modifier.padding(top = 16.dp)) {
+                        LazyRow(
+                            modifier = Modifier.padding(top = 16.dp, start = 32.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
                             items(homeInfo.beforeAndInProgressLectures) { quest ->
                                 InProgressWizCard(quest)
                             }
@@ -133,7 +134,10 @@ private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
                     }
 
                     Spacer(modifier = Modifier.height(40.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier.padding(start = 32.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(text = "습득한 Wiz", style = WizdumTheme.typography.body1_semib)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
@@ -148,6 +152,7 @@ private fun HomeContent(padding: PaddingValues, homeInfo: HomeResponse) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(51.dp)
+                                .padding(horizontal = 32.dp)
                                 .background(color = Color.White, shape = RoundedCornerShape(20.dp))
                                 .padding(16.dp)
                         ) {
@@ -248,7 +253,7 @@ fun InProgressWizCard(inProgressLecture: BeforeAndInProgressLecture) {
         Text(text = "${inProgressLecture.mentoName} 멘토님", style = WizdumTheme.typography.body3)
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = inProgressLecture.mentoLectureTitle,
+            text = inProgressLecture.classTitle,
             style = WizdumTheme.typography.body1_semib
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -261,6 +266,7 @@ fun CollectionWizCard(finishedLecture: FinishLecture) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 32.dp)
             .background(color = Color.White, shape = RoundedCornerShape(20.dp))
     ) {
         Box(
@@ -318,21 +324,39 @@ fun TodayWizCardPreview() {
     }
 }
 
-//@Preview
-//@Composable
-//fun InProgressWizCardPreview() {
-//    WizdumTheme {
-//        InProgressWizCard()
-//    }
-//}
-//
-//@Preview
-//@Composable
-//fun CollectionWizCardPreview() {
-//    WizdumTheme {
-//        CollectionWizCard()
-//    }
-//}
+@Preview
+@Composable
+fun InProgressWizCardPreview() {
+    WizdumTheme {
+        InProgressWizCard(
+            BeforeAndInProgressLecture(
+                mentoId = 1,
+                mentoName = "스파르타",
+                logoFilePath = "",
+                classTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+                lectureId = 1,
+                lectureStatus = "WAIT",
+                itemLevel = "MEDIUM"
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun CollectionWizCardPreview() {
+    WizdumTheme {
+        CollectionWizCard(
+            FinishLecture(
+                mentoId = 2,
+                mentoName = "윈스턴 처칠",
+                mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+                lectureId = 2,
+                completedAt = "2023-10-27 10:00:00"
+            )
+        )
+    }
+}
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
@@ -346,7 +370,7 @@ fun HomeScreenPreview() {
                 mentoId = 1,
                 mentoName = "스파르타",
                 logoFilePath = "",
-                mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+                classTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 lectureId = 1,
                 lectureStatus = "WAIT",
                 itemLevel = "MEDIUM"
@@ -363,6 +387,6 @@ fun HomeScreenPreview() {
         )
     )
     WizdumTheme {
-        HomeContent(padding = PaddingValues(), homeResponse)
+        HomeScreen(padding = PaddingValues(), homeResponse)
     }
 }
