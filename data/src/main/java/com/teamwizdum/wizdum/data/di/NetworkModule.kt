@@ -2,6 +2,7 @@ package com.teamwizdum.wizdum.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.teamwizdum.wizdum.data.network.TokenInterceptor
+import com.teamwizdum.wizdum.data.retrofit.ResultCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,6 +61,7 @@ object NetworkModule {
         json: Json,
     ): Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
+        .addCallAdapterFactory(ResultCallAdapterFactory())
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .client(okHttpClient)
         .build()
