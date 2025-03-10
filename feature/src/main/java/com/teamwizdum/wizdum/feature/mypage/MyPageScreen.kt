@@ -29,17 +29,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.UserResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.TitleAppbar
+import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.Black100
-import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel.Companion.PRIVACY_POLICY
+import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel.Companion.TERMS_OF_SERVICE
 
 @Composable
-fun MyPageScreen(padding: PaddingValues, viewModel: MyPageViewModel) {
+fun MyPageRoute(
+    padding: PaddingValues,
+    viewModel: MyPageViewModel = hiltViewModel(),
+    onNavigateToTerm: (String, String) -> Unit,
+) {
 
     LaunchedEffect(Unit) {
         viewModel.getUserInfo()
@@ -47,11 +54,19 @@ fun MyPageScreen(padding: PaddingValues, viewModel: MyPageViewModel) {
 
     val userInfo = viewModel.userInfo.collectAsState().value
 
-    MyPageContent(userInfo = userInfo, onNavigateToTerm = {})
+    MyPageScreen(
+        padding = padding,
+        userInfo = userInfo,
+        onNavigateToTerm = onNavigateToTerm
+    )
 }
 
 @Composable
-private fun MyPageContent(userInfo: UserResponse, onNavigateToTerm: () -> Unit) {
+private fun MyPageScreen(
+    padding: PaddingValues,
+    userInfo: UserResponse,
+    onNavigateToTerm: (String, String) -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +87,7 @@ private fun MyPageContent(userInfo: UserResponse, onNavigateToTerm: () -> Unit) 
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(color = Black600)
+                            .background(color = Color.White)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
@@ -90,10 +105,10 @@ private fun MyPageContent(userInfo: UserResponse, onNavigateToTerm: () -> Unit) 
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 MyPageWithIconSection("개인정보처리") {
-                    onNavigateToTerm()
+                    onNavigateToTerm("개인정보처리", PRIVACY_POLICY)
                 }
                 MyPageWithIconSection("이용약관") {
-                    onNavigateToTerm()
+                    onNavigateToTerm("이용약관", TERMS_OF_SERVICE)
                 }
                 HorizontalDivider(
                     modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
@@ -115,11 +130,11 @@ private fun MyPageWithIconSection(title: String, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp, vertical = 8.dp)
-            .clickable {
+            .noRippleClickable {
                 onClick()
             },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Absolute.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = title, style = WizdumTheme.typography.body1)
         Icon(
@@ -136,9 +151,7 @@ private fun MyPageSection(title: String, onClick: () -> Unit) {
         style = WizdumTheme.typography.body1,
         modifier = Modifier
             .padding(horizontal = 32.dp, vertical = 8.dp)
-            .clickable {
-                onClick()
-            }
+            .noRippleClickable { onClick() }
     )
 }
 
@@ -146,14 +159,15 @@ private fun MyPageSection(title: String, onClick: () -> Unit) {
 @Composable
 fun MyPageScreenPreview() {
     WizdumTheme {
-        MyPageContent(
-            UserResponse(
+        MyPageScreen(
+            padding = PaddingValues(),
+            userInfo = UserResponse(
                 userId = 1,
                 snsId = 1,
                 email = "aaa@naver.com",
                 name = "유니",
                 password = ""
             )
-        ) {}
+        ) { _, _ -> }
     }
 }

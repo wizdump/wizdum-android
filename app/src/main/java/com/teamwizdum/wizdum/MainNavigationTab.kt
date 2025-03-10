@@ -15,11 +15,11 @@ enum class MainNavigationTab(
         label = R.string.bottom_navigation_label_home,
         route = HomeRoute.HOME
     ),
-    MYPAGE(
+    MY_PAGE(
         selectedResId = R.drawable.ic_mypage_selected,
         unSelectedResId = R.drawable.ic_mypage,
         label = R.string.bottom_navigation_label_mypage,
-        route = MyPageRoute.MYPAGE
+        route = MyPageRoute.MY_PAGE
     );
 
     companion object {

@@ -64,8 +64,8 @@ fun MainScreen(navController: NavHostController) {
                 loginScreen(navController = navController)
                 lectureScreen(navController = navController)
                 chatScreen(navController = navController)
-                homeScreen(padding = innerPadding)
-                myPageScreen(padding = innerPadding)
+                homeScreen(padding = innerPadding, navController = navController)
+                myPageScreen(padding = innerPadding, navController = navController)
             }
         },
         bottomBar = {
@@ -121,7 +121,7 @@ private fun WizdumBottomBar(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 val isHomeSelected = (currentTab == MainNavigationTab.HOME)
-                val isMyPageSelected = (currentTab == MainNavigationTab.MYPAGE)
+                val isMyPageSelected = (currentTab == MainNavigationTab.MY_PAGE)
 
                 NavigationItem(
                     navTab = MainNavigationTab.HOME,
@@ -130,9 +130,9 @@ private fun WizdumBottomBar(
                 )
                 Spacer(modifier = Modifier.width(46.dp))
                 NavigationItem(
-                    navTab = MainNavigationTab.MYPAGE,
+                    navTab = MainNavigationTab.MY_PAGE,
                     isSelected = isMyPageSelected,
-                    onClick = { onClick(MainNavigationTab.MYPAGE) }
+                    onClick = { onClick(MainNavigationTab.MY_PAGE) }
                 )
             }
         }

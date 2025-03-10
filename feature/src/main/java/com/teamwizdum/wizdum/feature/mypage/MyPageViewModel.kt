@@ -42,4 +42,9 @@ class MyPageViewModel @Inject constructor(
             }
         }
     }
+
+    companion object {
+        const val PRIVACY_POLICY = "https://sites.google.com/view/wizdum-privacy"
+        const val TERMS_OF_SERVICE = "https://sites.google.com/view/wizdum-service"
+    }
 }
