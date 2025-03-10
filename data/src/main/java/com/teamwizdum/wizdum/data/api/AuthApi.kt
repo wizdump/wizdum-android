@@ -20,5 +20,5 @@ interface AuthApi {
     suspend fun logout(): Response<Unit>
 
     @POST("auth/token")
-    suspend fun refreshAccessToken(@Body refreshToken: RefreshTokenRequest): TokenResponse
+    suspend fun refreshAccessToken(@Body refreshToken: RefreshTokenRequest): Response<TokenResponse>
 }
