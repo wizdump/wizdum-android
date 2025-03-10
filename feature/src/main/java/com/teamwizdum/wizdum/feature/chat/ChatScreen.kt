@@ -6,26 +6,18 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,28 +31,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.theme.Black100
-import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black300
-import com.teamwizdum.wizdum.designsystem.theme.Black500
-import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
-import com.teamwizdum.wizdum.designsystem.theme.robotoFontFamily
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.chat.component.ChatBubble
 import com.teamwizdum.wizdum.feature.chat.component.ChatFinishSelectionBox
 import com.teamwizdum.wizdum.feature.chat.component.ChatHeader
 import com.teamwizdum.wizdum.feature.chat.component.ChatStartSelectionBox
+import com.teamwizdum.wizdum.feature.chat.component.ChatTextField
 import com.teamwizdum.wizdum.feature.chat.component.ChatWithProfileBubble
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
+import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
 
@@ -75,12 +62,12 @@ fun ChatRoute(
         viewModel.initialize(lectureInfo.lectureId)
     }
 
-    val message = viewModel.message.collectAsState().value
+    val messages = viewModel.messages.collectAsState().value
 
     ChatScreen(
-        lectureInfo = lectureInfo,
-        message = message,
         viewModel = viewModel,
+        lectureInfo = lectureInfo,
+        messages = messages,
         onNavigateToClear = { onNavigateToClear(it) },
         onNavigateToAllClear = {
             onNavigateToAllClear(
@@ -93,39 +80,72 @@ fun ChatRoute(
 
 @Composable
 private fun ChatScreen(
-    lectureInfo: LectureArgument,
-    message: List<ChatMessage>,
     viewModel: ChatViewModel,
+    lectureInfo: LectureArgument,
+    messages: List<ChatMessage>,
     onNavigateToClear: (LectureClearArgument) -> Unit,
     onNavigateToAllClear: () -> Unit,
 ) {
     val listState = rememberLazyListState()
 
     val isReceivingMessage = viewModel.isReceiving.collectAsState().value
+    var isSelectionBoxVisible by remember { mutableStateOf(messages.isEmpty()) }
     var isInputEnabled by remember { mutableStateOf(true) }
 
-    if (lectureInfo.lectureStatus == "DONE") {
-        isInputEnabled = false
-    }
-
-    LaunchedEffect(isReceivingMessage) {
-        isInputEnabled = !isReceivingMessage
-    }
-
-    LaunchedEffect(message.size) {
-        if (message.isNotEmpty()) {
-            listState.animateScrollToItem(message.lastIndex)
+    LaunchedEffect(isReceivingMessage, isSelectionBoxVisible, isInputEnabled) {
+        isInputEnabled = when {
+            isReceivingMessage -> false
+            isSelectionBoxVisible -> false
+            lectureInfo.lectureStatus == QuestStatus.DONE.name -> false
+            else -> true
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        BackAppBar(title = "${lectureInfo.orderSeq}강 - ${lectureInfo.lectureTitle}")
+    // 마지막 메세지로 자동 스크롤
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.lastIndex)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        BackAppBar(
+            title = "${lectureInfo.orderSeq}강 · ${lectureInfo.lectureTitle}",
+            actions = {
+                if (viewModel.checkOngoing())
+                    Row(
+                        modifier = Modifier.clickable {
+                            // 종료 처리
+                        },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_btn_exit),
+                            contentDescription = "대화 종료 및 나가기"
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "대화종료",
+                            style = WizdumTheme.typography.body2,
+                            color = WizdumTheme.colorScheme.error
+                        )
+                    }
+            }
+        )
         HorizontalDivider(thickness = 1.dp, color = Black300)
+
         ChatMessages(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            listState = listState,
             isReceiving = isReceivingMessage,
+            isSelectionBoxVisible = isSelectionBoxVisible,
+            mentorName = lectureInfo.mentorName,
+            mentorImgUrl = lectureInfo.mentorImgUrl,
+            isLastLecture = lectureInfo.isLastLecture,
+            messageList = messages,
+            onStartChat = { isSelectionBoxVisible = false },
             sendMessage = { isHide, text ->
                 viewModel.sendMessage(
                     name = lectureInfo.userName,
@@ -134,13 +154,6 @@ private fun ChatScreen(
                     isHide = isHide
                 )
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            mentorName = lectureInfo.mentorName,
-            mentorImgUrl = lectureInfo.mentorImgUrl,
-            messageList = message,
-            listState = listState,
             onNavigateToClear = {
                 viewModel.finishQuest(1) { encouragement ->
                     onNavigateToClear(
@@ -153,25 +166,41 @@ private fun ChatScreen(
                         )
                     )
                 }
+            },
+            onNavigateToAllClear = {
+                onNavigateToAllClear()
             }
         )
-        ChatTextField(viewModel = viewModel, isInputEnabled = isInputEnabled)
+
+        ChatTextField(
+            isInputEnabled = isInputEnabled,
+            sendMessage = { text ->
+                viewModel.setReceiving(true)
+                viewModel.sendMessage(
+                    name = lectureInfo.userName,
+                    lectureId = lectureInfo.lectureId,
+                    message = text
+                )
+            }
+        )
     }
 }
 
 @Composable
 fun ChatMessages(
-    isReceiving: Boolean = false,
-    sendMessage: (Boolean, String) -> Unit,
     modifier: Modifier,
+    listState: LazyListState,
+    isReceiving: Boolean = false,
+    isSelectionBoxVisible: Boolean,
     mentorName: String,
     mentorImgUrl: String,
+    isLastLecture: Boolean,
     messageList: List<ChatMessage>,
-    listState: LazyListState,
+    onStartChat: () -> Unit,
+    sendMessage: (Boolean, String) -> Unit,
     onNavigateToClear: () -> Unit,
+    onNavigateToAllClear: () -> Unit
 ) {
-    var isStartBoxVisible by remember { mutableStateOf(true) }
-
     LazyColumn(
         modifier = modifier
             .padding(start = 16.dp, end = 16.dp)
@@ -182,10 +211,10 @@ fun ChatMessages(
         item {
             ChatHeader(messageList = messageList, mentorName = mentorName)
 
-            if (messageList.isEmpty() && isStartBoxVisible) {
+            if (isSelectionBoxVisible) {
                 ChatStartSelectionBox(
                     onStart = {
-                        isStartBoxVisible = false
+                        onStartChat()
                         sendMessage(true, "대화해줘")
                     },
                     onNavigateBack = {
@@ -195,31 +224,35 @@ fun ChatMessages(
             }
         }
 
-        items(messageList) { message ->
-            when (message.type) {
+        items(messageList) { chat ->
+            when (chat.type) {
                 MessageType.USER_REQUEST.name -> {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
-                        message.message.content?.let {
-                            ChatBubble(message = it)
-                        }
+                        ChatBubble(message = chat.message.content)
                     }
                 }
 
                 MessageType.MENTOR_RESPONSE.name -> {
-                    message.message.content?.let {
-                        ChatWithProfileBubble(
-                            message = it,
-                            imgUrl = mentorImgUrl
-                        )
-                    }
+                    ChatWithProfileBubble(
+                        message = chat.message.content,
+                        imgUrl = mentorImgUrl
+                    )
                 }
             }
 
-            if (message.message.isFinish) { // 완료된 학습 방이 아니고, 마지막 메세지가 isFinish인 경우
-                ChatFinishSelectionBox(onNavigateToClear)
+            if (chat.message.isFinish && !chat.message.isOngoing) {
+                ChatFinishSelectionBox(
+                    isLastLecture = isLastLecture,
+                    onGoing = {
+                        // 사라지고
+                        // 상단 나가기 버튼 보여주기
+                    },
+                    onNavigateToClear = onNavigateToClear,
+                    onNavigateToAllClear = onNavigateToAllClear
+                )
             }
         }
 
@@ -230,76 +263,6 @@ fun ChatMessages(
                     imgUrl = mentorImgUrl,
                 )
             }
-        }
-    }
-}
-
-
-@Composable
-fun ChatTextField(viewModel: ChatViewModel, isInputEnabled: Boolean) {
-    var text by remember { mutableStateOf("") }
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Color.White)
-            .padding(top = 16.dp, start = 32.dp, end = 32.dp, bottom = 32.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        BasicTextField(
-            value = text,
-            onValueChange = { text = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .weight(1f)
-                .background(color = Black100, shape = RoundedCornerShape(10.dp))
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            textStyle = TextStyle(
-                fontFamily = robotoFontFamily,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
-            ),
-            enabled = isInputEnabled,
-            interactionSource = interactionSource,
-            decorationBox = @Composable { innerTextField ->
-                val isFocused = interactionSource.collectIsFocusedAsState().value
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .imePadding(), verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (!isFocused && text.isEmpty()) {
-                        Text(text = "대답하기", style = WizdumTheme.typography.body1, color = Black500)
-                    }
-
-                    innerTextField()
-                }
-            }
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Box(
-            modifier = Modifier
-                .width(40.dp)
-                .height(40.dp)
-                .background(
-                    color = if (isInputEnabled) Green200 else Black200,
-                    shape = RoundedCornerShape(10.dp)
-                ) // enable color black200
-                .clickable {
-                    viewModel.setReceiving(true)
-                    viewModel.sendMessage(name = "유니", lectureId = 1, message = text)
-                    text = ""
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_btn_send_enable),
-                contentDescription = "보내기"
-            )
         }
     }
 }
@@ -323,25 +286,4 @@ fun LoadingDots() {
         fontSize = 20.sp,
         color = Color.Gray
     )
-}
-
-@Preview(showBackground = true, widthDp = 360, heightDp = 800)
-@Composable
-fun ChatScreenPreview() {
-//    val chatlist = listOf(ChatMessage(
-//        type = "MENTOR_RESPONSE",
-//        lectureId = 1,
-//        name = "스파르타 전사",
-//        accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiLjhYXjhYciLCJhdXRoIjpbXSwiaWQiOjE2LCJuYW1lIjoi44WF44WHIiwicGFzc3dvcmQiOiIiLCJpYXQiOjE3NDA3OTcxNjAsImV4cCI6MTc0MzM4OTE2MH0._hEeo0mCNgp2be2sbmuF7APAqGghZfdMncUxiCUzhpk",
-//        message = MessageContent(
-//            content = "이라도",
-//            isFinish = true,
-//            isLast = false
-//        ),
-//        isHide = false,
-//        timestamp = "2025-03-01T11:24:56.642312938"
-//    ))
-//    WizdumTheme {
-//        ChantContent(chatlist)
-//    }
 }

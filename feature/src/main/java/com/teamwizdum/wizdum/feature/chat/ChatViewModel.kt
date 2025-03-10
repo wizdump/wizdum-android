@@ -25,8 +25,8 @@ class ChatViewModel @Inject constructor(
 
     private val token = tokenRepository.getAccessToken() ?: ""
 
-    private val _message = MutableStateFlow<List<ChatMessage>>(emptyList())
-    val message: StateFlow<List<ChatMessage>> = _message.asStateFlow()
+    private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
+    val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
 
     private val _isReceiving = MutableStateFlow(false)
     val isReceiving: StateFlow<Boolean> = _isReceiving
@@ -43,7 +43,7 @@ class ChatViewModel @Inject constructor(
             webSocketRepository.observeMessage().collect { message ->
                 if (message.message.isLast) {
                     message.message.content = receivedMessage.toString()
-                    _message.value += message
+                    _messages.value += message
 
                     receivedMessage.clear()
                     _isReceiving.value = false
@@ -83,7 +83,7 @@ class ChatViewModel @Inject constructor(
         webSocketRepository.sendMessage(senderMessage)
 
         if (!isHide) {
-            _message.value += senderMessage
+            _messages.value += senderMessage
         }
     }
 
@@ -91,7 +91,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             questRepository.getChatList(lectureId).collect {
                 questRepository.getChatList(lectureId).collect {
-                    _message.value = it
+                    _messages.value = it
                 }
             }
         }
@@ -107,6 +107,13 @@ class ChatViewModel @Inject constructor(
 
     fun setReceiving(isReceiving: Boolean) {
         _isReceiving.value = isReceiving
+    }
+
+    fun checkOngoing(): Boolean {
+        _messages.value.lastOrNull()?.message?.let { lastMessage ->
+            return (lastMessage.isFinish && lastMessage.isOngoing)
+        }
+        return false
     }
 
     override fun onCleared() {

@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.teamwizdum.wizdum.designsystem.R
@@ -29,6 +30,7 @@ fun BackAppBar(
     title: String = "",
     isDark: Boolean = false,
     onNavigateBack: () -> Unit = {},
+    actions: @Composable () -> Unit = {},
 ) {
     val resId = if (isDark) R.drawable.ic_btn_back_white else R.drawable.ic_btn_back
 
@@ -46,8 +48,15 @@ fun BackAppBar(
             )
         },
         title = {
-            Text(text = title, style = WizdumTheme.typography.body1_semib)
-        }
+            Text(
+                modifier = Modifier.padding(horizontal = 100.dp),
+                text = title,
+                style = WizdumTheme.typography.body1_semib,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        actions = actions
     )
 }
 

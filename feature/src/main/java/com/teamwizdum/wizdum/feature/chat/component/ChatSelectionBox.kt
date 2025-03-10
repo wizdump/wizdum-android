@@ -63,7 +63,12 @@ fun ChatStartSelectionBox(onStart: () -> Unit, onNavigateBack: () -> Unit) {
 }
 
 @Composable
-fun ChatFinishSelectionBox(onNavigateToClear: () -> Unit) {
+fun ChatFinishSelectionBox(
+    isLastLecture: Boolean,
+    onGoing: () -> Unit,
+    onNavigateToClear: () -> Unit,
+    onNavigateToAllClear: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,15 +93,19 @@ fun ChatFinishSelectionBox(onNavigateToClear: () -> Unit) {
             title = "강의를 완료할게요",
             textStyle = WizdumTheme.typography.body2_semib
         ) {
-            /*강의 종료 -> 계속하기 화면*/
-            onNavigateToClear() // TODO: 마지막 강의 여부 Flag 필요한가?
-
+            if (isLastLecture) {
+                onNavigateToAllClear()
+            } else {
+                onNavigateToClear()
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         WizdumBorderButton(
             title = "더 물어볼래요",
             textStyle = WizdumTheme.typography.body2_semib
-        ) {/* 사라져야 함*/ }
+        ) {
+            onGoing()
+        }
     }
 }
 
@@ -105,12 +114,13 @@ fun ChatFinishSelectionBox(onNavigateToClear: () -> Unit) {
 fun ChatSelectionBox() {
     WizdumTheme {
         Column {
-            ChatStartSelectionBox(onStart = { /*TODO*/ }) {
-
-            }
-            ChatFinishSelectionBox {
-
-            }
+            ChatStartSelectionBox(onStart = {}, onNavigateBack = {})
+            ChatFinishSelectionBox(
+                isLastLecture = false,
+                onGoing = {},
+                onNavigateToClear = {},
+                onNavigateToAllClear = {}
+            )
         }
     }
 }

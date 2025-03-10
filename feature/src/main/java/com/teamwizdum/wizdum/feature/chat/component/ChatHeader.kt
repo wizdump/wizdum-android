@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.feature.chat.component
 
+import android.icu.util.LocaleData
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +18,11 @@ import java.util.Locale
 
 @Composable
 fun ChatHeader(messageList: List<ChatMessage>, mentorName: String) {
-    var date = ""
-    if (messageList.isEmpty()) {
-        val today = LocalDate.now() // 특정 날짜 설정
-        val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.KOREAN)
-        date = today.format(formatter)
+    val formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.KOREAN)
+    val date = if (messageList.isNotEmpty()) {
+        messageList.first().timestamp.format(formatter)
     } else {
-        date = messageList.first().timestamp
+        LocalDate.now().format(formatter)
     }
 
     Column(
