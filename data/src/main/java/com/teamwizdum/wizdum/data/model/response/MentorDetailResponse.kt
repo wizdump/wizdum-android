@@ -8,8 +8,10 @@ data class MentorDetailResponse(
     val mentoName: String,
     val classTitle: String,
     val backgroundImageFilePath: String? = "",
+    val mentoringStyle: String = "",
     val itemLevel: String,
     val wiseSaying: String= "",
+    val friendWithLectureCount: Int,
     val benefits: List<String> = emptyList(),
     val lectures: List<Lecture> = emptyList()
 )
@@ -18,5 +20,6 @@ data class MentorDetailResponse(
 data class Lecture(
     val lectureId: Int = 0,
     val orderSeq: Int,
-    val title: String
+    val title: String,
+    val lectureLogoFilePath: String = "",
 )

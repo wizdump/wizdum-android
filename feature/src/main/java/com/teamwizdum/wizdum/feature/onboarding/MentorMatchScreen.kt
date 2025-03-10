@@ -44,11 +44,13 @@ import kotlin.math.absoluteValue
 @Composable
 fun MentorMatchRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
+    interestId: Int,
+    levelId: Int,
     categoryId: Int,
     onNavigateToMentorDetail: (Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getMentors(categoryId, false)
+        viewModel.getMentors(interestId, levelId, categoryId)
     }
 
     val mentors = viewModel.mentors.collectAsState().value
@@ -90,7 +92,7 @@ fun MentorCardPager(mentorList: List<MentorsResponse>, onNavigateToDetail: (Int)
     HorizontalPager(
         modifier = Modifier.fillMaxWidth(),
         state = pagerState,
-        contentPadding = PaddingValues(horizontal = 50.dp),
+        contentPadding = PaddingValues(horizontal = 32.dp),
     ) { page ->
         MentorCard(
             page = page,
@@ -149,13 +151,16 @@ private fun MentorCard(
                     Text(text = " 멘토님", style = WizdumTheme.typography.body1, color = Black600)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(mentorInfo.logoImageFilePath)
                         .crossfade(true)
                         .build(),
                     contentDescription = "멘토 프로필 이미지",
-                    modifier = Modifier.size(197.dp)
+                    modifier = Modifier
+                        .size(197.dp)
+                        .background(color = Black600)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
@@ -165,6 +170,40 @@ private fun MentorCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LevelInfo(level = mentorInfo.itemLevel)
+
+//                HorizontalDivider(
+//                    thickness = 1.dp,
+//                    color = Black200,
+//                    modifier = Modifier.padding(vertical = 16.dp)
+//                )
+
+//                Column {
+//                    Text(
+//                        text = "이 강의를 들으면 무엇이 달라질까요?",
+//                        style = WizdumTheme.typography.body2_semib,
+//                        modifier = Modifier.fillMaxWidth()
+//                    )
+//                    // TODO: 서버 데이터로 변경해야 한다
+
+//                    val temp = listOf(
+//                        "직관이 아닌 논리로 의사결정을 내리는 법을 배울 수 있어요.",
+//                        "조직을 운영하는 논리적 사고 프레임워크를 구축할 수 있어요.",
+//                        "상대의 행동을 예측하고, 최적의 협상 전략을 설계할 수 있어요."
+//                    )
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    temp.forEach {
+//                        Row(verticalAlignment = Alignment.Top) {
+//                            Box(
+//                                modifier = Modifier
+//                                    .padding(6.dp)
+//                                    .height(2.dp)
+//                                    .width(2.dp)
+//                                    .background(color = Black500, shape = CircleShape)
+//                            )
+//                            Text(text = it, style = WizdumTheme.typography.body2)
+//                        }
+//                    }
+//                }
             }
             Box(
                 modifier = Modifier

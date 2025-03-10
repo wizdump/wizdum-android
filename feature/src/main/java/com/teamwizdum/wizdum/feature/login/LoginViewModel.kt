@@ -17,32 +17,52 @@ class LoginViewModel @Inject constructor(
     private val questRepository: QuestRepository,
 ) : ViewModel() {
 
-    fun login(accessToken: String, onSuccess: () -> Unit) {
+    var classId: Int = -1
+
+    fun login(
+        accessToken: String,
+        moveToLecture: () -> Unit,
+        moveToHome: () -> Unit,
+    ) {
         viewModelScope.launch {
-            // 임시 자동 로그인
             val token = tokenRepository.getAccessToken()
 
             if (!token.isNullOrEmpty()) {
-                startQuest(2) {
-                    onSuccess()
+                checkRegisteredUser {
+                    if (classId != -1) {
+                        startLecture(classId) {
+                            moveToLecture()
+                        }
+                    } else {
+                        moveToHome()
+                    }
                 }
+
                 return@launch
             }
 
-            userRepository.login(accessToken).collect {
+            userRepository.signUp(accessToken).collect {
                 tokenRepository.saveTokens(
                     accessToken = it.accessToken,
                     refreshToken = it.refreshToken
                 )
 
-                onSuccess()
+                moveToHome()
 
                 Timber.d("accessToken 저장됨 : ${tokenRepository.getAccessToken()}")
             }
         }
     }
 
-    fun startQuest(classId: Int, onSuccess: () -> Unit) {
+    private fun checkRegisteredUser(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            userRepository.login().collect {
+                onSuccess()
+            }
+        }
+    }
+
+    private fun startLecture(classId: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
             questRepository.startQuest(classId = classId).collect {
                 onSuccess()

@@ -1,8 +1,6 @@
 package com.teamwizdum.wizdum.feature.login
 
 import android.content.Context
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,15 +26,31 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
-fun LoginScreen(
+fun LoginRoute(
     viewModel: LoginViewModel = hiltViewModel(),
-    onNavigateNext: () -> Unit,
+    classId: Int,
+    onNavigateToLecture: () -> Unit,
+    onNavigateToHome: () -> Unit,
 ) {
-    LoginContent(viewModel, onNavigateNext)
+    LaunchedEffect(classId) {
+        viewModel.classId = classId
+    }
+
+    LoginScreen(
+        onLoginClick = { accessToken ->
+            viewModel.login(
+                accessToken = accessToken,
+                moveToLecture = { onNavigateToLecture() },
+                moveToHome = { onNavigateToHome() }
+            )
+        }
+    )
 }
 
 @Composable
-private fun LoginContent(viewModel: LoginViewModel, onNavigateNext: () -> Unit) {
+private fun LoginScreen(
+    onLoginClick: (String) -> Unit,
+) {
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -61,11 +74,12 @@ private fun LoginContent(viewModel: LoginViewModel, onNavigateNext: () -> Unit) 
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "맞춤형 멘토추천과 학습기록 저장이 가능해요!", style = WizdumTheme.typography.body1)
             Spacer(modifier = Modifier.height(32.dp))
-            kakaoLoginButton(context = context, onKakaoSuccess = { accessToken ->
-                viewModel.login(accessToken = accessToken, onSuccess = {
-                    onNavigateNext()
-                })
-            })
+            kakaoLoginButton(
+                context = context,
+                onKakaoSuccess = { accessToken ->
+                    onLoginClick(accessToken)
+                }
+            )
         }
     }
 }
@@ -91,10 +105,10 @@ private fun kakaoLoginButton(context: Context, onKakaoSuccess: (String) -> Unit)
     )
 }
 
-//@Preview(showBackground = true, widthDp = 360, heightDp = 800)
-//@Composable
-//fun LoginScreenPreview() {
-//    WizdumTheme {
-//        LoginContent()
-//    }
-//}
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+fun LoginScreenPreview() {
+    WizdumTheme {
+        LoginScreen {}
+    }
+}

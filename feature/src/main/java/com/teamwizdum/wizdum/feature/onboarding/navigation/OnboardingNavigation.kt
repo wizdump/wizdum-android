@@ -106,7 +106,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
             navArgument("classId") { type = NavType.IntType }
         )
     ) { backstackEntry ->
-        val classId = backstackEntry.arguments?.getInt("classId") ?: 0
+        val classId = backstackEntry.arguments?.getInt("classId") ?: -1
 
         MentorDetailRoute(
             classId = classId,

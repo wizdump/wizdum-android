@@ -12,11 +12,19 @@ import javax.inject.Inject
 
 class UserRepository @Inject constructor(
     private val authApi: AuthApi,
-    private val userApi: UserApi
+    private val userApi: UserApi,
 ) {
 
-    suspend fun login(accessToken: String): Flow<TokenResponse> = flow {
-        emit(authApi.login(TokenRequest(accessToken = accessToken)))
+    suspend fun signUp(accessToken: String): Flow<TokenResponse> = flow {
+        emit(authApi.signUp(TokenRequest(accessToken = accessToken)))
+    }
+
+    suspend fun login(): Flow<Response<Unit>> = flow {
+        emit(authApi.login())
+    }
+
+    suspend fun logout(): Flow<Response<Unit>> = flow {
+        emit(authApi.logout())
     }
 
     suspend fun getUserInfo(): Flow<UserResponse> = flow {

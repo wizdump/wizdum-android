@@ -39,7 +39,10 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,7 +66,8 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 fun MentorDetailRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
     classId: Int,
-    onNavigateNext: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToLecture: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.getMentorDetail(classId)
@@ -71,11 +75,25 @@ fun MentorDetailRoute(
 
     val mentorInfo = viewModel.mentorInfo.collectAsState().value
 
-    MentorDetailScreen(mentorInfo = mentorInfo, onNavigateNext = onNavigateNext)
+    MentorDetailScreen(
+        mentorInfo = mentorInfo,
+        checkOnboarding = viewModel.checkUserOnboarding(),
+        onNavigateToLogin = onNavigateToLogin,
+        onNavigateToLecture = {
+            viewModel.startQuest(classId) {
+                onNavigateToLecture()
+            }
+        }
+    )
 }
 
 @Composable
-private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext: () -> Unit) {
+private fun MentorDetailScreen(
+    mentorInfo: MentorDetailResponse,
+    checkOnboarding: Boolean,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToLecture: () -> Unit,
+) {
     var columnHeightFraction by remember { mutableStateOf(0.76f) }
     val animatedHeight by animateFloatAsState(targetValue = columnHeightFraction, label = "")
 
@@ -102,8 +120,14 @@ private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext:
                 .data(mentorInfo.backgroundImageFilePath)
                 .crossfade(true)
                 .build(),
-            contentDescription = "멘토 프로필 이미지",
+            contentDescription = "멘토 배경 이미지",
             modifier = Modifier.fillMaxWidth()
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(292.dp)
+                .background(color = Color(0x80000000))
         )
 
         CloseAppBar(isDark = true)
@@ -123,23 +147,31 @@ private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext:
                 Column(modifier = Modifier.padding(end = 32.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row {
-                            Text(
-                                text = mentorInfo.mentoName,
-                                style = WizdumTheme.typography.body1_semib
-                            )
-                            Text(
-                                text = " 멘토님",
-                                style = WizdumTheme.typography.body1,
-                                color = Black600
-                            )
-                        }
+                        Text(
+                            text = mentorInfo.mentoName,
+                            style = WizdumTheme.typography.body1_semib
+                        )
+                        Text(
+                            text = " 멘토님",
+                            style = WizdumTheme.typography.body1,
+                            color = Black600
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = buildAnnotatedString {
+                                append("총 ")
+                                withStyle(style = SpanStyle(color = Green200)) {
+                                    append("${mentorInfo.friendWithLectureCount}명")
+                                }
+                                append(" 함께 수강 중")
+                            }, style = WizdumTheme.typography.body2
+                        )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = mentorInfo.classTitle, style = WizdumTheme.typography.h2)
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
                     LevelInfo(level = mentorInfo.itemLevel)
 
@@ -154,7 +186,8 @@ private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext:
                                 shape = RoundedCornerShape(10.dp)
                             )
                             .padding(horizontal = 32.dp, vertical = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.img_speech_balloon),
@@ -173,13 +206,13 @@ private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext:
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(text = "멘토링 스타일", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!", style = WizdumTheme.typography.body1)
+                    Text(text = mentorInfo.mentoringStyle, style = WizdumTheme.typography.body1)
 
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(text = "배울점", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        for (benefit in mentorInfo.benefits) {
+                        mentorInfo.benefits.forEach { benefit ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
                                     modifier = Modifier
@@ -189,7 +222,6 @@ private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext:
                                         .background(color = Black500, shape = CircleShape)
                                 )
                                 Text(text = benefit, style = WizdumTheme.typography.body1)
-
                             }
                         }
                     }
@@ -230,7 +262,11 @@ private fun MentorDetailScreen(mentorInfo: MentorDetailResponse, onNavigateNext:
                 )
                 .align(Alignment.BottomCenter)
         ) {
-            onNavigateNext()
+            if (checkOnboarding) {
+                onNavigateToLecture()
+            } else {
+                onNavigateToLogin()
+            }
         }
     }
 }
@@ -245,11 +281,14 @@ private fun QuestCard(lecture: Lecture) {
             .background(color = Color.White)
             .padding(16.dp)
     ) {
-        Box(
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(lecture.lectureLogoFilePath)
+                .crossfade(true)
+                .build(),
+            contentDescription = "강의 로고 이미지",
             modifier = Modifier
-                .width(48.dp)
-                .height(48.dp)
-                .background(color = Color.Green)
+                .size(48.dp)
                 .align(Alignment.TopEnd)
         )
         Column(
@@ -277,6 +316,8 @@ fun MentorDetailScreenPreview() {
             mentorInfo = MentorDetailResponse(
                 mentoName = "스파르타",
                 classTitle = "스파르타 코딩클럽",
+                mentoringStyle = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!",
+                friendWithLectureCount = 1,
                 itemLevel = "HIGH",
                 wiseSaying = "강인한 정신력과 철저한 자기 훈련을 통해 목표를 달성하는 스파르타식 도전!",
                 benefits = listOf(
@@ -289,7 +330,10 @@ fun MentorDetailScreenPreview() {
                     Lecture(orderSeq = 1, title = "결심을 넘어 행동으로"),
                     Lecture(orderSeq = 1, title = "결심을 넘어 행동으로")
                 )
-            )
-        ) {}
+            ),
+            checkOnboarding = false,
+            onNavigateToLogin = {},
+            onNavigateToLecture = {}
+        )
     }
 }
