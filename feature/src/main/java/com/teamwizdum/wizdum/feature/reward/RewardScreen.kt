@@ -25,7 +25,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.data.model.response.RewardResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
@@ -36,7 +38,10 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun RewardScreen(lectureId: Int, viewModel: RewardViewModel) {
+fun RewardRoute(
+    viewModel: RewardViewModel = hiltViewModel(),
+    lectureId: Int
+) {
 
     LaunchedEffect(Unit) {
         viewModel.getReward(lectureId)
@@ -44,11 +49,11 @@ fun RewardScreen(lectureId: Int, viewModel: RewardViewModel) {
 
     val rewardInfo = viewModel.rewardInfo.collectAsState().value
 
-    RewardContent(rewardInfo)
+    RewardScreen(rewardInfo)
 }
 
 @Composable
-private fun RewardContent(rewardInfo: RewardResponse) {
+private fun RewardScreen(rewardInfo: RewardResponse) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -165,10 +170,12 @@ private fun RewardCard(rewardInfo: RewardResponse) {
     }
 }
 
-//@Preview
-//@Composable
-//fun RewardScreenPreview() {
-//    WizdumTheme {
-//        RewardContent()
-//    }
-//}
+@Preview
+@Composable
+fun RewardScreenPreview() {
+    WizdumTheme {
+        RewardScreen(
+            rewardInfo = RewardResponse()
+        )
+    }
+}

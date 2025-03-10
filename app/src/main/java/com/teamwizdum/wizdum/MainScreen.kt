@@ -48,6 +48,7 @@ import com.teamwizdum.wizdum.feature.mypage.navigation.myPageScreen
 import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToInterest
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 import com.teamwizdum.wizdum.feature.quest.navigation.lectureScreen
+import com.teamwizdum.wizdum.feature.reward.navigation.rewardScreen
 
 @Composable
 fun MainScreen(navController: NavHostController) {
@@ -64,6 +65,7 @@ fun MainScreen(navController: NavHostController) {
                 loginScreen(navController = navController)
                 lectureScreen(navController = navController)
                 chatScreen(navController = navController)
+                rewardScreen(navController = navController)
                 homeScreen(padding = innerPadding, navController = navController)
                 myPageScreen(padding = innerPadding, navController = navController)
             }
