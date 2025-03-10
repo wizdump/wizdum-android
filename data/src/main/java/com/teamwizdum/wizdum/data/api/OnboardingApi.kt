@@ -1,28 +1,29 @@
 package com.teamwizdum.wizdum.data.api
 
+import com.teamwizdum.wizdum.data.model.response.InterestResponse
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
 import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
-import com.teamwizdum.wizdum.data.model.response.QuestionResponse
-import retrofit2.Response
+import com.teamwizdum.wizdum.data.model.response.LevelResponse
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface OnboardingApi {
+    @GET("questions/interest")
+    suspend fun getInterests(): List<InterestResponse>
+
+    @GET("questions/level")
+    suspend fun getLevel(): List<LevelResponse>
+
     @GET("questions/keywords")
     suspend fun getKeywords(): List<KeywordResponse>
 
-    @GET("questions")
-    suspend fun getQuestions(
-        @Query("keywordId") keywordId: Int,
-    ): List<QuestionResponse>
-
     @GET("mentos")
     suspend fun getMentors(
+        @Query("interestId") interestId: Int,
+        @Query("levelId") levelId: Int,
         @Query("categoryId") categoryId: Int,
-        @Query("useAiMento") useAiMentor: Boolean
     ): List<MentorsResponse>
 
     @GET("mentos/{classId}")

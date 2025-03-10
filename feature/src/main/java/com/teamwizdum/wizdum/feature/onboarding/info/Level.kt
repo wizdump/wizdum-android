@@ -1,9 +1,9 @@
 package com.teamwizdum.wizdum.feature.onboarding.info
 
 enum class Level(val rating: String, val comment: String) {
-    HIGH("⭐⭐⭐", "극강의 몰입 모드 ON!"),
-    MEDIUM("⭐⭐", "적당히 강하게!"),
-    LOW("⭐", "부담 없이 가볍게!");
+    HIGH("⭐⭐⭐", "전문가처럼 활용하기"),
+    MEDIUM("⭐⭐", "심화 발전하기"),
+    LOW("⭐", "기초다지기");
 
     companion object {
         fun fromString(level: String): Level {

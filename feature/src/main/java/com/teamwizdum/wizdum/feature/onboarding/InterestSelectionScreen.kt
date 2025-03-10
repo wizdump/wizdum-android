@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.teamwizdum.wizdum.data.model.response.KeywordResponse
+import com.teamwizdum.wizdum.data.model.response.InterestResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black500
@@ -48,26 +48,23 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun KeywordSelectionRoute(
+fun InterestSelectionRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    onNavigateToMentor: (Int) -> Unit,
+    onNavigateToLevel: (Int) -> Unit,
 ) {
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getKeyword()
+    LaunchedEffect(Unit) {
+        viewModel.getInterest()
     }
 
-    val keywords = viewModel.keywords.collectAsState().value
+    val interests = viewModel.interests.collectAsState().value
 
-    KeywordSelectionScreen(
-        keywords = keywords,
-        onNavigateToMentor = { onNavigateToMentor(it) }
-    )
+    InterestSelectionScreen(interests = interests, onNavigateToLevel = { onNavigateToLevel(it) })
 }
 
 @Composable
-private fun KeywordSelectionScreen(
-    keywords: List<KeywordResponse>,
-    onNavigateToMentor: (Int) -> Unit,
+fun InterestSelectionScreen(
+    interests: List<InterestResponse>,
+    onNavigateToLevel: (Int) -> Unit,
 ) {
     val selectedIndex = remember { mutableStateOf(-1) }
 
@@ -75,7 +72,7 @@ private fun KeywordSelectionScreen(
         Column {
             BackAppBar()
             Column(modifier = Modifier.padding(top = 32.dp, start = 32.dp, end = 32.dp)) {
-                Text(text = "어떠한 나로 성장하고 싶나요?", style = WizdumTheme.typography.h2)
+                Text(text = "당신이 현재 가장 관심 있는 분야는 무엇인가요", style = WizdumTheme.typography.h2)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = buildAnnotatedString {
@@ -93,11 +90,11 @@ private fun KeywordSelectionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(keywords.size, key = { it }) { index ->
-                        KeywordCard(
-                            title = keywords[index].value,
-                            description = keywords[index].description,
-                            imageUrl = keywords[index].fileUrl,
+                    items(interests.size, key = { it }) { index ->
+                        InterestCard(
+                            title = interests[index].value,
+                            description = interests[index].description,
+                            imageUrl = interests[index].fileUrl,
                             isSelected = selectedIndex.value == index,
                             onClick = {
                                 selectedIndex.value =
@@ -125,18 +122,18 @@ private fun KeywordSelectionScreen(
 
         if (selectedIndex.value != -1)
             WizdumFilledButton(
-                title = "멘토 추천받기",
+                title = "다음",
                 modifier = Modifier
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateToMentor(keywords[selectedIndex.value].keywordId)
+                onNavigateToLevel(interests[selectedIndex.value].interestId)
             }
     }
 }
 
 @Composable
-private fun KeywordCard(
+private fun InterestCard(
     title: String,
     description: String,
     imageUrl: String,
@@ -191,52 +188,50 @@ private fun KeywordCard(
     }
 }
 
-@Preview
-@Composable
-fun KeywordCardPreview() {
-    Column {
-        KeywordCard(
-            title = "도전적인",
-            imageUrl = "",
-            description = "새로운 목표에 도전하고, 극복하는 힘을 기르고 싶어요",
-            isSelected = true,
-            onClick = {})
-        Spacer(modifier = Modifier.height(50.dp))
-        KeywordCard(
-            title = "도전적인",
-            imageUrl = "",
-            description = "새로운 목표에 도전하고, 극복하는 힘을 기르고 싶어요",
-            isSelected = false,
-            onClick = {})
-    }
-}
-
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
-fun KeywordSelectionScreenPreview() {
+fun InterestSelectionScreenPreview() {
     WizdumTheme {
-        val keywordList = listOf(
-            KeywordResponse(
-                value = "도전적인",
-                description = "새로운 목표에 도전하고, 극복하는 힘을 기르고 싶어요"
+        InterestSelectionScreen(
+            interests = listOf(
+                InterestResponse(
+                    interestId = 1,
+                    value = "창의성과 혁신",
+                    description = "기존의 틀을 깨고 새로운 아이디어를 찾고 싶어요.",
+                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_303.png"
+                ),
+                InterestResponse(
+                    interestId = 2,
+                    value = "리더십과 경영철학",
+                    description = "효과적인 리더십과 조직 운영을 배우고 싶어요.",
+                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_304.png"
+                ),
+                InterestResponse(
+                    interestId = 3,
+                    value = "논리적 사고 & 문제 해결",
+                    description = "복잡한 문제를 분석하고 최적의 해결책을 찾고 싶어요.",
+                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_305.png"
+                ),
+                InterestResponse(
+                    interestId = 4,
+                    value = "역사적 인물들의 철학",
+                    description = "위인들의 지혜를 통해 삶을 더 깊이 이해하고 싶어요.",
+                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_306.png"
+                ),
+                InterestResponse(
+                    interestId = 5,
+                    value = "목표 설정 & 습관 형성",
+                    description = "나에게 맞는 루틴을 만들고 꾸준히 실천하고 싶어요.",
+                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_307.png"
+                ),
+                InterestResponse(
+                    interestId = 6,
+                    value = "웰빙과 균형",
+                    description = "정신/신체적 건강을 유지하며 지속적으로 성장하고 싶어요.",
+                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_307_1.png"
+                )
             ),
-            KeywordResponse(
-                value = "창의적인",
-                description = "틀에 얽매이지 않고, 새로운 시각과 생각을 키우고 싶어요"
-            ),
-            KeywordResponse(
-                value = "사색적인",
-                description = "깊이 있는 사고와 철학적 통찰로 삶을 바라보고 싶어요"
-            ),
-            KeywordResponse(
-                value = "분석적인",
-                description = "논리적으로 사고하고, 문제 해결 능력을 키우고 싶어요"
-            ),
-            KeywordResponse(
-                value = "건강한",
-                description = "신체적·정신적 균형을 통해 지속적인 성장을 이루고 싶어요"
-            ),
+            onNavigateToLevel = {}
         )
-        KeywordSelectionScreen(keywords = keywordList) {}
     }
 }

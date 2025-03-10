@@ -31,7 +31,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.teamwizdum.wizdum.data.model.response.QuestionResponse
+import com.teamwizdum.wizdum.data.model.response.LevelResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black500
@@ -42,24 +42,23 @@ import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 
 @Composable
-fun QuestionSelectionScreen(
+fun LevelSelectionRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    keywordId: Int,
-    onNavigateToMentor: (Int) -> Unit,
+    onNavigateToKeyword: (Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getQuestion(keywordId)
+        viewModel.getLevel()
     }
 
-    val questions = viewModel.questions.collectAsState().value
+    val levels = viewModel.level.collectAsState().value
 
-    QuestionContent(questions = questions, onNavigateToMentor = { onNavigateToMentor(it) })
+    LevelSelectionScreen(levels = levels, onNavigateToKeyword = { onNavigateToKeyword(it) })
 }
 
 @Composable
-private fun QuestionContent(
-    questions: List<QuestionResponse>,
-    onNavigateToMentor: (Int) -> Unit,
+private fun LevelSelectionScreen(
+    levels: List<LevelResponse>,
+    onNavigateToKeyword: (Int) -> Unit,
 ) {
     val selectedIndex = remember { mutableStateOf(-1) }
 
@@ -74,7 +73,7 @@ private fun QuestionContent(
                     .fillMaxSize()
                     .padding(top = 32.dp, start = 32.dp, end = 32.dp, bottom = 80.dp)
             ) {
-                Text(text = "조금 더 구체적으로 알고 싶어요", style = WizdumTheme.typography.h2)
+                Text(text = "이 주제에 대해 얼마나 익숙한가요?", style = WizdumTheme.typography.h2)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = buildAnnotatedString {
@@ -89,9 +88,9 @@ private fun QuestionContent(
 
                 Spacer(modifier = Modifier.height(34.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    questions.forEachIndexed { index, quest ->
-                        QuestionCard(
-                            content = quest.content,
+                    levels.forEachIndexed { index, quest ->
+                        LevelCard(
+                            content = quest.description,
                             level = quest.level,
                             isSelected = selectedIndex.value == index,
                             onClick = { selectedIndex.value = index }
@@ -101,8 +100,8 @@ private fun QuestionContent(
                 Spacer(modifier = Modifier.weight(1f))
 
                 if (selectedIndex.value != -1)
-                    WizdumFilledButton(title = "멘토 추천받기") {
-                        onNavigateToMentor(questions[selectedIndex.value].questionId)
+                    WizdumFilledButton(title = "다음") {
+                        onNavigateToKeyword(levels[selectedIndex.value].levelId)
                     }
             }
         }
@@ -110,7 +109,7 @@ private fun QuestionContent(
 }
 
 @Composable
-private fun QuestionCard(
+private fun LevelCard(
     content: String,
     level: String,
     isSelected: Boolean,
@@ -136,13 +135,13 @@ private fun QuestionCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
+                LevelInfo(level = level)
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = content,
                     style = if (isSelected) WizdumTheme.typography.h3_semib else WizdumTheme.typography.h3,
                     color = if (isSelected) Black700 else Black600
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                LevelInfo(level = level)
             }
             if (isSelected)
                 Image(
@@ -155,17 +154,17 @@ private fun QuestionCard(
 
 @Preview
 @Composable
-fun QuestionCardPreview() {
+fun LevelCardPreview() {
     WizdumTheme {
         Column {
-            QuestionCard(
+            LevelCard(
                 content = "누가 나를 채찍질 해줬으면 좋겠어요",
                 level = "HIGH",
                 isSelected = true,
                 onClick = {}
             )
             Spacer(modifier = Modifier.height(50.dp))
-            QuestionCard(
+            LevelCard(
                 content = "누가 나를 채찍질 해줬으면 좋겠어요",
                 level = "HIGH",
                 isSelected = false,
@@ -177,14 +176,14 @@ fun QuestionCardPreview() {
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
-fun QuestionSelectionScreenPreview() {
+fun LevelSelectionScreenPreview() {
     WizdumTheme {
         val questionList =
             listOf(
-                QuestionResponse(content = "이번엔 진짜 끝까지 해내고 싶어요!", level = "HIGH"),
-                QuestionResponse(content = "목표를 세웠는데, 시작하기가 어려워요.", level = "MEDIUM"),
-                QuestionResponse(content = "누가 나를 채찍질해줬으면 좋겠어요.", level = "LOW")
+                LevelResponse(description = "이번엔 진짜 끝까지 해내고 싶어요!", level = "HIGH"),
+                LevelResponse(description = "목표를 세웠는데, 시작하기가 어려워요.", level = "MEDIUM"),
+                LevelResponse(description = "누가 나를 채찍질해줬으면 좋겠어요.", level = "LOW")
             )
-        QuestionContent(questions = questionList) {}
+        LevelSelectionScreen(levels = questionList) {}
     }
 }

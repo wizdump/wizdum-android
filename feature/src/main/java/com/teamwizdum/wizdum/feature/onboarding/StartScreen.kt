@@ -30,7 +30,7 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun StartScreen(onNavigateToKeyword: () -> Unit) {
+fun StartScreen(onNavigateToInterest: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -68,7 +68,7 @@ fun StartScreen(onNavigateToKeyword: () -> Unit) {
             modifier = Modifier.padding(horizontal = 32.dp),
             title = "멘토 찾으러 떠나기",
         ) {
-            onNavigateToKeyword()
+            onNavigateToInterest()
         }
     }
 }
