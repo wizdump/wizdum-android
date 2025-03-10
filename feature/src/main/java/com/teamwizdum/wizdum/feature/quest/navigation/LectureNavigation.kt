@@ -13,6 +13,7 @@ import com.teamwizdum.wizdum.feature.quest.LectureAllClearRoute
 import com.teamwizdum.wizdum.feature.quest.LectureClearScreen
 import com.teamwizdum.wizdum.feature.quest.LectureRoute
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
+import com.teamwizdum.wizdum.feature.reward.navigation.navigateToReward
 import kotlinx.serialization.json.Json
 
 fun NavController.navigateToLecture(classId: Int) {
@@ -78,7 +79,7 @@ fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
             lectureId = lectureId,
             mentorName = mentorName,
             onNavigateToReward = {
-                navController.navigate("REWARD/$lectureId")
+                navController.navigateToReward(lectureId)
             }
         )
     }

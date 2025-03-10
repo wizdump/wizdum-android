@@ -101,6 +101,13 @@ fun MentorCommentBox(mentorName: String, comment: String) {
 @Composable
 fun QuestClearScreenPreview() {
     WizdumTheme {
-        //LectureClearScreen() {}
+        LectureClearScreen(
+            lectureInfo = LectureClearArgument(
+                mentorName = "스파르타",
+                orderSeq = 1,
+                lectureName = "결심을 넘어 행동으로",
+                encouragement = "좋다. 하지만 이것은 시작에 불과하다.\n다음단계에서도 너는 더 강해져야 한다."
+            )
+        ) {}
     }
 }

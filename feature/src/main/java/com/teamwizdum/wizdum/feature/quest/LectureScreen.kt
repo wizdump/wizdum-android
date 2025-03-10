@@ -182,7 +182,7 @@ fun LectureScreen(
                 if (lectureInfo.canGetWiz) {
                     TextWithIconBadge(
                         title = "Wiz 획득",
-                        resId = R.drawable.ic_checked,
+                        resId = R.drawable.ic_checked_whtie,
                         backgroundColor = Green200,
                         textColor = Color.White,
                     )
