@@ -1,7 +1,6 @@
 package com.teamwizdum.wizdum.data.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.teamwizdum.wizdum.data.network.TokenAuthenticator
 import com.teamwizdum.wizdum.data.network.TokenInterceptor
 import com.teamwizdum.wizdum.data.retrofit.ResultCallAdapterFactory
 import dagger.Module
@@ -49,12 +48,10 @@ object NetworkModule {
     @Provides
     fun provideOkHttpClient(
         tokenInterceptor: TokenInterceptor,
-        tokenAuthenticator: TokenAuthenticator,
         loggingInterceptor: HttpLoggingInterceptor,
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(tokenInterceptor)
         .addInterceptor(loggingInterceptor)
-        .authenticator(tokenAuthenticator)
         .build()
 
     @Singleton
