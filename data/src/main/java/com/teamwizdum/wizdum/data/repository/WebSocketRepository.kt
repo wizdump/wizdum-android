@@ -30,6 +30,8 @@ class WebSocketRepository @Inject constructor() {
     private var webSocket: WebSocket? = null
     private val messageChannel = Channel<ChatMessage>(Channel.BUFFERED)
 
+    val jsonFormatter = Json { encodeDefaults = true }
+
     fun connect() {
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -62,7 +64,7 @@ class WebSocketRepository @Inject constructor() {
     }
 
     fun sendMessage(messageData: ChatMessage) {
-        val jsonMessage = Json.encodeToString(messageData)
+        val jsonMessage = jsonFormatter.encodeToString(messageData)
         webSocket?.send(jsonMessage)
         Timber.tag("CHAT").d("메세지 전송 : $jsonMessage")
     }

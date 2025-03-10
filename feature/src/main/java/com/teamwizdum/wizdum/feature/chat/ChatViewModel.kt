@@ -8,7 +8,6 @@ import com.teamwizdum.wizdum.data.repository.QuestRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import com.teamwizdum.wizdum.data.repository.WebSocketRepository
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
-import com.teamwizdum.wizdum.feature.chat.info.QuestClearData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

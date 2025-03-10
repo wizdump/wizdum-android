@@ -19,5 +19,5 @@ data class MessageContent(
     var content: String? = null,
     val isFinish: Boolean = false, // 완료 충족 여부, 보내는 메세지는 false 고정
     val isLast: Boolean = false, // 마지막 토큰 여부, 보내는 메세지는 false 고정
-    val isOngoing: Boolean = false // 이어하기 진행 여부
+    val isOngoing: Boolean = false // 이어하기 진행 여부, 보내는 메세지는 false 고정
 )
