@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.coil.compose)
 
     implementation(libs.kakao.sdk.user)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

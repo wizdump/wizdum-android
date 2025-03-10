@@ -68,67 +68,53 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.designsystem.theme.robotoFontFamily
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
-import com.teamwizdum.wizdum.feature.chat.info.QuestClearData
+import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
+import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun ChatScreen(
+fun ChatRoute(
     viewModel: ChatViewModel = hiltViewModel(),
-    lectureId: Int,
-    orderSeq: Int,
-    lectureTitle: String,
-    lectureStatus: String,
-    isLastLecture: Boolean,
-    mentorName: String,
-    mentorImgUrl: String,
-    userName: String,
-    onNavigateToClear: () -> Unit,
+    lectureInfo: LectureArgument,
+    onNavigateToClear: (LectureClearArgument) -> Unit,
+    onNavigateToAllClear: (Int, String) -> Unit,
 ) {
-
-
     LaunchedEffect(Unit) {
-        viewModel.initialize(lectureId)
+        viewModel.initialize(lectureInfo.lectureId)
     }
 
     val message = viewModel.message.collectAsState().value
 
-    ChantContent(
-        lectureId,
-        orderSeq,
-        lectureTitle,
-        lectureStatus,
-        isLastLecture,
-        mentorName,
-        mentorImgUrl,
-        userName,
-        message,
-        viewModel,
-        onNavigateToClear
+    ChatScreen(
+        lectureInfo = lectureInfo,
+        message = message,
+        viewModel = viewModel,
+        onNavigateToClear = { onNavigateToClear(it) },
+        onNavigateToAllClear = {
+            onNavigateToAllClear(
+                lectureInfo.lectureId,
+                lectureInfo.mentorName
+            )
+        }
     )
 }
 
 @Composable
-private fun ChantContent(
-    lectureId: Int,
-    orderSeq: Int,
-    lectureTitle: String,
-    lectureStatus: String,
-    isLastLecture: Boolean,
-    mentorName: String,
-    mentorImgUrl: String,
-    userName: String,
+private fun ChatScreen(
+    lectureInfo: LectureArgument,
     message: List<ChatMessage>,
     viewModel: ChatViewModel,
-    onNavigateToClear: () -> Unit,
+    onNavigateToClear: (LectureClearArgument) -> Unit,
+    onNavigateToAllClear: () -> Unit,
 ) {
     val listState = rememberLazyListState()
 
     val isReceivingMessage = viewModel.isReceiving.collectAsState().value
     var isInputEnabled by remember { mutableStateOf(true) }
 
-    if (lectureStatus == "DONE") {
+    if (lectureInfo.lectureStatus == "DONE") {
         isInputEnabled = false
     }
 
@@ -146,39 +132,38 @@ private fun ChantContent(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        BackAppBar(title = "${orderSeq}강 - ${lectureTitle}")
+        BackAppBar(title = "${lectureInfo.orderSeq}강 - ${lectureInfo.lectureTitle}")
         HorizontalDivider(thickness = 1.dp, color = Black300)
         ChatMessages(
             viewModel = viewModel,
             isReceiving = isReceivingMessage,
             sendMessage = { isHide, text ->
                 viewModel.sendMessage(
-                    name = userName,
-                    lectureId = lectureId,
+                    name = lectureInfo.userName,
+                    lectureId = lectureInfo.lectureId,
                     message = text,
                     isHide = isHide
                 )
             },
-            lectureId = lectureId,
+            lectureId = lectureInfo.lectureId,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            mentorName = mentorName,
-            mentorImgUrl = mentorImgUrl,
+            mentorName = lectureInfo.mentorName,
+            mentorImgUrl = lectureInfo.mentorImgUrl,
             messageList = message,
             listState = listState,
             onNavigateToClear = {
                 viewModel.finishQuest(1) { encouragement ->
-                    viewModel.updateQuestClearData(
-                        QuestClearData(
-                            lectureId = lectureId,
-                            orderSeq = orderSeq,
-                            lectureName = lectureTitle,
-                            mentorName = mentorName,
+                    onNavigateToClear(
+                        LectureClearArgument(
+                            lectureId = lectureInfo.lectureId,
+                            orderSeq = lectureInfo.orderSeq,
+                            lectureName = lectureInfo.lectureTitle,
+                            mentorName = lectureInfo.mentorName,
                             encouragement = encouragement
                         )
                     )
-                    onNavigateToClear()
                 }
             }
         )

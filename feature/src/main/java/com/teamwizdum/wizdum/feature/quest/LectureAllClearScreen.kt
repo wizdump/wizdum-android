@@ -15,24 +15,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun QuestAllClearScreen(
-    lectureId: Int, mentorName: String,
-    onNavigateToReward: (Int) -> Unit,
+fun LectureAllClearRoute(
+    viewModel: LectureViewModel = hiltViewModel(),
+    lectureId: Int,
+    mentorName: String,
+    onNavigateToReward: () -> Unit,
 ) {
-    QuestAllClearContent(lectureId, mentorName, onNavigateToReward)
+    LectureAllClearScreen(
+        mentorName = mentorName,
+        onNavigateToReward = {
+            viewModel.postReward(lectureId) {
+                onNavigateToReward()
+            }
+        }
+    )
 }
 
 @Composable
-private fun QuestAllClearContent(
-    lectureId: Int,
+private fun LectureAllClearScreen(
     mentorName: String,
-    onNavigateToReward: (Int) -> Unit,
+    onNavigateToReward: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CloseAppBar()
@@ -65,9 +74,12 @@ private fun QuestAllClearContent(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            WizdumFilledButton(title = "리워드 받기", onClick = {
-                onNavigateToReward(lectureId)
-            })
+            WizdumFilledButton(
+                title = "리워드 받기",
+                onClick = {
+                    onNavigateToReward()
+                }
+            )
         }
     }
 }
@@ -76,6 +88,6 @@ private fun QuestAllClearContent(
 @Composable
 fun QuestAllClearScreenPreview() {
     WizdumTheme {
-        QuestAllClearContent(1, "스파르타") {}
+        LectureAllClearScreen("스파르타") {}
     }
 }

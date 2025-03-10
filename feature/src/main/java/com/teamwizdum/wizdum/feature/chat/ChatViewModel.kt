@@ -34,8 +34,6 @@ class ChatViewModel @Inject constructor(
 
     private var receivedMessage = StringBuilder()
 
-    var questClearData = QuestClearData()
-
     fun initialize(lectureId: Int) {
         webSocketRepository.connect()
 
@@ -110,10 +108,6 @@ class ChatViewModel @Inject constructor(
 
     fun setReceiving(isReceiving: Boolean) {
         _isReceiving.value = isReceiving
-    }
-
-    fun updateQuestClearData(data: QuestClearData) {
-        questClearData = data
     }
 
     override fun onCleared() {

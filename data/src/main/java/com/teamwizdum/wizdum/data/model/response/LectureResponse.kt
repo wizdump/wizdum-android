@@ -3,13 +3,13 @@ package com.teamwizdum.wizdum.data.model.response
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class QuestResponse(
+data class LectureResponse(
     val mentoId: Int = 1,
     val mentoName: String = "",
     val userName: String = "",
-    val logoImageFilePath: String? = "",
+    val logoImageFilePath: String = "",
     val backgroundImageFilePath: String? = "",
-    val mentoLectureTitle: String = "",
+    val classTitle: String = "",
     val level: String = "",
     val lectures: List<LectureDetail> = emptyList(),
     val isFinished: Boolean = false, // 전체 강의 완료 여부

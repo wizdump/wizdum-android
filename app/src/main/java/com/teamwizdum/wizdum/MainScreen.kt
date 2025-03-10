@@ -40,9 +40,14 @@ import androidx.navigation.compose.NavHost
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.chat.navigation.chatScreen
+import com.teamwizdum.wizdum.feature.home.HomeRoute
 import com.teamwizdum.wizdum.feature.home.homeScreen
+import com.teamwizdum.wizdum.feature.login.navigation.loginScreen
 import com.teamwizdum.wizdum.feature.mypage.myPageScreen
+import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToInterest
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
+import com.teamwizdum.wizdum.feature.quest.navigation.lectureScreen
 
 @Composable
 fun MainScreen(navController: NavHostController) {
@@ -53,9 +58,12 @@ fun MainScreen(navController: NavHostController) {
         content = { innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = "HOME"
+                startDestination = HomeRoute.HOME
             ) {
                 onboardingScreen(navController = navController)
+                loginScreen(navController = navController)
+                lectureScreen(navController = navController)
+                chatScreen(navController = navController)
                 homeScreen(padding = innerPadding)
                 myPageScreen(padding = innerPadding)
             }
@@ -73,7 +81,7 @@ fun MainScreen(navController: NavHostController) {
         floatingActionButton = {
             if (mainNavigator.shouldShowBottomBar())
                 FloatingActionButton(
-                    onClick = { navController.navigate("KEYWORD") },
+                    onClick = { navController.navigateToInterest() },
                     modifier = Modifier
                         .size(50.dp)
                         .offset(y = 40.dp),

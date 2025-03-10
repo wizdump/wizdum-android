@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.chat
+package com.teamwizdum.wizdum.feature.quest
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,13 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +24,13 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
 
 @Composable
-fun QuestClearScreen(viewModel: ChatViewModel, onNavigateToQuest: () -> Unit) {
+fun LectureClearScreen(
+    lectureInfo: LectureClearArgument,
+    onNavigateToLecture: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -50,24 +52,24 @@ fun QuestClearScreen(viewModel: ChatViewModel, onNavigateToQuest: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "${viewModel.questClearData.orderSeq}강 클리어!",
+                text = "${lectureInfo.orderSeq}강 클리어!",
                 style = WizdumTheme.typography.h2
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "'${viewModel.questClearData.lectureName}'를\n성공적으로 완료했어요.",
+                text = "'${lectureInfo.lectureName}'를\n성공적으로 완료했어요.",
                 style = WizdumTheme.typography.body1,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(48.dp))
             MentorCommentBox(
-                viewModel.questClearData.mentorName,
-                viewModel.questClearData.encouragement
+                lectureInfo.mentorName,
+                lectureInfo.encouragement
             )
             Spacer(modifier = Modifier.weight(1f))
 
             WizdumFilledButton(title = "계속하기") {
-                onNavigateToQuest()
+                onNavigateToLecture()
             }
         }
     }
@@ -95,10 +97,10 @@ fun MentorCommentBox(mentorName: String, comment: String) {
     }
 }
 
-//@Preview(showBackground = true, widthDp = 360, heightDp = 800)
-//@Composable
-//fun QuestClearScreenPreview() {
-//    WizdumTheme {
-//        QuestClearScreen()
-//    }
-//}
+@Preview(showBackground = true, widthDp = 360, heightDp = 800)
+@Composable
+fun QuestClearScreenPreview() {
+    WizdumTheme {
+        //LectureClearScreen() {}
+    }
+}

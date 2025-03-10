@@ -3,7 +3,7 @@ package com.teamwizdum.wizdum.data.repository
 import com.teamwizdum.wizdum.data.api.QuestApi
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.data.model.response.FinishQuestResponse
-import com.teamwizdum.wizdum.data.model.response.QuestResponse
+import com.teamwizdum.wizdum.data.model.response.LectureResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -16,7 +16,7 @@ class QuestRepository @Inject constructor(
         emit(questApi.startQuest(classId = classId))
     }
 
-    suspend fun getQuests(classId: Int): Flow<QuestResponse> = flow {
+    suspend fun getQuests(classId: Int): Flow<LectureResponse> = flow {
         emit(questApi.getQuests(classId))
     }
 

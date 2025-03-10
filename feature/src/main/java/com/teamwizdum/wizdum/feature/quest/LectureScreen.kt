@@ -48,10 +48,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.LectureDetail
-import com.teamwizdum.wizdum.data.model.response.QuestResponse
+import com.teamwizdum.wizdum.data.model.response.LectureResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.badge.TextBadge
 import com.teamwizdum.wizdum.designsystem.component.badge.TextWithIconBadge
@@ -59,7 +60,6 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black300
-import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green100
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.Success
@@ -69,49 +69,47 @@ import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 import com.teamwizdum.wizdum.feature.quest.component.QuestProgressBar
 import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
 import com.teamwizdum.wizdum.feature.quest.component.StatusCircle
-import com.teamwizdum.wizdum.feature.quest.info.ChatRoomInfo
 import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
-import timber.log.Timber
+import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
 
 @Composable
-fun QuestScreen(
-    viewModel: QuestViewModel,
-    onNavigateToChat: () -> Unit,
-    onNavigateToQuestALlClear: (Int, String) -> Unit,
+fun LectureRoute(
+    viewModel: LectureViewModel = hiltViewModel(),
+    classId: Int,
+    onNavigateToChat: (LectureArgument) -> Unit,
+    onNavigateToLectureAllClear: (Int, String) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getQuest(2)
+        viewModel.getQuest(classId)
     }
 
-    val questInfo = viewModel.quests.collectAsState().value
-    Timber.d("### viewModel: ${viewModel.hashCode()}")
+    val lectureInfo = viewModel.lectureInfo.collectAsState().value
 
-    QuestContent(
-        questInfo = questInfo,
+    LectureScreen(
+        lectureInfo = lectureInfo,
         onNavigateToChat = { lectureId, orderSeq, lectureStatus, lectureTitle ->
-            viewModel.updateChatRoomInfo(
-                ChatRoomInfo(
-                    mentorName = questInfo.mentoName,
-                    mentorImgUrl = questInfo.logoImageFilePath ?: "dd",
-                    userName = questInfo.userName,
-                    lectureTitle = lectureTitle,
+            val selectedLectureInfo =
+                LectureArgument(
                     lectureId = lectureId,
                     orderSeq = orderSeq,
+                    lectureTitle = lectureTitle,
                     lectureStatus = lectureStatus,
-                    isLastLecture = questInfo.isLastLecture(orderSeq),
+                    isLastLecture = lectureInfo.isLastLecture(orderSeq),
+                    mentorName = lectureInfo.mentoName,
+                    mentorImgUrl = lectureInfo.logoImageFilePath,
+                    userName = lectureInfo.userName,
                 )
-            )
-            onNavigateToChat()
+            onNavigateToChat(selectedLectureInfo)
         },
-        onNavigateToQuestALlClear
+        onNavigateToLectureAllClear = onNavigateToLectureAllClear
     )
 }
 
 @Composable
-fun QuestContent(
-    questInfo: QuestResponse,
+fun LectureScreen(
+    lectureInfo: LectureResponse,
     onNavigateToChat: (Int, Int, String, String) -> Unit,
-    onNavigateToReward: (Int, String) -> Unit,
+    onNavigateToLectureAllClear: (Int, String) -> Unit,
 ) {
     val minHeightPx = with(LocalDensity.current) { 310.dp.toPx() } // 상단 정보를 보여주기 위한 최소 높이
     val screenHeightPx =
@@ -143,21 +141,23 @@ fun QuestContent(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(questInfo.backgroundImageFilePath)
+                .data(lectureInfo.backgroundImageFilePath)
                 .crossfade(true)
                 .build(),
             contentDescription = "강의 배경 이미지",
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Black600)
+            modifier = Modifier.fillMaxWidth()
         )
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color(0xCC121212)))
+
         Column(
             modifier = Modifier.padding(top = 92.dp, start = 32.dp, end = 32.dp)
         ) {
             Row {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(questInfo.logoImageFilePath)
+                        .data(lectureInfo.logoImageFilePath)
                         .crossfade(true)
                         .build(),
                     contentDescription = "멘토 프로필 이미지",
@@ -169,17 +169,17 @@ fun QuestContent(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = questInfo.mentoName,
+                        text = lectureInfo.mentoName,
                         style = WizdumTheme.typography.body1_semib,
                         color = Color.White
                     )
                     Text(
-                        text = "${questInfo.userName}님의 멘토",
+                        text = "${lectureInfo.userName}님의 멘토",
                         style = WizdumTheme.typography.body2,
                         color = Color.White
                     )
                 }
-                if (questInfo.canGetWiz) {
+                if (lectureInfo.canGetWiz) {
                     TextWithIconBadge(
                         title = "Wiz 획득",
                         resId = R.drawable.ic_checked,
@@ -190,12 +190,12 @@ fun QuestContent(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = questInfo.mentoLectureTitle,
+                text = lectureInfo.classTitle,
                 style = WizdumTheme.typography.h2,
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
-            LevelInfo(level = questInfo.level)
+            LevelInfo(level = lectureInfo.level)
             Spacer(modifier = Modifier.height(32.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -204,14 +204,14 @@ fun QuestContent(
                 Text(text = "목표", style = WizdumTheme.typography.body1, color = Color.White)
                 QuestProgressBar(
                     modifier = Modifier.weight(1f),
-                    progress = questInfo.getProgress()
+                    progress = lectureInfo.getProgress()
                 )
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = Green200)) {
-                            append("${questInfo.getFinishedLectureCount()}")
+                            append("${lectureInfo.getFinishedLectureCount()}")
                         }
-                        append(" / ${questInfo.lectures.size}")
+                        append(" / ${lectureInfo.lectures.size}")
                     },
                     style = WizdumTheme.typography.body1,
                     color = Black200
@@ -232,7 +232,7 @@ fun QuestContent(
                 .padding(top = 32.dp, start = 24.dp, end = 24.dp)
                 .align(Alignment.BottomCenter)
         ) {
-            items(questInfo.lectures, key = { it.lectureId }) { lecture ->
+            items(lectureInfo.lectures, key = { it.lectureId }) { lecture ->
                 QuestItem(
                     lecture = lecture,
                     onNavigateToChat = {
@@ -247,14 +247,14 @@ fun QuestContent(
             }
         }
 
-        if (questInfo.isFinished && !questInfo.canGetWiz) {
+        if (lectureInfo.isFinished && !lectureInfo.canGetWiz) {
             WizdumFilledButton(
                 title = "리워드 받기",
                 modifier = Modifier
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateToReward(questInfo.mentoId, questInfo.mentoName)
+                onNavigateToLectureAllClear(lectureInfo.mentoId, lectureInfo.mentoName)
             }
         }
     }
@@ -523,11 +523,11 @@ fun ExpandableQuestCardPreview() {
 @Composable
 fun QuestScreenPreview() {
     WizdumTheme {
-        QuestContent(
-            questInfo = QuestResponse(
+        LectureScreen(
+            lectureInfo = LectureResponse(
                 mentoName = "스파르타",
                 userName = "유니",
-                mentoLectureTitle = "작심삼일을 극복하는\n초집중력과 루틴 만들기",
+                classTitle = "작심삼일을 극복하는\n초집중력과 루틴 만들기",
                 level = "HIGH",
                 lectures = listOf(
                     LectureDetail(
@@ -560,7 +560,7 @@ fun QuestScreenPreview() {
                 )
             ),
             onNavigateToChat = { _, _, _, _ -> },
-            onNavigateToReward = { _, _ -> }
+            onNavigateToLectureAllClear = { _, _ -> }
         )
     }
 }
