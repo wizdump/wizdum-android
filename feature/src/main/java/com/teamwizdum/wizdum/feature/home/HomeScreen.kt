@@ -47,6 +47,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelStarRating
 import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
 
@@ -61,14 +62,20 @@ fun HomeRoute(
         viewModel.getHomeData()
     }
 
-    val homeInfo = viewModel.homeData.collectAsState().value
+    val uiState = viewModel.homeData.collectAsState().value
 
-    HomeScreen(
-        padding = padding,
-        homeInfo = homeInfo,
-        onNavigateToInterest = onNavigateToInterest,
-        onNavigateToLecture = onNavigateToLecture
-    )
+    when(uiState) {
+        is UiState.Loading -> {}
+        is UiState.Success -> {
+            HomeScreen(
+                padding = padding,
+                homeInfo = uiState.data,
+                onNavigateToInterest = onNavigateToInterest,
+                onNavigateToLecture = onNavigateToLecture
+            )
+        }
+        is UiState.Failed -> {}
+    }
 }
 
 @Composable

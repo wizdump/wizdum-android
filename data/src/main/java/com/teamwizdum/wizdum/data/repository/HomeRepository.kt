@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class HomeRepository @Inject constructor(private val homeApi: HomeApi) {
-    suspend fun getHomeData(): Flow<HomeResponse> = flow {
-        emit(homeApi.getHomeData())
+    suspend fun getHomeData(): Result<HomeResponse> {
+        return runCatching { homeApi.getHomeData() }
     }
 }
