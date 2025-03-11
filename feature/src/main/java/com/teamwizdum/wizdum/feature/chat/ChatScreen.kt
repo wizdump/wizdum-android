@@ -1,8 +1,5 @@
 package com.teamwizdum.wizdum.feature.chat
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,10 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
@@ -41,11 +36,13 @@ import com.teamwizdum.wizdum.designsystem.theme.Black300
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.chat.component.ChatBubble
+import com.teamwizdum.wizdum.feature.chat.component.ChatDialog
 import com.teamwizdum.wizdum.feature.chat.component.ChatFinishSelectionBox
 import com.teamwizdum.wizdum.feature.chat.component.ChatHeader
 import com.teamwizdum.wizdum.feature.chat.component.ChatStartSelectionBox
 import com.teamwizdum.wizdum.feature.chat.component.ChatTextField
 import com.teamwizdum.wizdum.feature.chat.component.ChatWithProfileBubble
+import com.teamwizdum.wizdum.feature.chat.component.TypingIndicatorBubble
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
 import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
@@ -55,6 +52,7 @@ import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgum
 fun ChatRoute(
     viewModel: ChatViewModel = hiltViewModel(),
     lectureInfo: LectureArgument,
+    onBackPressed: () -> Unit,
     onNavigateToClear: (LectureClearArgument) -> Unit,
     onNavigateToAllClear: (Int, String) -> Unit,
 ) {
@@ -64,17 +62,41 @@ fun ChatRoute(
 
     val messages = viewModel.messages.collectAsState().value
 
+    var dialogState by remember { mutableStateOf(false) }
+
     ChatScreen(
         viewModel = viewModel,
         lectureInfo = lectureInfo,
         messages = messages,
-        onNavigateToClear = { onNavigateToClear(it) },
+        showDialog = { dialogState = true },
+        onNavigateToClear = {
+            viewModel.finishQuest(lectureInfo.lectureId) { encouragement ->
+                onNavigateToClear(
+                    LectureClearArgument(
+                        lectureId = lectureInfo.lectureId,
+                        orderSeq = lectureInfo.orderSeq,
+                        lectureName = lectureInfo.lectureTitle,
+                        mentorName = lectureInfo.mentorName,
+                        encouragement = encouragement
+                    )
+                )
+            }
+        },
         onNavigateToAllClear = {
             onNavigateToAllClear(
                 lectureInfo.lectureId,
                 lectureInfo.mentorName
             )
         }
+    )
+
+    ChatDialog(
+        dialogState = dialogState,
+        onExit = {
+            dialogState = false
+            onBackPressed()
+        },
+        onDismissRequest = { dialogState = false }
     )
 }
 
@@ -83,19 +105,22 @@ private fun ChatScreen(
     viewModel: ChatViewModel,
     lectureInfo: LectureArgument,
     messages: List<ChatMessage>,
-    onNavigateToClear: (LectureClearArgument) -> Unit,
+    showDialog: () -> Unit,
+    onNavigateToClear: () -> Unit,
     onNavigateToAllClear: () -> Unit,
 ) {
     val listState = rememberLazyListState()
 
     val isReceivingMessage = viewModel.isReceiving.collectAsState().value
-    var isSelectionBoxVisible by remember { mutableStateOf(messages.isEmpty()) }
+    var isStartBoxVisible by remember { mutableStateOf(messages.isEmpty()) }
+    var isFinishBoxVisible by remember { mutableStateOf(viewModel.checkFinish()) }
+    var isOnGoing by remember { mutableStateOf(viewModel.checkOngoing()) }
     var isInputEnabled by remember { mutableStateOf(true) }
 
-    LaunchedEffect(isReceivingMessage, isSelectionBoxVisible, isInputEnabled) {
+    LaunchedEffect(isReceivingMessage, isStartBoxVisible, isInputEnabled) {
         isInputEnabled = when {
             isReceivingMessage -> false
-            isSelectionBoxVisible -> false
+            isStartBoxVisible -> false
             lectureInfo.lectureStatus == QuestStatus.DONE.name -> false
             else -> true
         }
@@ -112,10 +137,14 @@ private fun ChatScreen(
         BackAppBar(
             title = "${lectureInfo.orderSeq}강 · ${lectureInfo.lectureTitle}",
             actions = {
-                if (viewModel.checkOngoing())
+                if (isOnGoing)
                     Row(
                         modifier = Modifier.clickable {
-                            // 종료 처리
+                            if (lectureInfo.isLastLecture) {
+                                onNavigateToAllClear()
+                            } else {
+                                onNavigateToClear()
+                            }
                         },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -140,12 +169,17 @@ private fun ChatScreen(
                 .weight(1f),
             listState = listState,
             isReceiving = isReceivingMessage,
-            isSelectionBoxVisible = isSelectionBoxVisible,
+            isStartBoxVisible = isStartBoxVisible,
+            isFinishBoxVisible = isFinishBoxVisible,
             mentorName = lectureInfo.mentorName,
             mentorImgUrl = lectureInfo.mentorImgUrl,
             isLastLecture = lectureInfo.isLastLecture,
             messageList = messages,
-            onStartChat = { isSelectionBoxVisible = false },
+            onStartChat = { isStartBoxVisible = false },
+            onGoingChat = {
+                isOnGoing = true
+                isFinishBoxVisible = false
+            },
             sendMessage = { isHide, text ->
                 viewModel.sendMessage(
                     name = lectureInfo.userName,
@@ -154,18 +188,9 @@ private fun ChatScreen(
                     isHide = isHide
                 )
             },
+            showDialog = showDialog,
             onNavigateToClear = {
-                viewModel.finishQuest(1) { encouragement ->
-                    onNavigateToClear(
-                        LectureClearArgument(
-                            lectureId = lectureInfo.lectureId,
-                            orderSeq = lectureInfo.orderSeq,
-                            lectureName = lectureInfo.lectureTitle,
-                            mentorName = lectureInfo.mentorName,
-                            encouragement = encouragement
-                        )
-                    )
-                }
+                onNavigateToClear()
             },
             onNavigateToAllClear = {
                 onNavigateToAllClear()
@@ -191,15 +216,18 @@ fun ChatMessages(
     modifier: Modifier,
     listState: LazyListState,
     isReceiving: Boolean = false,
-    isSelectionBoxVisible: Boolean,
+    isStartBoxVisible: Boolean,
+    isFinishBoxVisible: Boolean,
     mentorName: String,
     mentorImgUrl: String,
     isLastLecture: Boolean,
     messageList: List<ChatMessage>,
     onStartChat: () -> Unit,
+    onGoingChat: () -> Unit,
     sendMessage: (Boolean, String) -> Unit,
+    showDialog: () -> Unit,
     onNavigateToClear: () -> Unit,
-    onNavigateToAllClear: () -> Unit
+    onNavigateToAllClear: () -> Unit,
 ) {
     LazyColumn(
         modifier = modifier
@@ -211,14 +239,14 @@ fun ChatMessages(
         item {
             ChatHeader(messageList = messageList, mentorName = mentorName)
 
-            if (isSelectionBoxVisible) {
+            if (isStartBoxVisible) {
                 ChatStartSelectionBox(
                     onStart = {
                         onStartChat()
                         sendMessage(true, "대화해줘")
                     },
                     onNavigateBack = {
-                        /* 채팅방 나가기 */
+                        showDialog()
                     }
                 )
             }
@@ -238,17 +266,17 @@ fun ChatMessages(
                 MessageType.MENTOR_RESPONSE.name -> {
                     ChatWithProfileBubble(
                         message = chat.message.content,
+                        name = mentorName,
                         imgUrl = mentorImgUrl
                     )
                 }
             }
 
-            if (chat.message.isFinish && !chat.message.isOngoing) {
+            if (isFinishBoxVisible) {
                 ChatFinishSelectionBox(
                     isLastLecture = isLastLecture,
                     onGoing = {
-                        // 사라지고
-                        // 상단 나가기 버튼 보여주기
+                        onGoingChat()
                     },
                     onNavigateToClear = onNavigateToClear,
                     onNavigateToAllClear = onNavigateToAllClear
@@ -258,32 +286,8 @@ fun ChatMessages(
 
         if (isReceiving) {
             item {
-                ChatWithProfileBubble(
-                    message = "...",
-                    imgUrl = mentorImgUrl,
-                )
+                TypingIndicatorBubble(name = mentorName, imgUrl = mentorImgUrl)
             }
         }
     }
-}
-
-@Composable
-fun LoadingDots() {
-    val dotCount = remember { Animatable(1f) }
-
-    LaunchedEffect(Unit) {
-        while (true) {
-            dotCount.animateTo(
-                targetValue = 3f,
-                animationSpec = tween(durationMillis = 1000, easing = LinearEasing)
-            )
-            dotCount.snapTo(1f)
-        }
-    }
-
-    Text(
-        text = "●".repeat(dotCount.value.toInt()),
-        fontSize = 20.sp,
-        color = Color.Gray
-    )
 }

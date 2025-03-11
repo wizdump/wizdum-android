@@ -110,10 +110,13 @@ class ChatViewModel @Inject constructor(
     }
 
     fun checkOngoing(): Boolean {
-        _messages.value.lastOrNull()?.message?.let { lastMessage ->
-            return (lastMessage.isFinish && lastMessage.isOngoing)
-        }
-        return false
+        val lastMessage = _messages.value.lastOrNull()?.message
+        return lastMessage?.let { it.isFinish && it.isOngoing } ?: false
+    }
+
+    fun checkFinish(): Boolean {
+        val lastMessage = _messages.value.lastOrNull()?.message
+        return lastMessage?.let { it.isFinish && !it.isOngoing } ?: false
     }
 
     override fun onCleared() {

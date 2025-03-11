@@ -29,6 +29,9 @@ fun NavGraphBuilder.chatScreen(navController: NavHostController) {
 
         ChatRoute(
             lectureInfo = Json.decodeFromUri(lectureInfo),
+            onBackPressed = {
+                navController.popBackStack()
+            },
             onNavigateToClear = { clearedLectureInfo ->
                 navController.navigateToLectureClear(clearedLectureInfo)
             },
