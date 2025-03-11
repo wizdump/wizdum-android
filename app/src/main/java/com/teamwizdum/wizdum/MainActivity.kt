@@ -8,7 +8,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.teamwizdum.wizdum.feature.login.navigation.navigateToLogin
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.home.HomeRoute
 import com.teamwizdum.wizdum.feature.onboarding.navigation.OnboardingRoute
@@ -18,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,7 +36,9 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(mainState) {
                     when (mainState) {
                         MainState.Onboarding -> navController.navigate(OnboardingRoute.START) { popUpTo(0) }
-                        MainState.Login -> navController.navigate("LOGIN") { popUpTo(0) }
+                        MainState.Login -> navController.navigateToLogin(navOptions = navOptions {
+                            run { popUpTo(0) }
+                        })
                         MainState.Home -> navController.navigate(HomeRoute.HOME) { popUpTo(0) }
                         else -> {}
                     }

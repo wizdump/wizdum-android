@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +29,7 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.UiState
 
 @Composable
 fun LoginRoute(
@@ -40,20 +42,33 @@ fun LoginRoute(
         viewModel.classId = classId
     }
 
-    LoginScreen(
-        onLoginClick = { accessToken ->
-            viewModel.login(
-                accessToken = accessToken,
-                moveToLecture = { onNavigateToLecture() },
-                moveToHome = { onNavigateToHome() }
+    val uiState = viewModel.loginState.collectAsState().value
+
+    when (uiState) {
+        is UiState.Loading -> {
+            LoginScreen(
+                onLogin = { accessToken, nickName ->
+                    viewModel.nickName = nickName
+                    viewModel.login(
+                        accessToken = accessToken,
+                        moveToLecture = { onNavigateToLecture() },
+                        moveToHome = { onNavigateToHome() }
+                    )
+                }
             )
         }
-    )
+
+        is UiState.Success -> {
+            LoginSuccessScreen(name = viewModel.nickName)
+        }
+
+        is UiState.Failed -> {}
+    }
 }
 
 @Composable
 private fun LoginScreen(
-    onLoginClick: (String) -> Unit,
+    onLogin: (String, String) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -88,8 +103,8 @@ private fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
             KakaoLoginButton(
                 context = context,
-                onKakaoSuccess = { accessToken ->
-                    onLoginClick(accessToken)
+                onKakaoSuccess = { accessToken, nickName ->
+                    onLogin(accessToken, nickName)
                 }
             )
         }
@@ -97,7 +112,7 @@ private fun LoginScreen(
 }
 
 @Composable
-fun KakaoLoginButton(context: Context, onKakaoSuccess: (String) -> Unit) {
+fun KakaoLoginButton(context: Context, onKakaoSuccess: (String, String) -> Unit) {
     WizdumFilledButton(
         title = "카카오로 로그인",
         backgroundColor = Color(0xFFFFDC00),
@@ -106,8 +121,8 @@ fun KakaoLoginButton(context: Context, onKakaoSuccess: (String) -> Unit) {
         onClick = {
             KaKaoLoginManager.login(
                 context = context,
-                onSuccess = { accessToken ->
-                    onKakaoSuccess(accessToken)
+                onSuccess = { accessToken, nickName ->
+                    onKakaoSuccess(accessToken, nickName)
                 },
                 onFailed = {
 
@@ -121,6 +136,8 @@ fun KakaoLoginButton(context: Context, onKakaoSuccess: (String) -> Unit) {
 @Composable
 fun LoginScreenPreview() {
     WizdumTheme {
-        LoginScreen {}
+        LoginScreen(
+            onLogin = { _, _ -> },
+        )
     }
 }

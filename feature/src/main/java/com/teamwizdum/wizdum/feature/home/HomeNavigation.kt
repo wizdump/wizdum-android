@@ -15,7 +15,7 @@ fun NavGraphBuilder.homeScreen(padding: PaddingValues, navController: NavHostCon
                 navController.navigateToInterest()
             },
             onNavigateToLecture = { classId ->
-                navController.navigateToLecture(classId)
+                navController.navigateToLecture(classId, null)
             }
         )
     }

@@ -3,6 +3,7 @@ package com.teamwizdum.wizdum.feature.quest.navigation
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
@@ -16,8 +17,8 @@ import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgum
 import com.teamwizdum.wizdum.feature.reward.navigation.navigateToReward
 import kotlinx.serialization.json.Json
 
-fun NavController.navigateToLecture(classId: Int) {
-    navigate(LectureRoute.lectureMainRoute(classId))
+fun NavController.navigateToLecture(classId: Int, navOptions: NavOptions?) {
+    navigate(LectureRoute.lectureMainRoute(classId), navOptions)
 }
 
 fun NavController.navigateToLectureClear(lectureInfo: LectureClearArgument) {

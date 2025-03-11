@@ -11,7 +11,7 @@ object KaKaoLoginManager {
 
     fun login(
         context: Context,
-        onSuccess: (String) -> Unit = {},
+        onSuccess: (String, String) -> Unit = {_, _ ->},
         onFailed: (Throwable?) -> Unit = {},
     ) {
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(context = context)) {
@@ -39,14 +39,15 @@ object KaKaoLoginManager {
 
     private fun loginWithKakaoTalk(
         context: Context,
-        onSuccess: (String) -> Unit,
+        onSuccess: (String, String) -> Unit,
         onFailed: (Throwable?) -> Unit,
     ) {
         UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
             if (token != null) {
                 Timber.tag("KAKAO_TALK").d("로그인 성공 : ${token.accessToken}")
-                onSuccess(token.accessToken)
-                getKakaoUserInfo()
+                getKakaoUserInfo { nickName ->
+                    onSuccess(token.accessToken, nickName)
+                }
             } else {
                 Timber.tag("KAKAO_TALK").d("로그인 실패 : ${error?.cause}")
                 onFailed(error)
@@ -56,13 +57,15 @@ object KaKaoLoginManager {
 
     private fun loginWithKakaoAccount(
         context: Context,
-        onSuccess: (String) -> Unit,
+        onSuccess: (String, String) -> Unit,
         onFailed: (Throwable?) -> Unit,
     ) {
         UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
             if (token != null) {
                 Timber.tag("KAKAO_ACCOUNT").d("로그인 성공 : ${token.accessToken}")
-                onSuccess(token.accessToken)
+                getKakaoUserInfo { nickName ->
+                    onSuccess(token.accessToken, nickName)
+                }
             } else {
                 Timber.tag("KAKAO_ACCOUNT").d("로그인 실패 : ${error?.cause}")
                 onFailed(error)
@@ -80,11 +83,12 @@ object KaKaoLoginManager {
         }
     }
 
-    fun getKakaoUserInfo() {
+    private fun getKakaoUserInfo(onSuccess: (String) -> Unit) {
         UserApiClient.instance.me { user, error ->
             if (error != null) {
                 Timber.tag("KAKAO_USER").d("사용자 정보 요청 실패 : ${error.cause}")
             } else if (user != null) {
+                onSuccess(user.kakaoAccount?.profile?.nickname ?: "")
                 Timber.d(
                     "사용자 정보 요청 성공" +
                             "\n회원번호: ${user.id}" +

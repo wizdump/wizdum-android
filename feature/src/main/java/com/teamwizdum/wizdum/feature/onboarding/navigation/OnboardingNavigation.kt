@@ -114,7 +114,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
                 navController.navigateToLogin(classId)
             },
             onNavigateToLecture = {
-                navController.navigateToLecture(classId)
+                navController.navigateToLecture(classId, null)
             }
         )
     }
