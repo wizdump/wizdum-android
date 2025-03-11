@@ -29,6 +29,6 @@ data class FinishLecture(
     val mentoName: String,
     val classId: Int,
     val lectureId: Int,
-    val mentoLectureTitle: String,
+    val classTitle: String,
     val completedAt: String,
 )

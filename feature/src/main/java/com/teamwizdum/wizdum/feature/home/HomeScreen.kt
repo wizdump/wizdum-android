@@ -340,7 +340,7 @@ fun CollectionWizCard(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = finishedLecture.mentoLectureTitle,
+                text = finishedLecture.classTitle,
                 style = WizdumTheme.typography.body2_semib
             )
             Spacer(modifier = Modifier.height(4.dp))
@@ -392,7 +392,7 @@ fun CollectionWizCardPreview() {
             FinishLecture(
                 mentoId = 2,
                 mentoName = "윈스턴 처칠",
-                mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+                classTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 classId = 0,
                 lectureId = 2,
                 completedAt = "2023-10-27 10:00:00"
@@ -424,7 +424,7 @@ fun HomeScreenPreview() {
             FinishLecture(
                 mentoId = 2,
                 mentoName = "윈스턴 처칠",
-                mentoLectureTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
+                classTitle = "작심삼일을 극복하는 초집중력과 루틴 만들기",
                 classId = 0,
                 lectureId = 2,
                 completedAt = "2023-10-27 10:00:00"
