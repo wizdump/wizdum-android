@@ -26,10 +26,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -50,9 +53,10 @@ import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
+import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
-import kotlin.math.sqrt
 
 @Composable
 fun MentorMatchRoute(
@@ -66,9 +70,30 @@ fun MentorMatchRoute(
         viewModel.getMentors(interestId, levelId, categoryId)
     }
 
-    val mentors = viewModel.mentors.collectAsState().value
+    val uiState = viewModel.mentors.collectAsState().value
 
-    MentorMatchScreen(mentors = mentors, onNavigateToDetail = onNavigateToMentorDetail)
+    var isDelayedLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        delay(2000)
+        isDelayedLoading = false
+    }
+
+    when  {
+        isDelayedLoading -> {
+            MatchingInProgressScreen()
+        }
+        uiState is UiState.Loading -> {
+            MatchingInProgressScreen()
+        }
+        uiState is UiState.Success -> {
+            MentorMatchScreen(
+                mentors = uiState.data,
+                onNavigateToDetail = onNavigateToMentorDetail
+            )
+        }
+        uiState is UiState.Failed -> {}
+    }
 }
 
 @Composable
@@ -172,7 +197,8 @@ fun RenewalMentorCard(mentorInfo: MentorsResponse) {
             }
             
             Box(
-                modifier = Modifier.size(197.dp)
+                modifier = Modifier
+                    .size(197.dp)
                     .clip(HexagonShape)
                     .background(color = Green200)
                     .padding(4.dp)

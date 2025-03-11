@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,6 +59,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 
 // TODO: Status Bar 영역 체크
@@ -73,18 +75,26 @@ fun MentorDetailRoute(
         viewModel.getMentorDetail(classId)
     }
 
-    val mentorInfo = viewModel.mentorInfo.collectAsState().value
+    val uiState = viewModel.mentorInfo.collectAsState().value
 
-    MentorDetailScreen(
-        mentorInfo = mentorInfo,
-        checkOnboarding = viewModel.checkUserOnboarding(),
-        onNavigateToLogin = onNavigateToLogin,
-        onNavigateToLecture = {
-            viewModel.startQuest(classId) {
-                onNavigateToLecture()
-            }
+    when (uiState) {
+        is UiState.Loading -> {
+            CircularProgressIndicator()
         }
-    )
+        is UiState.Success -> {
+            MentorDetailScreen(
+                mentorInfo = uiState.data,
+                checkOnboarding = viewModel.checkUserOnboarding(),
+                onNavigateToLogin = onNavigateToLogin,
+                onNavigateToLecture = {
+                    viewModel.startQuest(classId) {
+                        onNavigateToLecture()
+                    }
+                }
+            )
+        }
+        is UiState.Failed -> {}
+    }
 }
 
 @Composable

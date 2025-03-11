@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +47,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.UiState
 
 @Composable
 fun KeywordSelectionRoute(
@@ -56,12 +58,20 @@ fun KeywordSelectionRoute(
         viewModel.getKeyword()
     }
 
-    val keywords = viewModel.keywords.collectAsState().value
+    val uiState = viewModel.keywords.collectAsState().value
 
-    KeywordSelectionScreen(
-        keywords = keywords,
-        onNavigateToMentor = { onNavigateToMentor(it) }
-    )
+    when (uiState) {
+        is UiState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is UiState.Success -> {
+            KeywordSelectionScreen(
+                keywords = uiState.data,
+                onNavigateToMentor = { onNavigateToMentor(it) }
+            )
+        }
+        is UiState.Failed -> {}
+    }
 }
 
 @Composable

@@ -2,9 +2,9 @@ package com.teamwizdum.wizdum.data.api
 
 import com.teamwizdum.wizdum.data.model.response.InterestResponse
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
+import com.teamwizdum.wizdum.data.model.response.LevelResponse
 import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
-import com.teamwizdum.wizdum.data.model.response.LevelResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

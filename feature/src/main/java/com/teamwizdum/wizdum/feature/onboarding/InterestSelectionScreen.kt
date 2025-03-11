@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +47,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.UiState
 
 @Composable
 fun InterestSelectionRoute(
@@ -56,9 +58,20 @@ fun InterestSelectionRoute(
         viewModel.getInterest()
     }
 
-    val interests = viewModel.interests.collectAsState().value
+    val uiState = viewModel.interests.collectAsState().value
 
-    InterestSelectionScreen(interests = interests, onNavigateToLevel = { onNavigateToLevel(it) })
+    when (uiState) {
+        is UiState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is UiState.Success -> {
+            InterestSelectionScreen(
+                interests = uiState.data,
+                onNavigateToLevel = { onNavigateToLevel(it) }
+            )
+        }
+        is UiState.Failed  -> {}
+    }
 }
 
 @Composable

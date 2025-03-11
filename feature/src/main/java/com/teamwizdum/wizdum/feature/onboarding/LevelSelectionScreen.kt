@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +40,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
 
 @Composable
@@ -50,9 +52,20 @@ fun LevelSelectionRoute(
         viewModel.getLevel()
     }
 
-    val levels = viewModel.level.collectAsState().value
+    val uiState = viewModel.levels.collectAsState().value
 
-    LevelSelectionScreen(levels = levels, onNavigateToKeyword = { onNavigateToKeyword(it) })
+    when (uiState) {
+        is UiState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is UiState.Success -> {
+            LevelSelectionScreen(
+                levels = uiState.data,
+                onNavigateToKeyword = { onNavigateToKeyword(it) }
+            )
+        }
+        is UiState.Failed -> {}
+    }
 }
 
 @Composable

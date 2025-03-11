@@ -9,6 +9,7 @@ import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.model.response.LevelResponse
 import com.teamwizdum.wizdum.data.repository.OnboardingRepository
 import com.teamwizdum.wizdum.data.repository.QuestRepository
+import com.teamwizdum.wizdum.feature.common.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,50 +24,54 @@ class OnboardingViewModel @Inject constructor(
 
     private val checkOnboarding = false
 
-    private val _interests = MutableStateFlow<List<InterestResponse>>(emptyList())
-    val interests: StateFlow<List<InterestResponse>> = _interests
+    private val _interests = MutableStateFlow<UiState<List<InterestResponse>>>(UiState.Loading)
+    val interests: StateFlow<UiState<List<InterestResponse>>> = _interests
 
-    private val _level = MutableStateFlow<List<LevelResponse>>(emptyList())
-    val level: StateFlow<List<LevelResponse>> = _level
+    private val _levels = MutableStateFlow<UiState<List<LevelResponse>>>(UiState.Loading)
+    val levels: StateFlow<UiState<List<LevelResponse>>> = _levels
 
-    private val _keywords = MutableStateFlow<List<KeywordResponse>>(emptyList())
-    val keywords: StateFlow<List<KeywordResponse>> = _keywords
+    private val _keywords = MutableStateFlow<UiState<List<KeywordResponse>>>(UiState.Loading)
+    val keywords: StateFlow<UiState<List<KeywordResponse>>> = _keywords
 
-    private val _mentors = MutableStateFlow<List<MentorsResponse>>(emptyList())
-    val mentors: StateFlow<List<MentorsResponse>> = _mentors
+    private val _mentors = MutableStateFlow<UiState<List<MentorsResponse>>>(UiState.Loading)
+    val mentors: StateFlow<UiState<List<MentorsResponse>>> = _mentors
 
-    private val _mentorInfo = MutableStateFlow<MentorDetailResponse>(
-        MentorDetailResponse(
-            mentoName = "",
-            classTitle = "",
-            itemLevel = "LOW",
-            friendWithLectureCount = 0
-        )
-    )
-    val mentorInfo: StateFlow<MentorDetailResponse> = _mentorInfo
+    private val _mentorInfo = MutableStateFlow<UiState<MentorDetailResponse>>(UiState.Loading)
+    val mentorInfo: StateFlow<UiState<MentorDetailResponse>> = _mentorInfo
 
     fun getInterest() {
         viewModelScope.launch {
-            onboardingRepository.getInterests().collect {
-                _interests.value = it
-            }
+            onboardingRepository.getInterests()
+                .onSuccess { data ->
+                    _interests.value = UiState.Success(data)
+                }
+                .onFailure { error ->
+                    _interests.value = UiState.Failed(error.message)
+                }
         }
     }
 
     fun getLevel() {
         viewModelScope.launch {
-            onboardingRepository.getLevel().collect {
-                _level.value = it
-            }
+            onboardingRepository.getLevel()
+                .onSuccess { data ->
+                    _levels.value = UiState.Success(data)
+                }
+                .onFailure { error ->
+                    _levels.value = UiState.Failed(error.message)
+                }
         }
     }
 
-    fun getKeyword(onSuccess: () -> Unit = {}) {
+    fun getKeyword() {
         viewModelScope.launch {
-            onboardingRepository.getKeywords().collect {
-                _keywords.value = it
-                onSuccess()
-            }
+            onboardingRepository.getKeywords()
+                .onSuccess { data ->
+                    _keywords.value = UiState.Success(data)
+                }
+                .onFailure { error ->
+                    _keywords.value = UiState.Failed(error.message)
+                }
         }
     }
 
@@ -76,17 +81,22 @@ class OnboardingViewModel @Inject constructor(
                 interestId = interestId,
                 levelId = levelId,
                 categoryId = categoryId
-            ).collect {
-                _mentors.value = it
+            ).onSuccess { data ->
+                _mentors.value = UiState.Success(data)
+            }.onFailure { error ->
+                _mentors.value = UiState.Failed(error.message)
             }
         }
     }
 
     fun getMentorDetail(classId: Int) {
         viewModelScope.launch {
-            onboardingRepository.getMentorDetail(classId = classId).collect {
-                _mentorInfo.value = it
-            }
+            onboardingRepository.getMentorDetail(classId)
+                .onSuccess { data ->
+                    _mentorInfo.value = UiState.Success(data)
+                }.onFailure { error ->
+                    _mentorInfo.value = UiState.Failed(error.message)
+                }
         }
     }
 
@@ -94,9 +104,13 @@ class OnboardingViewModel @Inject constructor(
 
     fun startQuest(classId: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            questRepository.startQuest(classId).collect {
-                onSuccess()
-            }
+            questRepository.startQuest(classId)
+                .onSuccess {
+                    onSuccess()
+                }
+                .onFailure {
+                    // 전역 에러 핸들링 처리
+                }
         }
     }
 }
