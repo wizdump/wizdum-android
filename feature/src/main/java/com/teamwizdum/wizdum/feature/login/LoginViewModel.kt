@@ -37,13 +37,7 @@ class LoginViewModel @Inject constructor(
 
             if (!token.isNullOrEmpty()) {
                 checkRegisteredUser {
-                    if (classId != -1) {
-                        startLecture(classId) {
-                            moveToLecture()
-                        }
-                    } else {
-                        moveToHome()
-                    }
+                    navigation(moveToLecture, moveToHome)
                 }
 
                 return@launch
@@ -59,12 +53,25 @@ class LoginViewModel @Inject constructor(
                     _loginState.value = UiState.Success(Unit)
                     delay(2000) // 로그인 완료 화면을 보여주기 위한 딜레이
 
-                    moveToHome()
+                    navigation(moveToLecture, moveToHome)
 
                     Timber.d("accessToken 저장됨 : ${tokenRepository.getAccessToken()}")
                 }.onFailure { error ->
                     _loginState.value = UiState.Failed(error.message)
                 }
+        }
+    }
+
+    private fun navigation(
+        moveToLecture: () -> Unit,
+        moveToHome: () -> Unit,
+    ) {
+        if (classId != -1) {
+            startLecture(classId) {
+                moveToLecture()
+            }
+        } else {
+            moveToHome()
         }
     }
 

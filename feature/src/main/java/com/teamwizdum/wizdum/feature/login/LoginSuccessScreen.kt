@@ -19,6 +19,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
@@ -48,7 +49,11 @@ fun LoginSuccessScreen(name: String) {
             style = WizdumTheme.typography.h2
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "멘토님이 대화할 준비를 하고 있어요!", style = WizdumTheme.typography.body1)
+        Text(
+            text = "멘토님이 대화할 준비를 하고 있어요!",
+            style = WizdumTheme.typography.body1,
+            color = Black600
+        )
     }
 }
 

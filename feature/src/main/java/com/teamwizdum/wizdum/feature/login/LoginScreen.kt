@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
@@ -98,7 +99,8 @@ private fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "맞춤형 멘토추천과 학습기록 저장이 가능해요!",
-                style = WizdumTheme.typography.body1
+                style = WizdumTheme.typography.body1,
+                color = Black600
             )
             Spacer(modifier = Modifier.height(32.dp))
             KakaoLoginButton(
