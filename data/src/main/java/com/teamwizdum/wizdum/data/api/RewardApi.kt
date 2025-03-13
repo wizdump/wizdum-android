@@ -9,11 +9,11 @@ import retrofit2.http.Query
 
 interface RewardApi {
     @POST("reward")
-    suspend fun postReward(@Query("lectureId") lectureId: Int): Response<Unit>
+    suspend fun postReward(@Query("classId") lectureId: Int): Response<Unit>
 
-    @GET("reward/{lectureId}")
+    @GET("reward/{classId}")
     suspend fun getReward(
-        @Path("lectureId") pathLectureId: Int,
-        @Query("lectureId") queryLectureId: Int
+        @Path("classId") pathLectureId: Int,
+        @Query("classId") queryLectureId: Int
     ): RewardResponse
 }

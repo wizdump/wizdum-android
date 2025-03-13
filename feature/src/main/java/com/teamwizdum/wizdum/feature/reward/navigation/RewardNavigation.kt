@@ -20,7 +20,14 @@ fun NavGraphBuilder.rewardScreen(navController: NavHostController) {
     ) { backstackEntry ->
         val lectureId = backstackEntry.arguments?.getInt("lectureId") ?: 0
 
-        RewardRoute(lectureId = lectureId)
+        RewardRoute(
+            lectureId = lectureId,
+            onNavigateToHome = {
+                navController.navigate("HOME") {
+                    popUpTo(navController.graph.startDestinationId) {inclusive = false}
+                }
+            }
+        )
     }
 }
 
