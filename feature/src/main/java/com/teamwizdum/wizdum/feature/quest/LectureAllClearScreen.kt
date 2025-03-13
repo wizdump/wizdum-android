@@ -86,7 +86,7 @@ private fun LectureAllClearScreen(
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
-fun QuestAllClearScreenPreview() {
+fun LectureAllClearScreenPreview() {
     WizdumTheme {
         LectureAllClearScreen("스파르타") {}
     }

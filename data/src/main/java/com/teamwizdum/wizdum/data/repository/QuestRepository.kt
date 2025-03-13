@@ -16,12 +16,12 @@ class QuestRepository @Inject constructor(
         return runCatching { questApi.startQuest(classId) }
     }
 
-    suspend fun getQuests(classId: Int): Flow<LectureResponse> = flow {
-        emit(questApi.getQuests(classId))
+    suspend fun getQuests(classId: Int): Result<LectureResponse> {
+        return runCatching { questApi.getQuests(classId) }
     }
 
-    suspend fun finishQuest(lectureId: Int): Flow<FinishQuestResponse> = flow {
-        emit(questApi.finishQuest(lectureId))
+    suspend fun finishQuest(lectureId: Int): Result<FinishQuestResponse> {
+        return runCatching { questApi.finishQuest(lectureId) }
     }
 
     suspend fun getChatList(lectureId: Int): Flow<List<ChatMessage>> = flow {

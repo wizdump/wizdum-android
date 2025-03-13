@@ -51,43 +51,53 @@ data class WizdumTypography(
 val Typograhy = WizdumTypography(
     h1 = robotoBoldStyle.copy(
         fontSize = 32.sp,
-        lineHeight = 32.sp * 1.6f
+        lineHeight = 32.sp * 1.6f,
+        color = Black700
     ),
     h2 = robotoSemiBoldStyle.copy(
         fontSize = 20.sp,
-        lineHeight = 20.sp * 1.6f
+        lineHeight = 20.sp * 1.6f,
+        color = Black700
     ),
     h3_semib = robotoSemiBoldStyle.copy(
         fontSize = 16.sp,
-        lineHeight = 16.sp * 1.6f
+        lineHeight = 16.sp * 1.6f,
+        color = Black700
     ),
     h3 = robotoMediumStyle.copy(
         fontSize = 16.sp,
-        lineHeight = 16.sp * 1.6f
+        lineHeight = 16.sp * 1.6f,
+        color = Black700
     ),
     body1_semib = robotoSemiBoldStyle.copy(
         fontSize = 14.sp,
-        lineHeight = 14.sp * 1.6f
+        lineHeight = 14.sp * 1.6f,
+        color = Black700
     ),
     body1 = robotoMediumStyle.copy(
         fontSize = 14.sp,
-        lineHeight = 14.sp * 1.6f
+        lineHeight = 14.sp * 1.6f,
+        color = Black700
     ),
     body2_semib = robotoSemiBoldStyle.copy(
         fontSize = 12.sp,
-        lineHeight = 12.sp * 1.6f
+        lineHeight = 12.sp * 1.6f,
+        color = Black700
     ),
     body2 = robotoMediumStyle.copy(
         fontSize = 12.sp,
-        lineHeight = 12.sp * 1.6f
+        lineHeight = 12.sp * 1.6f,
+        color = Black700
     ),
     body3_semib = robotoSemiBoldStyle.copy(
         fontSize = 10.sp,
-        lineHeight = 10.sp * 1.6f
+        lineHeight = 10.sp * 1.6f,
+        color = Black700
     ),
     body3 = robotoMediumStyle.copy(
         fontSize = 10.sp,
-        lineHeight = 10.sp * 1.6f
+        lineHeight = 10.sp * 1.6f,
+        color = Black700
     ),
 )
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +30,7 @@ import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgum
 @Composable
 fun LectureClearScreen(
     lectureInfo: LectureClearArgument,
-    onNavigateToLecture: () -> Unit,
+    onNavigateToLecture: (Int) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -69,7 +70,7 @@ fun LectureClearScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             WizdumFilledButton(title = "계속하기") {
-                onNavigateToLecture()
+                onNavigateToLecture(lectureInfo.classId)
             }
         }
     }
@@ -89,17 +90,20 @@ fun MentorCommentBox(mentorName: String, comment: String) {
                 style = WizdumTheme.typography.body2_semib
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = comment,
-                style = WizdumTheme.typography.body2
-            )
+            Row {
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(
+                    text = comment,
+                    style = WizdumTheme.typography.body2
+                )
+            }
         }
     }
 }
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
-fun QuestClearScreenPreview() {
+fun LectureClearScreenPreview() {
     WizdumTheme {
         LectureClearScreen(
             lectureInfo = LectureClearArgument(

@@ -25,8 +25,8 @@ fun NavController.navigateToLectureClear(lectureInfo: LectureClearArgument) {
     navigate(LectureRoute.lectureClearRoute(Json.encodeToUri(lectureInfo)))
 }
 
-fun NavController.navigateToLectureAllClear(lectureId: Int, mentorName: String) {
-    navigate(LectureRoute.lectureAllClearRoute(lectureId, mentorName))
+fun NavController.navigateToLectureAllClear(classId: Int, mentorName: String) {
+    navigate(LectureRoute.lectureAllClearRoute(classId, mentorName))
 }
 
 fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
@@ -59,9 +59,10 @@ fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
 
         LectureClearScreen(
             lectureInfo = Json.decodeFromUri(lectureInfo),
-            onNavigateToLecture = {
-                //navController.navigateToLecture()
-                // popBack()
+            onNavigateToLecture = { classId ->
+                navController.navigate("LECTURE/$classId") {
+                    popUpTo(navController.graph.startDestinationId) {inclusive = false}
+                }
             }
         )
     }
@@ -69,11 +70,11 @@ fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
     composable(
         route = LectureRoute.LECTURE_ALL_CLEAR,
         arguments = listOf(
-            navArgument("lectureId") { type = NavType.IntType },
+            navArgument("classId") { type = NavType.IntType },
             navArgument("mentorName") { type = NavType.StringType }
         )
     ) { backstackEntry ->
-        val lectureId = backstackEntry.arguments?.getInt("lectureId") ?: 0
+        val lectureId = backstackEntry.arguments?.getInt("classId") ?: 0
         val mentorName = backstackEntry.arguments?.getString("mentorName") ?: ""
 
         LectureAllClearRoute(
@@ -93,8 +94,8 @@ object LectureRoute {
     fun lectureClearRoute(clearedLectureInfo: String) = "LECTURE_CLEAR/$clearedLectureInfo"
     const val LECTURE_CLEAR = "LECTURE_CLEAR/{clearedLectureInfo}"
 
-    fun lectureAllClearRoute(lectureId: Int, mentorName: String) =
-        "LECTURE_ALL_CLEAR/$lectureId/$mentorName"
+    fun lectureAllClearRoute(classId: Int, mentorName: String) =
+        "LECTURE_ALL_CLEAR/$classId/$mentorName"
 
-    const val LECTURE_ALL_CLEAR = "LECTURE_ALL_CLEAR/{categoryId}"
+    const val LECTURE_ALL_CLEAR = "LECTURE_ALL_CLEAR/{classId}/{mentorName}"
 }

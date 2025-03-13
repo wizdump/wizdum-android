@@ -60,16 +60,17 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black300
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green100
 import com.teamwizdum.wizdum.designsystem.theme.Green200
-import com.teamwizdum.wizdum.designsystem.theme.Success
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
-import com.teamwizdum.wizdum.feature.quest.component.QuestProgressBar
-import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
+import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
+import com.teamwizdum.wizdum.feature.quest.component.LectureProgressBar
+import com.teamwizdum.wizdum.feature.common.component.LectureStatusBadge
 import com.teamwizdum.wizdum.feature.quest.component.StatusCircle
-import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
+import com.teamwizdum.wizdum.feature.common.enums.LectureStatus
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
 
 @Composable
@@ -80,29 +81,36 @@ fun LectureRoute(
     onNavigateToLectureAllClear: (Int, String) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getQuest(classId)
+        viewModel.getLecture(classId)
     }
 
-    val lectureInfo = viewModel.lectureInfo.collectAsState().value
+    val uiState = viewModel.lectureInfo.collectAsState().value
 
-    LectureScreen(
-        lectureInfo = lectureInfo,
-        onNavigateToChat = { lectureId, orderSeq, lectureStatus, lectureTitle ->
-            val selectedLectureInfo =
-                LectureArgument(
-                    lectureId = lectureId,
-                    orderSeq = orderSeq,
-                    lectureTitle = lectureTitle,
-                    lectureStatus = lectureStatus,
-                    isLastLecture = lectureInfo.isLastLecture(orderSeq),
-                    mentorName = lectureInfo.mentoName,
-                    mentorImgUrl = lectureInfo.logoImageFilePath,
-                    userName = lectureInfo.userName,
-                )
-            onNavigateToChat(selectedLectureInfo)
-        },
-        onNavigateToLectureAllClear = onNavigateToLectureAllClear
-    )
+    when(uiState) {
+        is UiState.Loading -> {}
+        is UiState.Success -> {
+            LectureScreen(
+                lectureInfo = uiState.data,
+                onNavigateToChat = { lectureId, orderSeq, lectureStatus, lectureTitle ->
+                    val selectedLectureInfo =
+                        LectureArgument(
+                            classId = classId,
+                            lectureId = lectureId,
+                            orderSeq = orderSeq,
+                            lectureTitle = lectureTitle,
+                            lectureStatus = lectureStatus,
+                            isLastLecture = uiState.data.isLastLecture(orderSeq),
+                            mentorName = uiState.data.mentoName,
+                            mentorImgUrl = uiState.data.logoImageFilePath,
+                            userName = uiState.data.userName,
+                        )
+                    onNavigateToChat(selectedLectureInfo)
+                },
+                onNavigateToLectureAllClear = onNavigateToLectureAllClear
+            )
+        }
+        is UiState.Failed -> {}
+    }
 }
 
 @Composable
@@ -147,9 +155,11 @@ fun LectureScreen(
             contentDescription = "강의 배경 이미지",
             modifier = Modifier.fillMaxWidth()
         )
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0xCC121212)))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color(0xCC121212))
+        )
 
         Column(
             modifier = Modifier.padding(top = 92.dp, start = 32.dp, end = 32.dp)
@@ -195,14 +205,14 @@ fun LectureScreen(
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
-            LevelInfo(level = lectureInfo.level)
+            LevelInfoCard(level = lectureInfo.level)
             Spacer(modifier = Modifier.height(32.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(text = "목표", style = WizdumTheme.typography.body1, color = Color.White)
-                QuestProgressBar(
+                LectureProgressBar(
                     modifier = Modifier.weight(1f),
                     progress = lectureInfo.getProgress()
                 )
@@ -233,7 +243,7 @@ fun LectureScreen(
                 .align(Alignment.BottomCenter)
         ) {
             items(lectureInfo.lectures, key = { it.lectureId }) { lecture ->
-                QuestItem(
+                LectureItem(
                     lecture = lecture,
                     onNavigateToChat = {
                         onNavigateToChat(
@@ -261,7 +271,7 @@ fun LectureScreen(
 }
 
 @Composable
-fun QuestItem(lecture: LectureDetail, onNavigateToChat: () -> Unit) {
+fun LectureItem(lecture: LectureDetail, onNavigateToChat: () -> Unit) {
     var rowHeight by remember { mutableStateOf(71) }
 
     Row {
@@ -272,11 +282,11 @@ fun QuestItem(lecture: LectureDetail, onNavigateToChat: () -> Unit) {
                 Modifier
                     .height(with(LocalDensity.current) { rowHeight.toDp() - 6.dp })
                     .width(1.dp)
-                    .background(color = if (lecture.isInProgress || lecture.lectureStatus != QuestStatus.WAIT.name) Green200 else Black300)
+                    .background(color = if (lecture.isInProgress || lecture.lectureStatus != LectureStatus.WAIT.name) Green200 else Black300)
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
-        ExpandableQuestCard(
+        ExpandableLectureCard(
             lectureInfo = lecture,
             onHeightChanged = { newHeight -> rowHeight = newHeight },
             onNavigateToChat = { onNavigateToChat() }
@@ -285,14 +295,14 @@ fun QuestItem(lecture: LectureDetail, onNavigateToChat: () -> Unit) {
 }
 
 @Composable
-fun ExpandableQuestCard(
+fun ExpandableLectureCard(
     lectureInfo: LectureDetail,
     onHeightChanged: (Int) -> Unit = {},
     onNavigateToChat: () -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(lectureInfo.isInProgress) }
     val cardHeight by animateDpAsState(
-        targetValue = if (isExpanded) 186.dp else if (!isExpanded && lectureInfo.lectureStatus == QuestStatus.WAIT.name) 95.dp else 71.dp,
+        targetValue = if (isExpanded) 186.dp else if (!isExpanded && lectureInfo.lectureStatus == LectureStatus.WAIT.name) 95.dp else 71.dp,
         label = "",
         finishedListener = { } // 애니메이션이 끝났을 때 높이
     )
@@ -313,7 +323,7 @@ fun ExpandableQuestCard(
                     .padding(top = 8.dp, start = 16.dp, end = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                QuestStatusBadge(
+                LectureStatusBadge(
                     status = lectureInfo.lectureStatus,
                     modifier = Modifier.align(Alignment.End)
                 )
@@ -336,6 +346,7 @@ fun ExpandableQuestCard(
                 Text(
                     text = "강의를 통해",
                     style = WizdumTheme.typography.body3,
+                    color = Black600,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -346,14 +357,14 @@ fun ExpandableQuestCard(
                 )
             }
 
-            if (lectureInfo.lectureStatus == QuestStatus.DONE.name) {
-                QuestRetryButton(
+            if (lectureInfo.lectureStatus == LectureStatus.DONE.name) {
+                LectureReviewButton(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     onNavigateToChat = { onNavigateToChat() },
                     onClick = { isExpanded = false }
                 )
             } else {
-                QuestStartButton(
+                LectureStartButton(
                     modifier = Modifier.align(Alignment.BottomCenter),
                     onNavigateToChat = { onNavigateToChat() }
                 )
@@ -370,19 +381,19 @@ fun ExpandableQuestCard(
                     Row {
                         Text(
                             text = "${lectureInfo.orderSeq}강",
-                            style = WizdumTheme.typography.body3
+                            style = WizdumTheme.typography.body3,
+                            color = Black600
                         )
 
-                        if (lectureInfo.lectureStatus == QuestStatus.DONE.name) {
+                        if (lectureInfo.lectureStatus == LectureStatus.DONE.name) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = " 수강완료",
                                     style = WizdumTheme.typography.body3_semib,
-                                    color = Success
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Image(
-                                    painter = painterResource(id = R.drawable.ic_badge_done),
+                                    painter = painterResource(id = R.drawable.ic_checked_black),
                                     contentDescription = "수강완료"
                                 )
                             }
@@ -393,13 +404,17 @@ fun ExpandableQuestCard(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = lectureInfo.title, style = WizdumTheme.typography.body2_semib)
 
-                    if (lectureInfo.lectureStatus == QuestStatus.WAIT.name) {
+                    if (lectureInfo.lectureStatus == LectureStatus.WAIT.name) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = lectureInfo.preview, style = WizdumTheme.typography.body3)
+                        Text(
+                            text = lectureInfo.preview,
+                            style = WizdumTheme.typography.body3,
+                            color = Black600
+                        )
                     }
                 }
 
-                if (lectureInfo.lectureStatus != QuestStatus.WAIT.name) {
+                if (lectureInfo.lectureStatus != LectureStatus.WAIT.name) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_btn_arrow_down),
                         contentDescription = "펼치기",
@@ -412,7 +427,7 @@ fun ExpandableQuestCard(
 }
 
 @Composable
-fun QuestStartButton(
+fun LectureStartButton(
     modifier: Modifier,
     onNavigateToChat: () -> Unit,
 ) {
@@ -436,7 +451,7 @@ fun QuestStartButton(
 }
 
 @Composable
-fun QuestRetryButton(
+fun LectureReviewButton(
     modifier: Modifier,
     onNavigateToChat: () -> Unit,
     onClick: () -> Unit,
@@ -479,10 +494,10 @@ fun QuestRetryButton(
 
 @Preview
 @Composable
-fun ExpandableQuestCardPreview() {
+fun ExpandableLectureCardPreview() {
     WizdumTheme {
         Column {
-            ExpandableQuestCard(
+            ExpandableLectureCard(
                 lectureInfo = LectureDetail(
                     lectureId = 1,
                     orderSeq = 1,
@@ -493,7 +508,7 @@ fun ExpandableQuestCardPreview() {
                     isFinished = false
                 ),
             ) {}
-            ExpandableQuestCard(
+            ExpandableLectureCard(
                 lectureInfo = LectureDetail(
                     lectureId = 1,
                     orderSeq = 1,
@@ -504,7 +519,7 @@ fun ExpandableQuestCardPreview() {
                     isFinished = true
                 )
             ) {}
-            ExpandableQuestCard(
+            ExpandableLectureCard(
                 lectureInfo = LectureDetail(
                     lectureId = 1,
                     orderSeq = 1,
@@ -521,7 +536,7 @@ fun ExpandableQuestCardPreview() {
 
 @Preview(showBackground = true, widthDp = 360, heightDp = 800)
 @Composable
-fun QuestScreenPreview() {
+fun LectureScreenPreview() {
     WizdumTheme {
         LectureScreen(
             lectureInfo = LectureResponse(

@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.quest.info
+package com.teamwizdum.wizdum.feature.common.enums
 
 import androidx.compose.ui.graphics.Color
 import com.teamwizdum.wizdum.designsystem.theme.Black100
@@ -7,11 +7,9 @@ import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.Green50
 import com.teamwizdum.wizdum.designsystem.theme.Success
-import com.teamwizdum.wizdum.designsystem.theme.Warning
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.onboarding.info.Level
 
-enum class QuestStatus(
+enum class LectureStatus(
     val text: String,
     val textColor: Color,
     val borderColor: Color,
@@ -23,7 +21,7 @@ enum class QuestStatus(
         text = "수강전",
         textColor = Black600,
         borderColor = Black200,
-        backgroundColor = Color.White,
+        backgroundColor = Black100,
         badgeIconRes = R.drawable.ic_badge_wait,
         questIconRes = R.drawable.ic_quest_wait
     ),
