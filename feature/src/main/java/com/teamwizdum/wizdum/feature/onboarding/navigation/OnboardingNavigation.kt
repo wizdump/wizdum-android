@@ -71,7 +71,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
         )
     ) { backstackEntry ->
         val interestId = backstackEntry.arguments?.getInt("interestId") ?: 0
-        val levelId = backstackEntry.arguments?.getInt("interestId") ?: 0
+        val levelId = backstackEntry.arguments?.getInt("levelId") ?: 0
 
         KeywordSelectionRoute(onNavigateToMentor = { categoryId ->
             navController.navigateToMentor(interestId, levelId, categoryId)
@@ -87,7 +87,7 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
         )
     ) { backstackEntry ->
         val interestId = backstackEntry.arguments?.getInt("interestId") ?: 0
-        val levelId = backstackEntry.arguments?.getInt("interestId") ?: 0
+        val levelId = backstackEntry.arguments?.getInt("levelId") ?: 0
         val categoryId = backstackEntry.arguments?.getInt("categoryId") ?: 0
 
         MentorMatchRoute(

@@ -57,10 +57,11 @@ import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
+import com.teamwizdum.wizdum.designsystem.theme.Green50
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.UiState
-import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
+import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 
 // TODO: Status Bar 영역 체크
 
@@ -78,9 +79,7 @@ fun MentorDetailRoute(
     val uiState = viewModel.mentorInfo.collectAsState().value
 
     when (uiState) {
-        is UiState.Loading -> {
-            CircularProgressIndicator()
-        }
+        is UiState.Loading -> {}
         is UiState.Success -> {
             MentorDetailScreen(
                 mentorInfo = uiState.data,
@@ -176,20 +175,26 @@ private fun MentorDetailScreen(
                                     append("${mentorInfo.friendWithLectureCount}명")
                                 }
                                 append(" 함께 수강 중")
-                            }, style = WizdumTheme.typography.body2
+                            },
+                            style = WizdumTheme.typography.body2,
+                            color = Black600
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = mentorInfo.classTitle, style = WizdumTheme.typography.h2)
 
                     Spacer(modifier = Modifier.height(8.dp))
-                    LevelInfo(level = mentorInfo.itemLevel)
+                    LevelInfoCard(
+                        level = mentorInfo.itemLevel,
+                        levelColor = Black600,
+                        subTitleColor = Black600
+                    )
 
                     Spacer(modifier = Modifier.height(24.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+                            .background(color = Green50, shape = RoundedCornerShape(10.dp))
                             .border(
                                 width = 1.dp,
                                 color = Green200,
@@ -216,22 +221,29 @@ private fun MentorDetailScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(text = "멘토링 스타일", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = mentorInfo.mentoringStyle, style = WizdumTheme.typography.body1)
+                    Text(
+                        text = mentorInfo.mentoringStyle,
+                        style = WizdumTheme.typography.body1,
+                        color = Black600
+                    )
 
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(text = "배울점", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                         mentorInfo.benefits.forEach { benefit ->
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(verticalAlignment = Alignment.Top) {
                                 Box(
                                     modifier = Modifier
-                                        .padding(6.dp)
-                                        .height(2.dp)
-                                        .width(2.dp)
-                                        .background(color = Black500, shape = CircleShape)
+                                        .padding(10.dp)
+                                        .size(2.dp)
+                                        .background(color = Black600, shape = CircleShape)
                                 )
-                                Text(text = benefit, style = WizdumTheme.typography.body1)
+                                Text(
+                                    text = benefit,
+                                    style = WizdumTheme.typography.body1,
+                                    color = Black600
+                                )
                             }
                         }
                     }
@@ -306,7 +318,11 @@ private fun QuestCard(lecture: Lecture) {
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
-            Text(text = "${lecture.orderSeq}강", style = WizdumTheme.typography.body2)
+            Text(
+                text = "${lecture.orderSeq}강",
+                style = WizdumTheme.typography.body2,
+                color = Black500
+            )
             Text(text = lecture.title, style = WizdumTheme.typography.body1_semib)
         }
     }

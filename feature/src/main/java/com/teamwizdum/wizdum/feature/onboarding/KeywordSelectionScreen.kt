@@ -61,9 +61,7 @@ fun KeywordSelectionRoute(
     val uiState = viewModel.keywords.collectAsState().value
 
     when (uiState) {
-        is UiState.Loading -> {
-            CircularProgressIndicator()
-        }
+        is UiState.Loading -> {}
         is UiState.Success -> {
             KeywordSelectionScreen(
                 keywords = uiState.data,

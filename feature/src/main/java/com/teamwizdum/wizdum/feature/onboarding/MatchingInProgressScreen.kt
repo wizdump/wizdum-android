@@ -24,6 +24,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.teamwizdum.wizdum.designsystem.theme.Black200
+import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
@@ -55,9 +56,12 @@ fun MatchingInProgressScreen() {
             )
         }
 
-
         Spacer(modifier = Modifier.height(24.dp))
-        Text(text = "시간의 문이 열리는 중...", style = WizdumTheme.typography.body2)
+        Text(
+            text = "시간의 문이 열리는 중...",
+            style = WizdumTheme.typography.body2,
+            color = Black600
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = buildAnnotatedString {

@@ -54,7 +54,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.UiState
-import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
+import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 
@@ -79,7 +79,7 @@ fun MentorMatchRoute(
         isDelayedLoading = false
     }
 
-    when  {
+    when {
         isDelayedLoading -> {
             MatchingInProgressScreen()
         }
@@ -179,15 +179,9 @@ fun RenewalMentorCard(mentorInfo: MentorsResponse) {
                 val width = size.width
                 val height = size.height
                 val centerX = width / 2
-                
+
                 moveTo(centerX, 0f) // 상단 꼭짓점
 
-//                arcTo(
-//                    rect = Rect(width / 2, 0f, width, height / 4),
-//                    startAngleDegrees = 190f,
-//                    sweepAngleDegrees = -160f,
-//                    forceMoveTo = false
-//                )
                 lineTo(width, height / 4) // 오른쪽 위 변
                 lineTo(width, height * 3 / 4) // 오른쪽 아래 변
                 lineTo(centerX, height) // 하단 꼭짓점
@@ -195,11 +189,11 @@ fun RenewalMentorCard(mentorInfo: MentorsResponse) {
                 lineTo(0f, height / 4) // 왼쪽 위 변
                 close() // 경로 닫기
             }
-            
+
             Box(
                 modifier = Modifier
-                    .size(197.dp)
                     .clip(HexagonShape)
+                    .size(197.dp)
                     .background(color = Green200)
                     .padding(4.dp)
             ) {
@@ -223,7 +217,7 @@ fun RenewalMentorCard(mentorInfo: MentorsResponse) {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(8.dp))
-            LevelInfo(level = mentorInfo.itemLevel)
+            LevelInfoCard(level = mentorInfo.itemLevel)
             HorizontalDivider(
                 thickness = 1.dp,
                 color = Black200,
@@ -248,11 +242,15 @@ fun RenewalMentorCard(mentorInfo: MentorsResponse) {
                     Row(verticalAlignment = Alignment.Top) {
                         Box(
                             modifier = Modifier
-                                .padding(6.dp)
+                                .padding(8.dp)
                                 .size(2.dp)
                                 .background(color = Black500, shape = CircleShape)
                         )
-                        Text(text = it, style = WizdumTheme.typography.body2)
+                        Text(
+                            text = it,
+                            style = WizdumTheme.typography.body2,
+                            color = Black600
+                        )
                     }
                 }
             }
@@ -345,7 +343,7 @@ fun MentorCard(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                LevelInfo(level = mentorInfo.itemLevel)
+                LevelInfoCard(level = mentorInfo.itemLevel)
             }
             Box(
                 modifier = Modifier

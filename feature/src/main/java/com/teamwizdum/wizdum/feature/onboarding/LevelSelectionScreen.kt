@@ -37,11 +37,10 @@ import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
-import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.UiState
-import com.teamwizdum.wizdum.feature.onboarding.component.LevelInfo
+import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 
 @Composable
 fun LevelSelectionRoute(
@@ -55,13 +54,11 @@ fun LevelSelectionRoute(
     val uiState = viewModel.levels.collectAsState().value
 
     when (uiState) {
-        is UiState.Loading -> {
-            CircularProgressIndicator()
-        }
+        is UiState.Loading -> {}
         is UiState.Success -> {
             LevelSelectionScreen(
                 levels = uiState.data,
-                onNavigateToKeyword = { onNavigateToKeyword(it) }
+                onNavigateToKeyword = onNavigateToKeyword
             )
         }
         is UiState.Failed -> {}
@@ -114,6 +111,7 @@ private fun LevelSelectionScreen(
 
                 if (selectedIndex.value != -1)
                     WizdumFilledButton(title = "다음") {
+                        val dd = levels[selectedIndex.value].levelId
                         onNavigateToKeyword(levels[selectedIndex.value].levelId)
                     }
             }
@@ -148,12 +146,11 @@ private fun LevelCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                LevelInfo(level = level)
+                LevelInfoCard(level = level, subTitleColor = Black600)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = content,
                     style = if (isSelected) WizdumTheme.typography.h3_semib else WizdumTheme.typography.h3,
-                    color = if (isSelected) Black700 else Black600
                 )
             }
             if (isSelected)

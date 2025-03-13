@@ -61,9 +61,7 @@ fun InterestSelectionRoute(
     val uiState = viewModel.interests.collectAsState().value
 
     when (uiState) {
-        is UiState.Loading -> {
-            CircularProgressIndicator()
-        }
+        is UiState.Loading -> {}
         is UiState.Success -> {
             InterestSelectionScreen(
                 interests = uiState.data,
