@@ -4,8 +4,6 @@ import com.teamwizdum.wizdum.data.api.QuestApi
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.data.model.response.FinishQuestResponse
 import com.teamwizdum.wizdum.data.model.response.LectureResponse
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -24,7 +22,7 @@ class QuestRepository @Inject constructor(
         return runCatching { questApi.finishQuest(lectureId) }
     }
 
-    suspend fun getChatList(lectureId: Int): Flow<List<ChatMessage>> = flow {
-        emit(questApi.getChatList(lectureId))
+    suspend fun getChatList(lectureId: Int): Result<List<ChatMessage>> {
+        return runCatching { questApi.getChatList(lectureId) }
     }
 }

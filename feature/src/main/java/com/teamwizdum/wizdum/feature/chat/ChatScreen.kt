@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,7 +45,8 @@ import com.teamwizdum.wizdum.feature.chat.component.ChatTextField
 import com.teamwizdum.wizdum.feature.chat.component.ChatWithProfileBubble
 import com.teamwizdum.wizdum.feature.chat.component.TypingIndicatorBubble
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
-import com.teamwizdum.wizdum.feature.quest.info.QuestStatus
+import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.enums.LectureStatus
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
 
@@ -60,35 +62,45 @@ fun ChatRoute(
         viewModel.initialize(lectureInfo.lectureId)
     }
 
-    val messages = viewModel.messages.collectAsState().value
+    val uiState = viewModel.chatUiState.collectAsState().value
+    val messageList = viewModel.messages.collectAsState().value
 
     var dialogState by remember { mutableStateOf(false) }
 
-    ChatScreen(
-        viewModel = viewModel,
-        lectureInfo = lectureInfo,
-        messages = messages,
-        showDialog = { dialogState = true },
-        onNavigateToClear = {
-            viewModel.finishQuest(lectureInfo.lectureId) { encouragement ->
-                onNavigateToClear(
-                    LectureClearArgument(
-                        lectureId = lectureInfo.lectureId,
-                        orderSeq = lectureInfo.orderSeq,
-                        lectureName = lectureInfo.lectureTitle,
-                        mentorName = lectureInfo.mentorName,
-                        encouragement = encouragement
-                    )
-                )
-            }
-        },
-        onNavigateToAllClear = {
-            onNavigateToAllClear(
-                lectureInfo.lectureId,
-                lectureInfo.mentorName
+    when(uiState) {
+        is UiState.Loading -> {}
+        is UiState.Success -> {
+            ChatScreen(
+                viewModel = viewModel,
+                lectureInfo = lectureInfo,
+                messages = messageList,
+                showDialog = { dialogState = true },
+                onNavigateToClear = {
+                    viewModel.finishQuest(lectureInfo.lectureId) { encouragement ->
+                        onNavigateToClear(
+                            LectureClearArgument(
+                                classId = lectureInfo.classId,
+                                lectureId = lectureInfo.lectureId,
+                                orderSeq = lectureInfo.orderSeq,
+                                mentorName = lectureInfo.mentorName,
+                                lectureName = lectureInfo.lectureTitle,
+                                encouragement = encouragement
+                            )
+                        )
+                    }
+                },
+                onNavigateToAllClear = {
+                    viewModel.finishQuest(lectureInfo.lectureId) {
+                        onNavigateToAllClear(
+                            lectureInfo.classId,
+                            lectureInfo.mentorName
+                        )
+                    }
+                }
             )
         }
-    )
+        is UiState.Failed -> {}
+    }
 
     ChatDialog(
         dialogState = dialogState,
@@ -112,16 +124,27 @@ private fun ChatScreen(
     val listState = rememberLazyListState()
 
     val isReceivingMessage = viewModel.isReceiving.collectAsState().value
+    val isLectureFinished = viewModel.isFinish.collectAsState().value
+
     var isStartBoxVisible by remember { mutableStateOf(messages.isEmpty()) }
-    var isFinishBoxVisible by remember { mutableStateOf(viewModel.checkFinish()) }
-    var isOnGoing by remember { mutableStateOf(viewModel.checkOngoing()) }
+    var isFinishBoxVisible by remember {
+        mutableStateOf(viewModel.shouldShowFinishState(lectureInfo.lectureStatus))
+    }
+    var isOnGoing by remember { mutableStateOf(viewModel.isChatOngoing(lectureInfo.lectureStatus)) }
     var isInputEnabled by remember { mutableStateOf(true) }
 
-    LaunchedEffect(isReceivingMessage, isStartBoxVisible, isInputEnabled) {
+    LaunchedEffect(
+        isLectureFinished,
+        isReceivingMessage,
+        isStartBoxVisible,
+        isFinishBoxVisible,
+        isInputEnabled
+    ) {
         isInputEnabled = when {
             isReceivingMessage -> false
-            isStartBoxVisible -> false
-            lectureInfo.lectureStatus == QuestStatus.DONE.name -> false
+            (messages.isEmpty() && isStartBoxVisible) -> false
+            isFinishBoxVisible || isLectureFinished -> false
+            lectureInfo.lectureStatus == LectureStatus.DONE.name -> false
             else -> true
         }
     }
@@ -164,16 +187,13 @@ private fun ChatScreen(
         HorizontalDivider(thickness = 1.dp, color = Black300)
 
         ChatMessages(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+            modifier = Modifier.weight(1f),
             listState = listState,
+            isLectureFinished = isLectureFinished,
             isReceiving = isReceivingMessage,
             isStartBoxVisible = isStartBoxVisible,
             isFinishBoxVisible = isFinishBoxVisible,
-            mentorName = lectureInfo.mentorName,
-            mentorImgUrl = lectureInfo.mentorImgUrl,
-            isLastLecture = lectureInfo.isLastLecture,
+            lectureInfo = lectureInfo,
             messageList = messages,
             onStartChat = { isStartBoxVisible = false },
             onGoingChat = {
@@ -196,7 +216,6 @@ private fun ChatScreen(
                 onNavigateToAllClear()
             }
         )
-
         ChatTextField(
             isInputEnabled = isInputEnabled,
             sendMessage = { text ->
@@ -215,12 +234,11 @@ private fun ChatScreen(
 fun ChatMessages(
     modifier: Modifier,
     listState: LazyListState,
+    isLectureFinished: Boolean,
     isReceiving: Boolean = false,
     isStartBoxVisible: Boolean,
     isFinishBoxVisible: Boolean,
-    mentorName: String,
-    mentorImgUrl: String,
-    isLastLecture: Boolean,
+    lectureInfo: LectureArgument,
     messageList: List<ChatMessage>,
     onStartChat: () -> Unit,
     onGoingChat: () -> Unit,
@@ -237,13 +255,18 @@ fun ChatMessages(
         state = listState
     ) {
         item {
-            ChatHeader(messageList = messageList, mentorName = mentorName)
+            ChatHeader(
+                messageList = messageList,
+                mentorName = lectureInfo.mentorName
+            )
 
             if (isStartBoxVisible) {
                 ChatStartSelectionBox(
+                    mentorName = lectureInfo.mentorName,
+                    orderSeq = lectureInfo.orderSeq,
                     onStart = {
                         onStartChat()
-                        sendMessage(true, "대화해줘")
+                        sendMessage(true, "인사해줘")
                     },
                     onNavigateBack = {
                         showDialog()
@@ -266,15 +289,18 @@ fun ChatMessages(
                 MessageType.MENTOR_RESPONSE.name -> {
                     ChatWithProfileBubble(
                         message = chat.message.content,
-                        name = mentorName,
-                        imgUrl = mentorImgUrl
+                        name = lectureInfo.mentorName,
+                        imgUrl = lectureInfo.mentorImgUrl
                     )
                 }
             }
+        }
 
-            if (isFinishBoxVisible) {
+        if (isFinishBoxVisible || isLectureFinished) {
+            item {
                 ChatFinishSelectionBox(
-                    isLastLecture = isLastLecture,
+                    orderSeq = lectureInfo.orderSeq,
+                    isLastLecture = lectureInfo.isLastLecture,
                     onGoing = {
                         onGoingChat()
                     },
@@ -286,8 +312,15 @@ fun ChatMessages(
 
         if (isReceiving) {
             item {
-                TypingIndicatorBubble(name = mentorName, imgUrl = mentorImgUrl)
+                TypingIndicatorBubble(
+                    name = lectureInfo.mentorName,
+                    imgUrl = lectureInfo.mentorImgUrl
+                )
             }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }

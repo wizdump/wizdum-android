@@ -1,8 +1,7 @@
 package com.teamwizdum.wizdum.feature.chat.component
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +33,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black300
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatBubble(message: String, modifier: Modifier = Modifier) {
@@ -112,14 +111,16 @@ fun TypingIndicatorBubble(name: String, imgUrl: String) {
 
 @Composable
 fun TypingIndicator() {
-    val dotAlphas = remember { mutableStateListOf(0f, 0f, 0f) }
+    val dots = List(3) { remember { Animatable(0.3f) } }
 
     LaunchedEffect(Unit) {
         while (true) {
-            repeat(3) { index ->
-                dotAlphas[index] = 1f
-                delay(300L)
-                dotAlphas[index] = 0.3f
+            dots.forEach { animatable ->
+                launch {
+                    animatable.animateTo(1f, animationSpec = tween(300))
+                    animatable.animateTo(0.3f, animationSpec = tween(300))
+                }
+                delay(200)
             }
         }
     }
@@ -136,11 +137,11 @@ fun TypingIndicator() {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        dotAlphas.forEach { alpha ->
+        dots.forEach { animatable ->
             Box(
                 modifier = Modifier
                     .size(6.dp)
-                    .graphicsLayer { this.alpha = alpha }
+                    .graphicsLayer { this.alpha = animatable.value }
                     .background(color = Black300, shape = CircleShape)
             )
         }

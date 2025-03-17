@@ -25,7 +25,12 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun ChatStartSelectionBox(onStart: () -> Unit, onNavigateBack: () -> Unit) {
+fun ChatStartSelectionBox(
+    mentorName: String,
+    orderSeq: Int,
+    onStart: () -> Unit,
+    onNavigateBack: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,8 +48,8 @@ fun ChatStartSelectionBox(onStart: () -> Unit, onNavigateBack: () -> Unit) {
                 .height(72.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "스파르타 멘토님과", style = WizdumTheme.typography.body3)
-        Text(text = "1강을 시작하시겠어요?", style = WizdumTheme.typography.body1_semib)
+        Text(text = "$mentorName 멘토님과", style = WizdumTheme.typography.body3)
+        Text(text = "${orderSeq}강을 시작하시겠어요?", style = WizdumTheme.typography.body1_semib)
         Spacer(modifier = Modifier.height(16.dp))
         WizdumFilledButton(
             title = "네, 준비되었어요!",
@@ -64,6 +69,7 @@ fun ChatStartSelectionBox(onStart: () -> Unit, onNavigateBack: () -> Unit) {
 
 @Composable
 fun ChatFinishSelectionBox(
+    orderSeq: Int,
     isLastLecture: Boolean,
     onGoing: () -> Unit,
     onNavigateToClear: () -> Unit,
@@ -72,7 +78,6 @@ fun ChatFinishSelectionBox(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp)
             .background(color = Black50, shape = RoundedCornerShape(20.dp))
             .border(width = 1.dp, color = Black200, shape = RoundedCornerShape(20.dp))
             .padding(top = 24.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
@@ -86,7 +91,7 @@ fun ChatFinishSelectionBox(
                 .height(72.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "1강을 성공적으로 완료했어요!", style = WizdumTheme.typography.body3)
+        Text(text = "${orderSeq}강을 성공적으로 완료했어요!", style = WizdumTheme.typography.body3)
         Text(text = "강의를 마칠까요?", style = WizdumTheme.typography.body1_semib)
         Spacer(modifier = Modifier.height(16.dp))
         WizdumFilledButton(
@@ -114,13 +119,20 @@ fun ChatFinishSelectionBox(
 fun ChatSelectionBox() {
     WizdumTheme {
         Column {
-            ChatStartSelectionBox(onStart = {}, onNavigateBack = {})
             ChatFinishSelectionBox(
+                orderSeq = 1,
                 isLastLecture = false,
                 onGoing = {},
                 onNavigateToClear = {},
                 onNavigateToAllClear = {}
             )
+            ChatStartSelectionBox(
+                mentorName = "스파르타",
+                orderSeq = 1,
+                onStart = {},
+                onNavigateBack = {}
+            )
+
         }
     }
 }

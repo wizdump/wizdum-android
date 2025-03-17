@@ -8,6 +8,8 @@ import com.teamwizdum.wizdum.data.repository.QuestRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import com.teamwizdum.wizdum.data.repository.WebSocketRepository
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
+import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.enums.LectureStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,11 +27,17 @@ class ChatViewModel @Inject constructor(
 
     private val token = tokenRepository.getAccessToken() ?: ""
 
+    private val _chatUiState = MutableStateFlow<UiState<List<ChatMessage>>>(UiState.Loading)
+    val chatUiState: StateFlow<UiState<List<ChatMessage>>> = _chatUiState.asStateFlow()
+
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
-    val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
+    val messages: StateFlow<List<ChatMessage>> = _messages
 
     private val _isReceiving = MutableStateFlow(false)
     val isReceiving: StateFlow<Boolean> = _isReceiving
+
+    private val _isFinish = MutableStateFlow(false)
+    val isFinish: StateFlow<Boolean> = _isFinish
 
     private var receivedMessage = StringBuilder()
 
@@ -37,35 +45,23 @@ class ChatViewModel @Inject constructor(
         webSocketRepository.connect()
 
         viewModelScope.launch(Dispatchers.Main) {
-
             getChatList(lectureId)
 
-            webSocketRepository.observeMessage().collect { message ->
-                if (message.message.isLast) {
-                    message.message.content = receivedMessage.toString()
-                    _messages.value += message
+            webSocketRepository.observeMessage().collect { chat ->
+                if (chat.message.isLast) {
+                    chat.message.content = receivedMessage.toString()
+                    _messages.value += chat
 
                     receivedMessage.clear()
                     _isReceiving.value = false
+                    _isFinish.value = isChatFinished(chat)
                 } else {
                     if (!_isReceiving.value) {
                         receivedMessage.clear()
                     }
-                    receivedMessage.append(message.message.content)
+                    receivedMessage.append(chat.message.content)
                     _isReceiving.value = true
                 }
-//                if (!message.message.isLast) {
-//                    receivedMessage.append(message.message.content)
-//                    _isReceiving.value = true
-//
-//                } else {
-//                    val totalMessage = message
-//                    totalMessage.message.content = receivedMessage.toString()
-//                    _message.value += totalMessage
-//
-//                    receivedMessage.clear()
-//                    _isReceiving.value = false
-//                }
             }
         }
     }
@@ -87,21 +83,24 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun getChatList(lectureId: Int) {
+    private fun getChatList(lectureId: Int) {
         viewModelScope.launch {
-            questRepository.getChatList(lectureId).collect {
-                questRepository.getChatList(lectureId).collect {
-                    _messages.value = it
+            questRepository.getChatList(lectureId)
+                .onSuccess { data ->
+                    _chatUiState.value = UiState.Success(data)
+                    _messages.value = data
+                }.onFailure {
+
                 }
-            }
         }
     }
 
     fun finishQuest(lectureId: Int, onSuccess: (String) -> Unit) {
         viewModelScope.launch {
-            questRepository.finishQuest(lectureId).collect {
-                onSuccess(it.encouragement)
-            }
+            questRepository.finishQuest(lectureId)
+                .onSuccess {
+                    onSuccess(it.encouragement)
+                }.onFailure { }
         }
     }
 
@@ -109,12 +108,24 @@ class ChatViewModel @Inject constructor(
         _isReceiving.value = isReceiving
     }
 
-    fun checkOngoing(): Boolean {
+    fun isChatOngoing(lectureStatus: String): Boolean {
+        if (lectureStatus == LectureStatus.DONE.name) {
+            return false
+        }
+
         val lastMessage = _messages.value.lastOrNull()?.message
         return lastMessage?.let { it.isFinish && it.isOngoing } ?: false
     }
 
-    fun checkFinish(): Boolean {
+    private fun isChatFinished(chat: ChatMessage): Boolean {
+        return chat.message.isFinish && !chat.message.isOngoing
+    }
+
+    fun shouldShowFinishState(lectureStatus: String): Boolean {
+        if (lectureStatus == LectureStatus.DONE.name || messages.value.isEmpty()) {
+            return false
+        }
+
         val lastMessage = _messages.value.lastOrNull()?.message
         return lastMessage?.let { it.isFinish && !it.isOngoing } ?: false
     }

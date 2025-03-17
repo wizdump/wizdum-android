@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -72,8 +71,8 @@ fun ChatTextField(isInputEnabled: Boolean, sendMessage: (String) -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight()
-                        .imePadding(), verticalAlignment = Alignment.CenterVertically
+                        .fillMaxHeight(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (!isFocused && text.isEmpty()) {
                         Text(
