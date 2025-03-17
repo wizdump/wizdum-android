@@ -37,8 +37,8 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", properties.getProperty("kako_native_app_key"))
-        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = properties.getProperty("kako_native_app_key")
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", properties.getProperty("kakao_native_app_key"))
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = properties.getProperty("kakao_redirect_key")
     }
 
     buildTypes {
