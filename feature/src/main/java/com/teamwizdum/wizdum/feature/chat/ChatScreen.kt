@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
+import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black300
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
@@ -135,8 +136,13 @@ private fun ChatScreen(
     var isOnGoing by remember { mutableStateOf(viewModel.isChatOngoing(lectureInfo.lectureStatus)) }
     var isInputEnabled by remember { mutableStateOf(true) }
 
+    LaunchedEffect(isLectureFinished) {
+        if (isLectureFinished) {
+            isFinishBoxVisible = true
+        }
+    }
+
     LaunchedEffect(
-        isLectureFinished,
         isReceivingMessage,
         isStartBoxVisible,
         isFinishBoxVisible,
@@ -145,7 +151,7 @@ private fun ChatScreen(
         isInputEnabled = when {
             isReceivingMessage -> false
             (messages.isEmpty() && isStartBoxVisible) -> false
-            isFinishBoxVisible || isLectureFinished -> false
+            isFinishBoxVisible -> false
             lectureInfo.lectureStatus == LectureStatus.DONE.name -> false
             else -> true
         }
@@ -165,7 +171,7 @@ private fun ChatScreen(
             actions = {
                 if (isOnGoing)
                     Row(
-                        modifier = Modifier.clickable {
+                        modifier = Modifier.noRippleClickable {
                             if (lectureInfo.isLastLecture) {
                                 onNavigateToAllClear()
                             } else {
@@ -192,7 +198,6 @@ private fun ChatScreen(
         ChatMessages(
             modifier = Modifier.weight(1f),
             listState = listState,
-            isLectureFinished = isLectureFinished,
             isReceiving = isReceivingMessage,
             isStartBoxVisible = isStartBoxVisible,
             isFinishBoxVisible = isFinishBoxVisible,
@@ -237,7 +242,6 @@ private fun ChatScreen(
 fun ChatMessages(
     modifier: Modifier,
     listState: LazyListState,
-    isLectureFinished: Boolean,
     isReceiving: Boolean = false,
     isStartBoxVisible: Boolean,
     isFinishBoxVisible: Boolean,
@@ -299,7 +303,7 @@ fun ChatMessages(
             }
         }
 
-        if (isFinishBoxVisible || isLectureFinished) {
+        if (isFinishBoxVisible) {
             item {
                 ChatFinishSelectionBox(
                     orderSeq = lectureInfo.orderSeq,
