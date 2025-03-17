@@ -54,7 +54,7 @@ import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgum
 fun ChatRoute(
     viewModel: ChatViewModel = hiltViewModel(),
     lectureInfo: LectureArgument,
-    onBackPressed: () -> Unit,
+    onNavigateBack: () -> Unit,
     onNavigateToClear: (LectureClearArgument) -> Unit,
     onNavigateToAllClear: (Int, String) -> Unit,
 ) {
@@ -75,6 +75,7 @@ fun ChatRoute(
                 lectureInfo = lectureInfo,
                 messages = messageList,
                 showDialog = { dialogState = true },
+                onNavigateBack = onNavigateBack,
                 onNavigateToClear = {
                     viewModel.finishQuest(lectureInfo.lectureId) { encouragement ->
                         onNavigateToClear(
@@ -106,7 +107,7 @@ fun ChatRoute(
         dialogState = dialogState,
         onExit = {
             dialogState = false
-            onBackPressed()
+            onNavigateBack()
         },
         onDismissRequest = { dialogState = false }
     )
@@ -118,6 +119,7 @@ private fun ChatScreen(
     lectureInfo: LectureArgument,
     messages: List<ChatMessage>,
     showDialog: () -> Unit,
+    onNavigateBack: () -> Unit,
     onNavigateToClear: () -> Unit,
     onNavigateToAllClear: () -> Unit,
 ) {
@@ -159,6 +161,7 @@ private fun ChatScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         BackAppBar(
             title = "${lectureInfo.orderSeq}강 · ${lectureInfo.lectureTitle}",
+            onNavigateBack = onNavigateBack,
             actions = {
                 if (isOnGoing)
                     Row(

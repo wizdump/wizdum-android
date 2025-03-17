@@ -64,6 +64,7 @@ fun MentorMatchRoute(
     interestId: Int,
     levelId: Int,
     categoryId: Int,
+    onNavigateBack: () -> Unit,
     onNavigateToMentorDetail: (Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
@@ -89,6 +90,7 @@ fun MentorMatchRoute(
         uiState is UiState.Success -> {
             MentorMatchScreen(
                 mentors = uiState.data,
+                onNavigateBack = onNavigateBack,
                 onNavigateToDetail = onNavigateToMentorDetail
             )
         }
@@ -99,13 +101,14 @@ fun MentorMatchRoute(
 @Composable
 private fun MentorMatchScreen(
     mentors: List<MentorsResponse>,
+    onNavigateBack: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            BackAppBar()
+            BackAppBar(onNavigateBack = onNavigateBack)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -405,6 +408,10 @@ fun MentorMatchScreenPreview() {
         )
     )
     WizdumTheme {
-        MentorMatchScreen(mentors = mentorList) {}
+        MentorMatchScreen(
+            mentors = mentorList,
+            onNavigateBack = {},
+            onNavigateToDetail = {}
+        )
     }
 }

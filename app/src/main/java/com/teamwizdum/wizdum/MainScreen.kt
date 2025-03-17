@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
@@ -41,18 +43,38 @@ import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.chat.navigation.chatScreen
-import com.teamwizdum.wizdum.feature.home.HomeRoute
-import com.teamwizdum.wizdum.feature.home.homeScreen
+import com.teamwizdum.wizdum.feature.chat.navigation.navigateToChat
+import com.teamwizdum.wizdum.feature.home.navigation.HomeRoute
+import com.teamwizdum.wizdum.feature.home.navigation.homeScreen
+import com.teamwizdum.wizdum.feature.home.navigation.navigateHome
 import com.teamwizdum.wizdum.feature.login.navigation.loginScreen
+import com.teamwizdum.wizdum.feature.login.navigation.navigateToLogin
 import com.teamwizdum.wizdum.feature.mypage.navigation.myPageScreen
+import com.teamwizdum.wizdum.feature.mypage.navigation.navigateToTerm
 import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToInterest
+import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToKeyword
+import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToLevel
+import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToMentor
+import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToMentorDetail
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
 import com.teamwizdum.wizdum.feature.quest.navigation.lectureScreen
+import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLecture
+import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureAllClear
+import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureClear
+import com.teamwizdum.wizdum.feature.reward.navigation.navigateToReward
 import com.teamwizdum.wizdum.feature.reward.navigation.rewardScreen
+import timber.log.Timber
 
 @Composable
 fun MainScreen(navController: NavHostController) {
     val mainNavigator = MainNavigator(navController)
+    val context = LocalContext.current
+
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+        navController.backQueue.forEachIndexed { index, entry ->
+            Timber.tag("NAVI").d(entry.destination.route)
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -61,13 +83,51 @@ fun MainScreen(navController: NavHostController) {
                 navController = navController,
                 startDestination = HomeRoute.HOME
             ) {
-                onboardingScreen(navController = navController)
-                loginScreen(navController = navController)
-                lectureScreen(navController = navController)
-                chatScreen(navController = navController)
-                rewardScreen(navController = navController)
-                homeScreen(padding = innerPadding, navController = navController)
-                myPageScreen(padding = innerPadding, navController = navController)
+                onboardingScreen(
+                    onNavigateBack = navController::popBackStack,
+                    onNavigateToInterest = navController::navigateToInterest,
+                    onNavigateToLevel = navController::navigateToLevel,
+                    onNavigateToKeyword = navController::navigateToKeyword,
+                    onNavigateToMentor = navController::navigateToMentor,
+                    onNavigateToMentorDetail = navController::navigateToMentorDetail,
+                    onNavigateToLogin = navController::navigateToLogin,
+                    onNavigateToLecture = navController::navigateToLecture
+                )
+                loginScreen(
+                    onNavigateBack = navController::popBackStack,
+                    onNavigateToLecture = navController::navigateToLecture,
+                    onNavigateToHome = navController::navigateHome
+                )
+                lectureScreen(
+                    onNavigateBack = navController::popBackStack,
+                    onNavigateToLecture = navController::navigateToLecture,
+                    onNavigateToChat = navController::navigateToChat,
+                    onNavigateToAllClear = navController::navigateToLectureAllClear,
+                    onNavigateToReward = navController::navigateToReward
+                )
+                chatScreen(
+                    onNavigateBack = navController::popBackStack,
+                    onNavigateToClear = navController::navigateToLectureClear,
+                    onNavigateToAllClear = navController::navigateToLectureAllClear
+                )
+                rewardScreen(
+                    onNavigationBack = navController::popBackStack
+                )
+                homeScreen(
+                    padding = innerPadding,
+                    onNavigateToInterest = navController::navigateToInterest,
+                    onNavigateToLecture = navController::navigateToLecture,
+                )
+                myPageScreen(
+                    padding = innerPadding,
+                    restartMainActivity = {
+                        val intent = Intent(context, MainActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        }
+                        context.startActivity(intent)
+                    },
+                    onNavigateToTerm = navController::navigateToTerm
+                )
             }
         },
         bottomBar = {

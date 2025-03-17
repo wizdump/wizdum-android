@@ -44,7 +44,7 @@ import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel.Companion.TERMS_OF_S
 fun MyPageRoute(
     padding: PaddingValues,
     viewModel: MyPageViewModel = hiltViewModel(),
-    onNavigateToLogin: () -> Unit,
+    restartMainActivity: () -> Unit,
     onNavigateToTerm: (String, String) -> Unit,
 ) {
 
@@ -59,12 +59,12 @@ fun MyPageRoute(
         userInfo = userInfo,
         onLogout = {
             viewModel.logout {
-                onNavigateToLogin()
+                restartMainActivity()
             }
         },
         onWithdraw = {
             viewModel.withdraw {
-                onNavigateToLogin()
+                restartMainActivity()
             }
         },
         onNavigateToTerm = onNavigateToTerm

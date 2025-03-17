@@ -2,34 +2,48 @@ package com.teamwizdum.wizdum.feature.quest.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.teamwizdum.wizdum.feature.chat.navigation.navigateToChat
 import com.teamwizdum.wizdum.feature.common.extensions.decodeFromUri
 import com.teamwizdum.wizdum.feature.common.extensions.encodeToUri
+import com.teamwizdum.wizdum.feature.home.navigation.HomeRoute
 import com.teamwizdum.wizdum.feature.quest.LectureAllClearRoute
 import com.teamwizdum.wizdum.feature.quest.LectureClearScreen
 import com.teamwizdum.wizdum.feature.quest.LectureRoute
+import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
-import com.teamwizdum.wizdum.feature.reward.navigation.navigateToReward
 import kotlinx.serialization.json.Json
 
-fun NavController.navigateToLecture(classId: Int, navOptions: NavOptions?) {
-    navigate(LectureRoute.lectureMainRoute(classId), navOptions)
+fun NavController.navigateToLecture(classId: Int) {
+    navigate(LectureRoute.lectureMainRoute(classId)) {
+        popUpTo(HomeRoute.HOME) { inclusive = false }
+    }
 }
 
 fun NavController.navigateToLectureClear(lectureInfo: LectureClearArgument) {
-    navigate(LectureRoute.lectureClearRoute(Json.encodeToUri(lectureInfo)))
+    navigate(LectureRoute.lectureClearRoute(Json.encodeToUri(lectureInfo))) {
+        popUpTo(LectureRoute.lectureMainRoute(lectureInfo.classId)) {
+            inclusive = true
+        }
+    }
 }
 
 fun NavController.navigateToLectureAllClear(classId: Int, mentorName: String) {
-    navigate(LectureRoute.lectureAllClearRoute(classId, mentorName))
+    navigate(LectureRoute.lectureAllClearRoute(classId, mentorName)) {
+        popUpTo(LectureRoute.lectureMainRoute(classId)) {
+            inclusive = true
+        }
+    }
 }
 
-fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
+fun NavGraphBuilder.lectureScreen(
+    onNavigateBack: () -> Unit,
+    onNavigateToLecture: (Int) -> Unit,
+    onNavigateToChat: (LectureArgument) -> Unit,
+    onNavigateToAllClear: (Int, String) -> Unit,
+    onNavigateToReward: (Int) -> Unit,
+) {
     composable(
         route = LectureRoute.LECTURE,
         arguments = listOf(
@@ -40,11 +54,12 @@ fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
 
         LectureRoute(
             classId = classId,
+            onNavigateBack = onNavigateBack,
             onNavigateToChat = { lectureInfo ->
-                navController.navigateToChat(lectureInfo)
+                onNavigateToChat(lectureInfo)
             },
-            onNavigateToLectureAllClear = { lectureId, mentorName ->
-                navController.navigateToLectureAllClear(lectureId, mentorName)
+            onNavigateToLectureAllClear = { mentorName ->
+                onNavigateToAllClear(classId, mentorName)
             }
         )
     }
@@ -60,9 +75,7 @@ fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
         LectureClearScreen(
             lectureInfo = Json.decodeFromUri(lectureInfo),
             onNavigateToLecture = { classId ->
-                navController.navigate("LECTURE/$classId") {
-                    popUpTo(navController.graph.startDestinationId) {inclusive = false}
-                }
+                onNavigateToLecture(classId)
             }
         )
     }
@@ -74,14 +87,17 @@ fun NavGraphBuilder.lectureScreen(navController: NavHostController) {
             navArgument("mentorName") { type = NavType.StringType }
         )
     ) { backstackEntry ->
-        val lectureId = backstackEntry.arguments?.getInt("classId") ?: 0
+        val classId = backstackEntry.arguments?.getInt("classId") ?: 0
         val mentorName = backstackEntry.arguments?.getString("mentorName") ?: ""
 
         LectureAllClearRoute(
-            lectureId = lectureId,
+            classId = classId,
             mentorName = mentorName,
+            onNavigateToLecture = {
+                onNavigateToLecture(classId)
+            },
             onNavigateToReward = {
-                navController.navigateToReward(lectureId)
+                onNavigateToReward(classId)
             }
         )
     }

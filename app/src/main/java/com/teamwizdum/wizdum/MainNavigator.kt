@@ -5,7 +5,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
-import com.teamwizdum.wizdum.feature.home.HomeRoute
+import com.teamwizdum.wizdum.feature.home.navigation.HomeRoute
 import com.teamwizdum.wizdum.feature.mypage.navigation.MyPageRoute
 
 class MainNavigator(private val navController: NavHostController) {

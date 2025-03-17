@@ -36,6 +36,7 @@ import com.teamwizdum.wizdum.feature.common.base.UiState
 fun LoginRoute(
     viewModel: LoginViewModel = hiltViewModel(),
     classId: Int,
+    onNavigateBack: () -> Unit,
     onNavigateToLecture: () -> Unit,
     onNavigateToHome: () -> Unit,
 ) {
@@ -48,6 +49,7 @@ fun LoginRoute(
     when (uiState) {
         is UiState.Loading -> {
             LoginScreen(
+                onNavigateBack = onNavigateBack,
                 onLogin = { accessToken, nickName ->
                     viewModel.nickName = nickName
                     viewModel.login(
@@ -69,12 +71,13 @@ fun LoginRoute(
 
 @Composable
 private fun LoginScreen(
+    onNavigateBack: () -> Unit,
     onLogin: (String, String) -> Unit,
 ) {
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        BackAppBar()
+        BackAppBar(onNavigateBack = onNavigateBack)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -139,6 +142,7 @@ fun KakaoLoginButton(context: Context, onKakaoSuccess: (String, String) -> Unit)
 fun LoginScreenPreview() {
     WizdumTheme {
         LoginScreen(
+            onNavigateBack = {},
             onLogin = { _, _ -> },
         )
     }

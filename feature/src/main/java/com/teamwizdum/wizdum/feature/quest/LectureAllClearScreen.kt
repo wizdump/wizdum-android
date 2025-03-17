@@ -24,14 +24,16 @@ import com.teamwizdum.wizdum.feature.R
 @Composable
 fun LectureAllClearRoute(
     viewModel: LectureViewModel = hiltViewModel(),
-    lectureId: Int,
+    classId: Int,
     mentorName: String,
+    onNavigateToLecture: () -> Unit,
     onNavigateToReward: () -> Unit,
 ) {
     LectureAllClearScreen(
         mentorName = mentorName,
+        onNavigateToLecture = onNavigateToLecture,
         onNavigateToReward = {
-            viewModel.postReward(lectureId) {
+            viewModel.postReward(classId) {
                 onNavigateToReward()
             }
         }
@@ -41,10 +43,13 @@ fun LectureAllClearRoute(
 @Composable
 private fun LectureAllClearScreen(
     mentorName: String,
+    onNavigateToLecture: () -> Unit,
     onNavigateToReward: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        CloseAppBar()
+        CloseAppBar {
+            onNavigateToLecture()
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -88,6 +93,10 @@ private fun LectureAllClearScreen(
 @Composable
 fun LectureAllClearScreenPreview() {
     WizdumTheme {
-        LectureAllClearScreen("스파르타") {}
+        LectureAllClearScreen(
+            mentorName = "스파르타",
+            onNavigateToLecture = {},
+            onNavigateToReward = {}
+        )
     }
 }

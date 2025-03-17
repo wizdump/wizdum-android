@@ -69,6 +69,7 @@ import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 fun MentorDetailRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
     classId: Int,
+    onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToLecture: () -> Unit,
 ) {
@@ -84,6 +85,7 @@ fun MentorDetailRoute(
             MentorDetailScreen(
                 mentorInfo = uiState.data,
                 checkOnboarding = viewModel.checkUserOnboarding(),
+                onNavigateBack = onNavigateBack,
                 onNavigateToLogin = onNavigateToLogin,
                 onNavigateToLecture = {
                     viewModel.startQuest(classId) {
@@ -100,6 +102,7 @@ fun MentorDetailRoute(
 private fun MentorDetailScreen(
     mentorInfo: MentorDetailResponse,
     checkOnboarding: Boolean,
+    onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToLecture: () -> Unit,
 ) {
@@ -139,7 +142,7 @@ private fun MentorDetailScreen(
                 .background(color = Color(0x80000000))
         )
 
-        CloseAppBar(isDark = true)
+        CloseAppBar(isDark = true, onClose = onNavigateBack)
 
         LazyColumn(
             modifier = Modifier
@@ -358,6 +361,7 @@ fun MentorDetailScreenPreview() {
                 )
             ),
             checkOnboarding = false,
+            onNavigateBack = {},
             onNavigateToLogin = {},
             onNavigateToLecture = {}
         )

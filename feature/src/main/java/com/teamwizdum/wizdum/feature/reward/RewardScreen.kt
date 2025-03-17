@@ -47,12 +47,12 @@ import com.teamwizdum.wizdum.feature.common.extensions.formatBasicDateTime
 @Composable
 fun RewardRoute(
     viewModel: RewardViewModel = hiltViewModel(),
-    lectureId: Int,
+    classId: Int,
     onNavigateToHome: () -> Unit,
 ) {
 
     LaunchedEffect(Unit) {
-        viewModel.getReward(lectureId)
+        viewModel.getReward(classId)
     }
 
     val uiState = viewModel.rewardInfo.collectAsState().value

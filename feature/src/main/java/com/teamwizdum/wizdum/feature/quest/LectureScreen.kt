@@ -77,8 +77,9 @@ import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
 fun LectureRoute(
     viewModel: LectureViewModel = hiltViewModel(),
     classId: Int,
+    onNavigateBack: () -> Unit,
     onNavigateToChat: (LectureArgument) -> Unit,
-    onNavigateToLectureAllClear: (Int, String) -> Unit,
+    onNavigateToLectureAllClear: (String) -> Unit,
 ) {
     LaunchedEffect(Unit) {
         viewModel.getLecture(classId)
@@ -86,11 +87,12 @@ fun LectureRoute(
 
     val uiState = viewModel.lectureInfo.collectAsState().value
 
-    when(uiState) {
+    when (uiState) {
         is UiState.Loading -> {}
         is UiState.Success -> {
             LectureScreen(
                 lectureInfo = uiState.data,
+                onNavigateToBack = onNavigateBack,
                 onNavigateToChat = { lectureId, orderSeq, lectureStatus, lectureTitle ->
                     val selectedLectureInfo =
                         LectureArgument(
@@ -109,6 +111,7 @@ fun LectureRoute(
                 onNavigateToLectureAllClear = onNavigateToLectureAllClear
             )
         }
+
         is UiState.Failed -> {}
     }
 }
@@ -116,8 +119,9 @@ fun LectureRoute(
 @Composable
 fun LectureScreen(
     lectureInfo: LectureResponse,
+    onNavigateToBack: () -> Unit,
     onNavigateToChat: (Int, Int, String, String) -> Unit,
-    onNavigateToLectureAllClear: (Int, String) -> Unit,
+    onNavigateToLectureAllClear: (String) -> Unit,
 ) {
     val minHeightPx = with(LocalDensity.current) { 310.dp.toPx() } // 상단 정보를 보여주기 위한 최소 높이
     val screenHeightPx =
@@ -229,7 +233,12 @@ fun LectureScreen(
             }
         }
 
-        BackAppBar(isDark = true)
+        BackAppBar(
+            isDark = true,
+            onNavigateBack = {
+                onNavigateToBack()
+            }
+        )
 
         LazyColumn(
             modifier = Modifier
@@ -264,7 +273,7 @@ fun LectureScreen(
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateToLectureAllClear(lectureInfo.mentoId, lectureInfo.mentoName)
+                onNavigateToLectureAllClear(lectureInfo.mentoName)
             }
         }
     }
@@ -574,8 +583,9 @@ fun LectureScreenPreview() {
                     )
                 )
             ),
+            onNavigateToBack = {},
             onNavigateToChat = { _, _, _, _ -> },
-            onNavigateToLectureAllClear = { _, _ -> }
+            onNavigateToLectureAllClear = { _ -> }
         )
     }
 }

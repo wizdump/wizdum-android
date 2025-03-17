@@ -45,6 +45,7 @@ import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 @Composable
 fun LevelSelectionRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
     onNavigateToKeyword: (Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
@@ -58,6 +59,7 @@ fun LevelSelectionRoute(
         is UiState.Success -> {
             LevelSelectionScreen(
                 levels = uiState.data,
+                onNavigateBack = onNavigateBack,
                 onNavigateToKeyword = onNavigateToKeyword
             )
         }
@@ -68,6 +70,7 @@ fun LevelSelectionRoute(
 @Composable
 private fun LevelSelectionScreen(
     levels: List<LevelResponse>,
+    onNavigateBack: () -> Unit,
     onNavigateToKeyword: (Int) -> Unit,
 ) {
     val selectedIndex = remember { mutableStateOf(-1) }
@@ -76,7 +79,7 @@ private fun LevelSelectionScreen(
         Column(
             modifier = Modifier.fillMaxSize(),
         ) {
-            BackAppBar()
+            BackAppBar(onNavigateBack = onNavigateBack)
 
             Column(
                 modifier = Modifier
@@ -194,6 +197,10 @@ fun LevelSelectionScreenPreview() {
                 LevelResponse(description = "목표를 세웠는데, 시작하기가 어려워요.", level = "MEDIUM"),
                 LevelResponse(description = "누가 나를 채찍질해줬으면 좋겠어요.", level = "LOW")
             )
-        LevelSelectionScreen(levels = questionList) {}
+        LevelSelectionScreen(
+            levels = questionList,
+            onNavigateBack = {},
+            onNavigateToKeyword = {}
+        )
     }
 }

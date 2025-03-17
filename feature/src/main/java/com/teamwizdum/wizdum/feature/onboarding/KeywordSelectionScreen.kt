@@ -52,6 +52,7 @@ import com.teamwizdum.wizdum.feature.common.base.UiState
 @Composable
 fun KeywordSelectionRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
     onNavigateToMentor: (Int) -> Unit,
 ) {
     LaunchedEffect(key1 = Unit) {
@@ -65,6 +66,7 @@ fun KeywordSelectionRoute(
         is UiState.Success -> {
             KeywordSelectionScreen(
                 keywords = uiState.data,
+                onNavigateBack = onNavigateBack,
                 onNavigateToMentor = { onNavigateToMentor(it) }
             )
         }
@@ -75,13 +77,14 @@ fun KeywordSelectionRoute(
 @Composable
 private fun KeywordSelectionScreen(
     keywords: List<KeywordResponse>,
+    onNavigateBack: () -> Unit,
     onNavigateToMentor: (Int) -> Unit,
 ) {
     val selectedIndex = remember { mutableStateOf(-1) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
-            BackAppBar()
+            BackAppBar(onNavigateBack = onNavigateBack)
             Column(modifier = Modifier.padding(top = 32.dp, start = 32.dp, end = 32.dp)) {
                 Text(text = "어떠한 나로 성장하고 싶나요?", style = WizdumTheme.typography.h2)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -245,6 +248,10 @@ fun KeywordSelectionScreenPreview() {
                 description = "신체적·정신적 균형을 통해 지속적인 성장을 이루고 싶어요"
             ),
         )
-        KeywordSelectionScreen(keywords = keywordList) {}
+        KeywordSelectionScreen(
+            keywords = keywordList,
+            onNavigateBack = {},
+            onNavigateToMentor = {}
+        )
     }
 }

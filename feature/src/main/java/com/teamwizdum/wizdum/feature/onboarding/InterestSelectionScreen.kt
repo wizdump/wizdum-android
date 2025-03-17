@@ -52,6 +52,7 @@ import com.teamwizdum.wizdum.feature.common.base.UiState
 @Composable
 fun InterestSelectionRoute(
     viewModel: OnboardingViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
     onNavigateToLevel: (Int) -> Unit,
 ) {
     LaunchedEffect(Unit) {
@@ -65,6 +66,7 @@ fun InterestSelectionRoute(
         is UiState.Success -> {
             InterestSelectionScreen(
                 interests = uiState.data,
+                onNavigateBack = onNavigateBack,
                 onNavigateToLevel = { onNavigateToLevel(it) }
             )
         }
@@ -75,13 +77,14 @@ fun InterestSelectionRoute(
 @Composable
 fun InterestSelectionScreen(
     interests: List<InterestResponse>,
+    onNavigateBack: () -> Unit,
     onNavigateToLevel: (Int) -> Unit,
 ) {
     val selectedIndex = remember { mutableStateOf(-1) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column {
-            BackAppBar()
+            BackAppBar(onNavigateBack = onNavigateBack)
             Column(modifier = Modifier.padding(top = 32.dp, start = 32.dp, end = 32.dp)) {
                 Text(text = "당신이 현재 가장 관심 있는 분야는 무엇인가요", style = WizdumTheme.typography.h2)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -242,6 +245,7 @@ fun InterestSelectionScreenPreview() {
                     fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_307_1.png"
                 )
             ),
+            onNavigateBack = {},
             onNavigateToLevel = {}
         )
     }

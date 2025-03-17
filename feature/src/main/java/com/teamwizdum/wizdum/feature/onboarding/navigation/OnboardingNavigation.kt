@@ -2,18 +2,15 @@ package com.teamwizdum.wizdum.feature.onboarding.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.teamwizdum.wizdum.feature.login.navigation.navigateToLogin
 import com.teamwizdum.wizdum.feature.onboarding.InterestSelectionRoute
 import com.teamwizdum.wizdum.feature.onboarding.KeywordSelectionRoute
+import com.teamwizdum.wizdum.feature.onboarding.LevelSelectionRoute
 import com.teamwizdum.wizdum.feature.onboarding.MentorDetailRoute
 import com.teamwizdum.wizdum.feature.onboarding.MentorMatchRoute
-import com.teamwizdum.wizdum.feature.onboarding.LevelSelectionRoute
 import com.teamwizdum.wizdum.feature.onboarding.StartScreen
-import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLecture
 
 
 fun NavController.navigateToInterest() {
@@ -35,17 +32,29 @@ fun NavController.navigateToMentorDetail(classId: Int) {
     navigate(OnboardingRoute.onboardingMentorDetailRoute(classId))
 }
 
-fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
+fun NavGraphBuilder.onboardingScreen(
+    onNavigateBack: () -> Unit,
+    onNavigateToInterest: () -> Unit,
+    onNavigateToLevel: (Int) -> Unit,
+    onNavigateToKeyword: (Int, Int) -> Unit,
+    onNavigateToMentor: (Int, Int, Int) -> Unit,
+    onNavigateToMentorDetail: (Int) -> Unit,
+    onNavigateToLogin: (Int) -> Unit,
+    onNavigateToLecture: (Int) -> Unit,
+) {
     composable(route = OnboardingRoute.START) {
-        StartScreen(onNavigateToInterest = {
-            navController.navigateToInterest()
-        })
+        StartScreen(
+            onNavigateToInterest = onNavigateToInterest
+        )
     }
 
     composable(route = OnboardingRoute.INTEREST) {
-        InterestSelectionRoute(onNavigateToLevel = { id ->
-            navController.navigateToLevel(id)
-        })
+        InterestSelectionRoute(
+            onNavigateBack = onNavigateBack,
+            onNavigateToLevel = { id ->
+                onNavigateToLevel(id)
+            }
+        )
     }
 
     composable(
@@ -57,8 +66,9 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
         val interestId = backstackEntry.arguments?.getInt("interestId") ?: 0
 
         LevelSelectionRoute(
+            onNavigateBack = onNavigateBack,
             onNavigateToKeyword = { levelId ->
-                navController.navigateToKeyword(interestId, levelId)
+                onNavigateToKeyword(interestId, levelId)
             }
         )
     }
@@ -73,9 +83,12 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
         val interestId = backstackEntry.arguments?.getInt("interestId") ?: 0
         val levelId = backstackEntry.arguments?.getInt("levelId") ?: 0
 
-        KeywordSelectionRoute(onNavigateToMentor = { categoryId ->
-            navController.navigateToMentor(interestId, levelId, categoryId)
-        })
+        KeywordSelectionRoute(
+            onNavigateBack = onNavigateBack,
+            onNavigateToMentor = { categoryId ->
+                onNavigateToMentor(interestId, levelId, categoryId)
+            }
+        )
     }
 
     composable(
@@ -93,12 +106,13 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
         MentorMatchRoute(
             interestId = interestId,
             levelId = levelId,
-            categoryId = categoryId
-        ) { id ->
-            navController.navigateToMentorDetail(id)
-        }
+            categoryId = categoryId,
+            onNavigateBack = onNavigateBack,
+            onNavigateToMentorDetail = { classId ->
+                onNavigateToMentorDetail(classId)
+            }
+        )
     }
-
 
     composable(
         route = OnboardingRoute.MENTOR_DETAIL,
@@ -111,10 +125,11 @@ fun NavGraphBuilder.onboardingScreen(navController: NavHostController) {
         MentorDetailRoute(
             classId = classId,
             onNavigateToLogin = {
-                navController.navigateToLogin(classId)
+                onNavigateToLogin(classId)
             },
+            onNavigateBack = onNavigateBack,
             onNavigateToLecture = {
-                navController.navigateToLecture(classId, null)
+                onNavigateToLecture(classId)
             }
         )
     }
@@ -132,6 +147,7 @@ object OnboardingRoute {
 
     fun onboardingMentorRoute(interestId: Int, levelId: Int, categoryId: Int) =
         "MENTOR/$interestId/$levelId/$categoryId"
+
     const val MENTOR = "MENTOR/{interestId}/{levelId}/{categoryId}"
 
     fun onboardingMentorDetailRoute(classId: Int) = "MENTOR_DETAIL/$classId"

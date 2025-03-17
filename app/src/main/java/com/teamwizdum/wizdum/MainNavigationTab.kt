@@ -1,6 +1,6 @@
 package com.teamwizdum.wizdum
 
-import com.teamwizdum.wizdum.feature.home.HomeRoute
+import com.teamwizdum.wizdum.feature.home.navigation.HomeRoute
 import com.teamwizdum.wizdum.feature.mypage.navigation.MyPageRoute
 
 enum class MainNavigationTab(

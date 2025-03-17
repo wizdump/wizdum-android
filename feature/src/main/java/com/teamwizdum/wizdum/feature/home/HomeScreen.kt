@@ -44,12 +44,16 @@ import com.teamwizdum.wizdum.data.model.response.FinishLecture
 import com.teamwizdum.wizdum.data.model.response.HomeResponse
 import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.Black100
+import com.teamwizdum.wizdum.designsystem.theme.Black500
+import com.teamwizdum.wizdum.designsystem.theme.Black600
+import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.UiState
-import com.teamwizdum.wizdum.feature.onboarding.component.LevelStarRating
-import com.teamwizdum.wizdum.feature.quest.component.QuestStatusBadge
+import com.teamwizdum.wizdum.feature.common.component.LevelStarRating
+import com.teamwizdum.wizdum.feature.common.component.LectureStatusBadge
+import com.teamwizdum.wizdum.feature.common.extensions.formatBasicDateTime
 
 @Composable
 fun HomeRoute(
@@ -64,7 +68,7 @@ fun HomeRoute(
 
     val uiState = viewModel.homeData.collectAsState().value
 
-    when(uiState) {
+    when (uiState) {
         is UiState.Loading -> {}
         is UiState.Success -> {
             HomeScreen(
@@ -74,6 +78,7 @@ fun HomeRoute(
                 onNavigateToLecture = onNavigateToLecture
             )
         }
+
         is UiState.Failed -> {}
     }
 }
@@ -117,12 +122,18 @@ fun HomeScreen(
                 Text(
                     text = buildAnnotatedString {
                         append("\uD83D\uDCAA 총 ")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                        withStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.SemiBold,
+                                color = Black700
+                            )
+                        ) {
                             append("${homeInfo.friendWithLectureCount}명")
                         }
                         append(" 의 친구들이 같이 수강중이에요")
                     },
-                    style = WizdumTheme.typography.body2
+                    style = WizdumTheme.typography.body2,
+                    color = Black600
                 )
             }
 
@@ -140,7 +151,7 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "${homeInfo.beforeAndInProgressLectures.size}",
-                            style = WizdumTheme.typography.body1
+                            style = WizdumTheme.typography.body1_semib
                         )
                     }
 
@@ -171,7 +182,8 @@ fun HomeScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "${homeInfo.finishLectures.size}",
-                            style = WizdumTheme.typography.body1_semib
+                            style = WizdumTheme.typography.body1_semib,
+                            //color =
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -188,6 +200,7 @@ fun HomeScreen(
                             Text(
                                 text = "수강 완료된 강의가 아직 없어요",
                                 style = WizdumTheme.typography.body2,
+                                color = Black600,
                                 modifier = Modifier.align(
                                     Alignment.Center
                                 )
@@ -199,6 +212,7 @@ fun HomeScreen(
                                 finishedLecture = lecture,
                                 onNavigateToLecture = { onNavigateToLecture(lecture.classId) }
                             )
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
                     }
                 }
@@ -290,16 +304,27 @@ fun InProgressWizCard(
                 .align(Alignment.End)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        QuestStatusBadge(status = inProgressLecture.lectureStatus)
+        LectureStatusBadge(status = inProgressLecture.lectureStatus)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "${inProgressLecture.mentoName} 멘토님", style = WizdumTheme.typography.body3)
+        Text(
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(fontWeight = FontWeight.SemiBold, color = Black600)
+                ) {
+                    append(inProgressLecture.mentoName)
+                }
+                append(" 멘토님")
+            },
+            style = WizdumTheme.typography.body3,
+            color = Black500
+        )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = inProgressLecture.classTitle,
             style = WizdumTheme.typography.body1_semib
         )
         Spacer(modifier = Modifier.height(8.dp))
-        LevelStarRating(level = inProgressLecture.itemLevel)
+        LevelStarRating(level = inProgressLecture.itemLevel, levelColor = Black600)
     }
 }
 
@@ -338,12 +363,15 @@ fun CollectionWizCard(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                    withStyle(
+                        style = SpanStyle(fontWeight = FontWeight.SemiBold, color = Black700)
+                    ) {
                         append(finishedLecture.mentoName)
                     }
                     append(" 멘토님")
                 },
-                style = WizdumTheme.typography.body3
+                style = WizdumTheme.typography.body3,
+                color = Black600
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -358,7 +386,11 @@ fun CollectionWizCard(
                     modifier = Modifier.size(10.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(text = finishedLecture.completedAt, style = WizdumTheme.typography.body3)
+                Text(
+                    text = "${formatBasicDateTime(finishedLecture.completedAt)} 완료",
+                    style = WizdumTheme.typography.body3,
+                    color = Black500
+                )
             }
         }
     }
