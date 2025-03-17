@@ -9,7 +9,19 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+val keystoreProperties = Properties().apply {
+    load(File(rootProject.rootDir, "local.properties").inputStream())
+}
+
 android {
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["wizdum_key_alias"] as String
+            keyPassword = keystoreProperties["wizdum_key_password"] as String
+            storeFile = file(keystoreProperties["wizdum_store_file"] as String)
+            storePassword = keystoreProperties["wizdum_store_password"] as String
+        }
+    }
     namespace = "com.teamwizdum.wizdum"
     compileSdk = 35
 
@@ -36,6 +48,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs["release"]
         }
     }
     compileOptions {
