@@ -15,24 +15,35 @@ import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
 import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
 import kotlinx.serialization.json.Json
 
-fun NavController.navigateToLecture(classId: Int) {
-    navigate(LectureRoute.lectureMainRoute(classId)) {
-        popUpTo(HomeRoute.HOME) { inclusive = false }
+fun NavController.navigateToLectureWithHomeRoot(classId: Int) {
+    // Home 화면 root 설정을 위한 navigate
+    navigate(HomeRoute.HOME) {
+        popUpTo(graph.id) { inclusive = false } // 기존 모든 스택 제거
+        launchSingleTop = true
     }
+
+    // 그다음 Lecture 이동
+    navigate(LectureRoute.lectureMainRoute(classId))
+}
+
+fun NavController.navigateToLecture(classId: Int) {
+    navigate(LectureRoute.lectureMainRoute(classId))
 }
 
 fun NavController.navigateToLectureClear(lectureInfo: LectureClearArgument) {
     navigate(LectureRoute.lectureClearRoute(Json.encodeToUri(lectureInfo))) {
-        popUpTo(LectureRoute.lectureMainRoute(lectureInfo.classId)) {
-            inclusive = true
+        val lectureMainRouteId = graph.findNode(LectureRoute.LECTURE)?.id ?: 0
+        popUpTo(lectureMainRouteId) {
+            inclusive = false
         }
     }
 }
 
 fun NavController.navigateToLectureAllClear(classId: Int, mentorName: String) {
     navigate(LectureRoute.lectureAllClearRoute(classId, mentorName)) {
-        popUpTo(LectureRoute.lectureMainRoute(classId)) {
-            inclusive = true
+        val lectureMainRouteId = graph.findNode(LectureRoute.LECTURE)?.id ?: 0
+        popUpTo(lectureMainRouteId) {
+            inclusive = false
         }
     }
 }

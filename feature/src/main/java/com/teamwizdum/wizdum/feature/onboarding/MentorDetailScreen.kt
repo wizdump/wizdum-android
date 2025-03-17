@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -75,16 +74,18 @@ fun MentorDetailRoute(
 ) {
     LaunchedEffect(Unit) {
         viewModel.getMentorDetail(classId)
+        viewModel.hasSeenOnboarding()
     }
 
     val uiState = viewModel.mentorInfo.collectAsState().value
+    val hasSeenOnboarding = viewModel.hasSeenOnboarding.collectAsState().value
 
     when (uiState) {
         is UiState.Loading -> {}
         is UiState.Success -> {
             MentorDetailScreen(
                 mentorInfo = uiState.data,
-                checkOnboarding = viewModel.checkUserOnboarding(),
+                checkOnboarding = hasSeenOnboarding,
                 onNavigateBack = onNavigateBack,
                 onNavigateToLogin = onNavigateToLogin,
                 onNavigateToLecture = {

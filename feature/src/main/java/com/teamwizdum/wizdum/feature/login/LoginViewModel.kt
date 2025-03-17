@@ -2,6 +2,7 @@ package com.teamwizdum.wizdum.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.teamwizdum.wizdum.data.repository.DataStoreRepository
 import com.teamwizdum.wizdum.data.repository.QuestRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import com.teamwizdum.wizdum.data.repository.UserRepository
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    private val dataStoreRepository: DataStoreRepository,
     private val tokenRepository: TokenRepository,
     private val userRepository: UserRepository,
     private val questRepository: QuestRepository,
@@ -49,6 +51,8 @@ class LoginViewModel @Inject constructor(
                         accessToken = it.accessToken,
                         refreshToken = it.refreshToken
                     )
+
+                    setOnboardingCompleted()
 
                     _loginState.value = UiState.Success(Unit)
                     delay(2000) // 로그인 완료 화면을 보여주기 위한 딜레이
@@ -96,6 +100,13 @@ class LoginViewModel @Inject constructor(
                 }.onFailure { error ->
                     _loginState.value = UiState.Failed(error.message)
                 }
+        }
+    }
+
+    private fun setOnboardingCompleted() {
+        viewModelScope.launch {
+            dataStoreRepository.setOnboardingCompleted(true) // set 메서드만 의존성 문제 발생
+            Timber.d("hasSeenCheck in Login : ${dataStoreRepository.isOnboardingCompleted()}")
         }
     }
 }

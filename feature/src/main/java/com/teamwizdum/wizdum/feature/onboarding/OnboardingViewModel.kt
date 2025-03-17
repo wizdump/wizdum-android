@@ -4,9 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.response.InterestResponse
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
+import com.teamwizdum.wizdum.data.model.response.LevelResponse
 import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
-import com.teamwizdum.wizdum.data.model.response.LevelResponse
+import com.teamwizdum.wizdum.data.repository.DataStoreRepository
 import com.teamwizdum.wizdum.data.repository.OnboardingRepository
 import com.teamwizdum.wizdum.data.repository.QuestRepository
 import com.teamwizdum.wizdum.feature.common.base.UiState
@@ -18,11 +19,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
+    private val dataStoreRepository: DataStoreRepository,
     private val onboardingRepository: OnboardingRepository,
     private val questRepository: QuestRepository,
 ) : ViewModel() {
 
-    private val checkOnboarding = false
+    private val _hasSeenOnboarding = MutableStateFlow(false)
+    val hasSeenOnboarding: StateFlow<Boolean> = _hasSeenOnboarding
 
     private val _interests = MutableStateFlow<UiState<List<InterestResponse>>>(UiState.Loading)
     val interests: StateFlow<UiState<List<InterestResponse>>> = _interests
@@ -100,8 +103,6 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun checkUserOnboarding(): Boolean = checkOnboarding
-
     fun startQuest(classId: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
             questRepository.startQuest(classId)
@@ -111,6 +112,13 @@ class OnboardingViewModel @Inject constructor(
                 .onFailure {
                     // 전역 에러 핸들링 처리
                 }
+        }
+    }
+
+
+    fun hasSeenOnboarding() {
+        viewModelScope.launch {
+            _hasSeenOnboarding.value = dataStoreRepository.isOnboardingCompleted() ?: false
         }
     }
 }

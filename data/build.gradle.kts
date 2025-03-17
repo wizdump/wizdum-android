@@ -45,7 +45,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.timber)
+
     implementation(libs.androidx.security)
+    implementation(libs.androidx.datastore.core)
+    api(libs.androidx.datastore.preferences)
 
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)

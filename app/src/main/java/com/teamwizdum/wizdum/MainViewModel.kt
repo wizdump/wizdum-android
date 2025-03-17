@@ -2,19 +2,21 @@ package com.teamwizdum.wizdum
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.teamwizdum.wizdum.data.repository.DataStoreRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val tokenRepository: TokenRepository
+    private val tokenRepository: TokenRepository,
+    private val dataStoreRepository: DataStoreRepository,
 ) : ViewModel() {
 
-    private val checkOnboarding = true
     private val accessToken = tokenRepository.getAccessToken()
 
     private val _mainState = MutableStateFlow<MainState>(MainState.None)
@@ -26,7 +28,7 @@ class MainViewModel @Inject constructor(
 
     private fun navigate() {
         // 1. onboarding 여부 체크
-        if (!checkOnboarding) {
+        if (!hasSeenOnboarding()) {
             _mainState.value = MainState.Onboarding
             return
         }
@@ -45,6 +47,12 @@ class MainViewModel @Inject constructor(
             // 성공 -> 홈화면
             // 실패 -> 로그인 화면
             _mainState.value = MainState.Home
+        }
+    }
+
+    private fun hasSeenOnboarding(): Boolean {
+        return runBlocking {
+            dataStoreRepository.isOnboardingCompleted() ?: false
         }
     }
 }

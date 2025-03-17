@@ -61,6 +61,7 @@ import com.teamwizdum.wizdum.feature.quest.navigation.lectureScreen
 import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLecture
 import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureAllClear
 import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureClear
+import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureWithHomeRoot
 import com.teamwizdum.wizdum.feature.reward.navigation.navigateToReward
 import com.teamwizdum.wizdum.feature.reward.navigation.rewardScreen
 import timber.log.Timber
@@ -91,11 +92,11 @@ fun MainScreen(navController: NavHostController) {
                     onNavigateToMentor = navController::navigateToMentor,
                     onNavigateToMentorDetail = navController::navigateToMentorDetail,
                     onNavigateToLogin = navController::navigateToLogin,
-                    onNavigateToLecture = navController::navigateToLecture
+                    onNavigateToLecture = navController::navigateToLectureWithHomeRoot
                 )
                 loginScreen(
                     onNavigateBack = navController::popBackStack,
-                    onNavigateToLecture = navController::navigateToLecture,
+                    onNavigateToLecture = navController::navigateToLectureWithHomeRoot,
                     onNavigateToHome = navController::navigateHome
                 )
                 lectureScreen(
