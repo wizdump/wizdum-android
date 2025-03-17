@@ -2,7 +2,6 @@ package com.teamwizdum.wizdum.feature.chat
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,8 +47,8 @@ import com.teamwizdum.wizdum.feature.chat.component.TypingIndicatorBubble
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
 import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.common.enums.LectureStatus
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureArgument
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureClearArgument
 
 @Composable
 fun ChatRoute(
@@ -78,7 +77,7 @@ fun ChatRoute(
                 showDialog = { dialogState = true },
                 onNavigateBack = onNavigateBack,
                 onNavigateToClear = {
-                    viewModel.finishQuest(lectureInfo.lectureId) { encouragement ->
+                    viewModel.finishLecture(lectureInfo.lectureId) { encouragement ->
                         onNavigateToClear(
                             LectureClearArgument(
                                 classId = lectureInfo.classId,
@@ -92,7 +91,7 @@ fun ChatRoute(
                     }
                 },
                 onNavigateToAllClear = {
-                    viewModel.finishQuest(lectureInfo.lectureId) {
+                    viewModel.finishLecture(lectureInfo.lectureId) {
                         onNavigateToAllClear(
                             lectureInfo.classId,
                             lectureInfo.mentorName

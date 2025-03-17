@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.quest
+package com.teamwizdum.wizdum.feature.lecture
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,7 +25,7 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureClearArgument
 
 @Composable
 fun LectureClearScreen(

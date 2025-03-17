@@ -3,7 +3,7 @@ package com.teamwizdum.wizdum.feature.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.repository.DataStoreRepository
-import com.teamwizdum.wizdum.data.repository.QuestRepository
+import com.teamwizdum.wizdum.data.repository.LectureRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import com.teamwizdum.wizdum.data.repository.UserRepository
 import com.teamwizdum.wizdum.feature.common.base.UiState
@@ -20,7 +20,7 @@ class LoginViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val tokenRepository: TokenRepository,
     private val userRepository: UserRepository,
-    private val questRepository: QuestRepository,
+    private val lectureRepository: LectureRepository,
 ) : ViewModel() {
 
     var classId: Int = -1
@@ -94,7 +94,7 @@ class LoginViewModel @Inject constructor(
 
     private fun startLecture(classId: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            questRepository.startQuest(classId = classId)
+            lectureRepository.startLecture(classId = classId)
                 .onSuccess {
                     onSuccess()
                 }.onFailure { error ->

@@ -3,7 +3,7 @@ package com.teamwizdum.wizdum.data.di
 import com.teamwizdum.wizdum.data.api.AuthApi
 import com.teamwizdum.wizdum.data.api.HomeApi
 import com.teamwizdum.wizdum.data.api.OnboardingApi
-import com.teamwizdum.wizdum.data.api.QuestApi
+import com.teamwizdum.wizdum.data.api.LectureApi
 import com.teamwizdum.wizdum.data.api.RewardApi
 import com.teamwizdum.wizdum.data.api.UserApi
 import dagger.Module
@@ -31,8 +31,8 @@ object ApiServiceModule {
 
     @Singleton
     @Provides
-    fun provideQuestApi(retrofit: Retrofit): QuestApi {
-        return retrofit.create(QuestApi::class.java)
+    fun provideLectureApi(retrofit: Retrofit): LectureApi {
+        return retrofit.create(LectureApi::class.java)
     }
 
     @Singleton

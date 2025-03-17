@@ -1,9 +1,9 @@
-package com.teamwizdum.wizdum.feature.quest
+package com.teamwizdum.wizdum.feature.lecture
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.response.LectureResponse
-import com.teamwizdum.wizdum.data.repository.QuestRepository
+import com.teamwizdum.wizdum.data.repository.LectureRepository
 import com.teamwizdum.wizdum.data.repository.RewardRepository
 import com.teamwizdum.wizdum.feature.common.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,16 +14,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LectureViewModel @Inject constructor(
-    private val questRepository: QuestRepository,
+    private val lectureRepository: LectureRepository,
     private val rewardRepository: RewardRepository
 ) : ViewModel() {
 
     private val _lectureInfo = MutableStateFlow<UiState<LectureResponse>>(UiState.Loading)
     val lectureInfo: StateFlow<UiState<LectureResponse>> = _lectureInfo
 
-    fun getLecture(classId: Int) {
+    fun getLectures(classId: Int) {
         viewModelScope.launch {
-            questRepository.getQuests(classId)
+            lectureRepository.getLectures(classId)
                 .onSuccess { data ->
                     _lectureInfo.value = UiState.Success(data)
                 }.onFailure { error ->

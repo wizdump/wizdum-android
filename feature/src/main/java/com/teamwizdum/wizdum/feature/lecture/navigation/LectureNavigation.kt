@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.quest.navigation
+package com.teamwizdum.wizdum.feature.lecture.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -8,11 +8,11 @@ import androidx.navigation.navArgument
 import com.teamwizdum.wizdum.feature.common.extensions.decodeFromUri
 import com.teamwizdum.wizdum.feature.common.extensions.encodeToUri
 import com.teamwizdum.wizdum.feature.home.navigation.HomeRoute
-import com.teamwizdum.wizdum.feature.quest.LectureAllClearRoute
-import com.teamwizdum.wizdum.feature.quest.LectureClearScreen
-import com.teamwizdum.wizdum.feature.quest.LectureRoute
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
+import com.teamwizdum.wizdum.feature.lecture.LectureAllClearRoute
+import com.teamwizdum.wizdum.feature.lecture.LectureClearScreen
+import com.teamwizdum.wizdum.feature.lecture.LectureRoute
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureArgument
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureClearArgument
 import kotlinx.serialization.json.Json
 
 fun NavController.navigateToLectureWithHomeRoot(classId: Int) {

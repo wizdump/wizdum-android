@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.quest
+package com.teamwizdum.wizdum.feature.lecture
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

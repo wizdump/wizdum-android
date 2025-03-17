@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.ChatMessage
 import com.teamwizdum.wizdum.data.model.MessageContent
-import com.teamwizdum.wizdum.data.repository.QuestRepository
+import com.teamwizdum.wizdum.data.repository.LectureRepository
 import com.teamwizdum.wizdum.data.repository.TokenRepository
 import com.teamwizdum.wizdum.data.repository.WebSocketRepository
 import com.teamwizdum.wizdum.feature.chat.info.MessageType
@@ -22,7 +22,7 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val webSocketRepository: WebSocketRepository,
     private val tokenRepository: TokenRepository,
-    private val questRepository: QuestRepository,
+    private val lectureRepository: LectureRepository,
 ) : ViewModel() {
 
     private val token = tokenRepository.getAccessToken() ?: ""
@@ -85,7 +85,7 @@ class ChatViewModel @Inject constructor(
 
     private fun getChatList(lectureId: Int) {
         viewModelScope.launch {
-            questRepository.getChatList(lectureId)
+            lectureRepository.getChatList(lectureId)
                 .onSuccess { data ->
                     _chatUiState.value = UiState.Success(data)
                     _messages.value = data
@@ -95,9 +95,9 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun finishQuest(lectureId: Int, onSuccess: (String) -> Unit) {
+    fun finishLecture(lectureId: Int, onSuccess: (String) -> Unit) {
         viewModelScope.launch {
-            questRepository.finishQuest(lectureId)
+            lectureRepository.finishLecture(lectureId)
                 .onSuccess {
                     onSuccess(it.encouragement)
                 }.onFailure { }

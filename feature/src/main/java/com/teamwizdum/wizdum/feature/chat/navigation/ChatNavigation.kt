@@ -8,8 +8,8 @@ import androidx.navigation.navArgument
 import com.teamwizdum.wizdum.feature.chat.ChatRoute
 import com.teamwizdum.wizdum.feature.common.extensions.decodeFromUri
 import com.teamwizdum.wizdum.feature.common.extensions.encodeToUri
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureClearArgument
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureArgument
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureClearArgument
 import kotlinx.serialization.json.Json
 
 fun NavController.navigateToChat(lectureInfo: LectureArgument) {

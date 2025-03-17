@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.quest
+package com.teamwizdum.wizdum.feature.lecture
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -67,11 +67,11 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
-import com.teamwizdum.wizdum.feature.quest.component.LectureProgressBar
+import com.teamwizdum.wizdum.feature.lecture.component.LectureProgressBar
 import com.teamwizdum.wizdum.feature.common.component.LectureStatusBadge
-import com.teamwizdum.wizdum.feature.quest.component.StatusCircle
+import com.teamwizdum.wizdum.feature.lecture.component.StatusCircle
 import com.teamwizdum.wizdum.feature.common.enums.LectureStatus
-import com.teamwizdum.wizdum.feature.quest.navigation.argument.LectureArgument
+import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureArgument
 
 @Composable
 fun LectureRoute(
@@ -82,7 +82,7 @@ fun LectureRoute(
     onNavigateToLectureAllClear: (String) -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        viewModel.getLecture(classId)
+        viewModel.getLectures(classId)
     }
 
     val uiState = viewModel.lectureInfo.collectAsState().value

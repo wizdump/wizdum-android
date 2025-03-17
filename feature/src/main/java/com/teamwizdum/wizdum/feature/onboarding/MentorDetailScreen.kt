@@ -89,7 +89,7 @@ fun MentorDetailRoute(
                 onNavigateBack = onNavigateBack,
                 onNavigateToLogin = onNavigateToLogin,
                 onNavigateToLecture = {
-                    viewModel.startQuest(classId) {
+                    viewModel.startLecture(classId) {
                         onNavigateToLecture()
                     }
                 }

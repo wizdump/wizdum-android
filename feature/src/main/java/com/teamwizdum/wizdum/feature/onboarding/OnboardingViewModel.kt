@@ -9,7 +9,7 @@ import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.data.repository.DataStoreRepository
 import com.teamwizdum.wizdum.data.repository.OnboardingRepository
-import com.teamwizdum.wizdum.data.repository.QuestRepository
+import com.teamwizdum.wizdum.data.repository.LectureRepository
 import com.teamwizdum.wizdum.feature.common.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class OnboardingViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val onboardingRepository: OnboardingRepository,
-    private val questRepository: QuestRepository,
+    private val lectureRepository: LectureRepository,
 ) : ViewModel() {
 
     private val _hasSeenOnboarding = MutableStateFlow(false)
@@ -103,9 +103,9 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun startQuest(classId: Int, onSuccess: () -> Unit) {
+    fun startLecture(classId: Int, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            questRepository.startQuest(classId)
+            lectureRepository.startLecture(classId)
                 .onSuccess {
                     onSuccess()
                 }

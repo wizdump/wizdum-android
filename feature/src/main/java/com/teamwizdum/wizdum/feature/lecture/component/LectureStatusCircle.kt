@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.quest.component
+package com.teamwizdum.wizdum.feature.lecture.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable

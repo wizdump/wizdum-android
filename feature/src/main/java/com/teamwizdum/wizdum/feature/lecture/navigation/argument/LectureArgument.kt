@@ -1,4 +1,4 @@
-package com.teamwizdum.wizdum.feature.quest.navigation.argument
+package com.teamwizdum.wizdum.feature.lecture.navigation.argument
 
 import kotlinx.serialization.Serializable
 

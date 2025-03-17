@@ -57,11 +57,11 @@ import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToLevel
 import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToMentor
 import com.teamwizdum.wizdum.feature.onboarding.navigation.navigateToMentorDetail
 import com.teamwizdum.wizdum.feature.onboarding.navigation.onboardingScreen
-import com.teamwizdum.wizdum.feature.quest.navigation.lectureScreen
-import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLecture
-import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureAllClear
-import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureClear
-import com.teamwizdum.wizdum.feature.quest.navigation.navigateToLectureWithHomeRoot
+import com.teamwizdum.wizdum.feature.lecture.navigation.lectureScreen
+import com.teamwizdum.wizdum.feature.lecture.navigation.navigateToLecture
+import com.teamwizdum.wizdum.feature.lecture.navigation.navigateToLectureAllClear
+import com.teamwizdum.wizdum.feature.lecture.navigation.navigateToLectureClear
+import com.teamwizdum.wizdum.feature.lecture.navigation.navigateToLectureWithHomeRoot
 import com.teamwizdum.wizdum.feature.reward.navigation.navigateToReward
 import com.teamwizdum.wizdum.feature.reward.navigation.rewardScreen
 import timber.log.Timber
