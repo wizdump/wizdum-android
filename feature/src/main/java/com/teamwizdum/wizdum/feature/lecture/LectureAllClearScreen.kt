@@ -27,12 +27,12 @@ fun LectureAllClearRoute(
     viewModel: LectureViewModel = hiltViewModel(),
     classId: Int,
     mentorName: String,
-    onNavigateToLecture: () -> Unit,
+    onNavigateBack: () -> Unit,
     onNavigateToReward: () -> Unit,
 ) {
     LectureAllClearScreen(
         mentorName = mentorName,
-        onNavigateToLecture = onNavigateToLecture,
+        onNavigateBack = onNavigateBack,
         onNavigateToReward = {
             viewModel.postReward(classId) {
                 onNavigateToReward()
@@ -44,12 +44,12 @@ fun LectureAllClearRoute(
 @Composable
 private fun LectureAllClearScreen(
     mentorName: String,
-    onNavigateToLecture: () -> Unit,
+    onNavigateBack: () -> Unit,
     onNavigateToReward: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         CloseAppBar {
-            onNavigateToLecture()
+            onNavigateBack()
         }
         Column(
             modifier = Modifier
@@ -97,7 +97,7 @@ fun LectureAllClearScreenPreview() {
     WizdumTheme {
         LectureAllClearScreen(
             mentorName = "스파르타",
-            onNavigateToLecture = {},
+            onNavigateBack = {},
             onNavigateToReward = {}
         )
     }

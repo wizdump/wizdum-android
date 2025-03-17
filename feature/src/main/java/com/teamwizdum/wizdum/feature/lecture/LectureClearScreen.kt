@@ -30,7 +30,7 @@ import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureClearArg
 @Composable
 fun LectureClearScreen(
     lectureInfo: LectureClearArgument,
-    onNavigateToLecture: (Int) -> Unit,
+    onNavigateBack: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -73,7 +73,7 @@ fun LectureClearScreen(
                 modifier = Modifier.fillMaxWidth(),
                 title = "계속하기"
             ) {
-                onNavigateToLecture(lectureInfo.classId)
+                onNavigateBack()
             }
         }
     }

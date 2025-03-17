@@ -101,7 +101,6 @@ fun MainScreen(navController: NavHostController) {
                 )
                 lectureScreen(
                     onNavigateBack = navController::popBackStack,
-                    onNavigateToLecture = navController::navigateToLecture,
                     onNavigateToChat = navController::navigateToChat,
                     onNavigateToAllClear = navController::navigateToLectureAllClear,
                     onNavigateToReward = navController::navigateToReward

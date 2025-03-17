@@ -50,7 +50,6 @@ fun NavController.navigateToLectureAllClear(classId: Int, mentorName: String) {
 
 fun NavGraphBuilder.lectureScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToLecture: (Int) -> Unit,
     onNavigateToChat: (LectureArgument) -> Unit,
     onNavigateToAllClear: (Int, String) -> Unit,
     onNavigateToReward: (Int) -> Unit,
@@ -85,9 +84,7 @@ fun NavGraphBuilder.lectureScreen(
 
         LectureClearScreen(
             lectureInfo = Json.decodeFromUri(lectureInfo),
-            onNavigateToLecture = { classId ->
-                onNavigateToLecture(classId)
-            }
+            onNavigateBack = onNavigateBack
         )
     }
 
@@ -104,9 +101,7 @@ fun NavGraphBuilder.lectureScreen(
         LectureAllClearRoute(
             classId = classId,
             mentorName = mentorName,
-            onNavigateToLecture = {
-                onNavigateToLecture(classId)
-            },
+            onNavigateBack = onNavigateBack,
             onNavigateToReward = {
                 onNavigateToReward(classId)
             }
