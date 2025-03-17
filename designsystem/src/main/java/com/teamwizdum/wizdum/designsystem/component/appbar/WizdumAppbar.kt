@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.teamwizdum.wizdum.designsystem.R
+import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -41,7 +42,7 @@ fun BackAppBar(
                 painter = painterResource(id = resId),
                 contentDescription = "뒤로가기",
                 modifier = modifier
-                    .clickable {
+                    .noRippleClickable {
                         onNavigateBack()
                     }
                     .padding(16.dp)
@@ -79,7 +80,7 @@ fun CloseAppBar(
                 painter = painterResource(id = resId),
                 contentDescription = "취소",
                 modifier = modifier
-                    .clickable {
+                    .noRippleClickable {
                         onClose()
                     }
                     .padding(16.dp)

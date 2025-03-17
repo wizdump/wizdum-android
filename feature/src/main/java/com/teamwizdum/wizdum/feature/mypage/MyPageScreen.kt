@@ -20,6 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +37,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.UserResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.TitleAppbar
+import com.teamwizdum.wizdum.designsystem.component.dialog.ChoiceDialog
 import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
@@ -53,21 +58,46 @@ fun MyPageRoute(
     }
 
     val userInfo = viewModel.userInfo.collectAsState().value
+    var logoutDialogState by remember { mutableStateOf(false) }
+    var withdrawDialogState by remember { mutableStateOf(false) }
 
     MyPageScreen(
         padding = padding,
         userInfo = userInfo,
-        onLogout = {
+        onLogout = { logoutDialogState = true },
+        onWithdraw = { withdrawDialogState = true },
+        onNavigateToTerm = onNavigateToTerm
+    )
+
+    ChoiceDialog(
+        dialogState = logoutDialogState,
+        title = "로그아웃 하시겠어요?",
+        confirmTitle = "로그아웃",
+        dismissTitle = "취소",
+        onConfirmRequest = {
             viewModel.logout {
                 restartMainActivity()
             }
         },
-        onWithdraw = {
+        onDismissRequest = {
+            logoutDialogState = false
+        }
+    )
+
+    ChoiceDialog(
+        dialogState = withdrawDialogState,
+        title = "정말 탈퇴하시겠어요?",
+        subTitle = "계정 정보와 학습 기록이 영구 삭제됩니다.",
+        confirmTitle = "탈퇴",
+        dismissTitle = "취소",
+        onConfirmRequest = {
             viewModel.withdraw {
                 restartMainActivity()
             }
         },
-        onNavigateToTerm = onNavigateToTerm
+        onDismissRequest = {
+            withdrawDialogState = false
+        }
     )
 }
 

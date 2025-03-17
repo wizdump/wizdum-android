@@ -116,6 +116,9 @@ fun InterestSelectionScreen(
                             }
                         )
                     }
+                    item {
+                        Spacer(modifier = Modifier.height(200.dp))
+                    }
                 }
             }
         }
@@ -138,6 +141,7 @@ fun InterestSelectionScreen(
             WizdumFilledButton(
                 title = "다음",
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {

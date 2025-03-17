@@ -52,6 +52,7 @@ fun ChatStartSelectionBox(
         Text(text = "${orderSeq}강을 시작하시겠어요?", style = WizdumTheme.typography.body1_semib)
         Spacer(modifier = Modifier.height(16.dp))
         WizdumFilledButton(
+            modifier = Modifier.fillMaxWidth(),
             title = "네, 준비되었어요!",
             textStyle = WizdumTheme.typography.body2_semib
         ) {
@@ -59,6 +60,7 @@ fun ChatStartSelectionBox(
         }
         Spacer(modifier = Modifier.height(8.dp))
         WizdumBorderButton(
+            modifier = Modifier.fillMaxWidth(),
             title = "나중에 다시 올게요",
             textStyle = WizdumTheme.typography.body2_semib
         ) {
@@ -95,6 +97,7 @@ fun ChatFinishSelectionBox(
         Text(text = "강의를 마칠까요?", style = WizdumTheme.typography.body1_semib)
         Spacer(modifier = Modifier.height(16.dp))
         WizdumFilledButton(
+            modifier = Modifier.fillMaxWidth(),
             title = "강의를 완료할게요",
             textStyle = WizdumTheme.typography.body2_semib
         ) {
@@ -106,6 +109,7 @@ fun ChatFinishSelectionBox(
         }
         Spacer(modifier = Modifier.height(8.dp))
         WizdumBorderButton(
+            modifier = Modifier.fillMaxWidth(),
             title = "더 물어볼래요",
             textStyle = WizdumTheme.typography.body2_semib
         ) {

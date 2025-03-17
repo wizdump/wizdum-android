@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.feature.reward
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -124,6 +125,7 @@ private fun RewardScreen(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 WizdumFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
                     title = "나의 승리 공유하기",
                 ) {
                     // TODO : 공유로 넘어가면 창 종료, 복귀 시 메인 화면으로 이동

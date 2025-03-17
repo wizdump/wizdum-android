@@ -69,7 +69,10 @@ fun LectureClearScreen(
             )
             Spacer(modifier = Modifier.weight(1f))
 
-            WizdumFilledButton(title = "계속하기") {
+            WizdumFilledButton(
+                modifier = Modifier.fillMaxWidth(),
+                title = "계속하기"
+            ) {
                 onNavigateToLecture(lectureInfo.classId)
             }
         }

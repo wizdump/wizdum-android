@@ -116,6 +116,9 @@ private fun KeywordSelectionScreen(
                             }
                         )
                     }
+                    item {
+                        Spacer(modifier = Modifier.height(200.dp))
+                    }
                 }
             }
         }
@@ -138,6 +141,7 @@ private fun KeywordSelectionScreen(
             WizdumFilledButton(
                 title = "멘토 추천받기",
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {

@@ -26,7 +26,6 @@ fun WizdumFilledButton(
     onClick: () -> Unit,
 ) {
     Box(modifier = modifier
-        .fillMaxWidth()
         .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
         .clickable { onClick() }
     ) {

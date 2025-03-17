@@ -62,6 +62,7 @@ fun ChatDialog(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     WizdumFilledButton(
+                        modifier = Modifier.fillMaxWidth(),
                         title = "계속 진행하기",
                         textStyle = WizdumTheme.typography.body2_semib
                     ) {
@@ -69,6 +70,7 @@ fun ChatDialog(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     WizdumBorderButton(
+                        modifier = Modifier.fillMaxWidth(),
                         title = "정말 나가기",
                         textColor = WizdumTheme.colorScheme.error,
                         textStyle = WizdumTheme.typography.body2_semib,

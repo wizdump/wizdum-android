@@ -28,7 +28,6 @@ fun WizdumBorderButton(
     onClick: () -> Unit,
 ) {
     Box(modifier = modifier
-        .fillMaxWidth()
         .background(color = backgroundColor, shape = RoundedCornerShape(10.dp))
         .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(10.dp))
         .clickable { onClick() }

@@ -143,8 +143,9 @@ private fun MentorMatchScreen(
         }
         WizdumFilledButton(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 80.dp, start = 32.dp, end = 32.dp),
+                .fillMaxWidth()
+                .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
+                .align(Alignment.BottomCenter),
             title = "강의 미리보기"
         ) {
             mentors.forEach { mentors ->

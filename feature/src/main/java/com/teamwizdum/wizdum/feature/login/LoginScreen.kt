@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,7 +81,7 @@ private fun LoginScreen(
         BackAppBar(onNavigateBack = onNavigateBack)
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxHeight(0.9f)
                 .padding(horizontal = 32.dp),
             verticalArrangement = Arrangement.Center,
         ) {

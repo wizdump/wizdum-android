@@ -63,6 +63,7 @@ fun LevelSelectionRoute(
                 onNavigateToKeyword = onNavigateToKeyword
             )
         }
+
         is UiState.Failed -> {}
     }
 }
@@ -106,19 +107,25 @@ private fun LevelSelectionScreen(
                             content = quest.description,
                             level = quest.level,
                             isSelected = selectedIndex.value == index,
-                            onClick = { selectedIndex.value = index }
+                            onClick = {
+                                selectedIndex.value =
+                                    if (selectedIndex.value == index) -1 else index
+                            }
                         )
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
-
-                if (selectedIndex.value != -1)
-                    WizdumFilledButton(title = "다음") {
-                        val dd = levels[selectedIndex.value].levelId
-                        onNavigateToKeyword(levels[selectedIndex.value].levelId)
-                    }
             }
         }
+        if (selectedIndex.value != -1)
+            WizdumFilledButton(
+                title = "다음",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                onNavigateToKeyword(levels[selectedIndex.value].levelId)
+            }
     }
 }
 

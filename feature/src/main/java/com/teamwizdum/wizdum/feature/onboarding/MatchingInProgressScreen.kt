@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,48 +31,51 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
 fun MatchingInProgressScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(color = Color.White)
     ) {
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier.fillMaxHeight(0.9f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Box(
-                modifier = Modifier
-                    .size(76.dp)
-                    .background(color = Color.White, shape = CircleShape)
-                    .border(width = 3.dp, color = Black200, shape = CircleShape),
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(76.dp)
+                        .background(color = Color.White, shape = CircleShape)
+                        .border(width = 3.dp, color = Black200, shape = CircleShape),
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(start = 57.dp)
+                        .width(27.dp)
+                        .height(8.dp)
+                        .background(color = Green200)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "시간의 문이 열리는 중...",
+                style = WizdumTheme.typography.body2,
+                color = Black600
             )
-            Box(
-                modifier = Modifier
-                    .padding(start = 57.dp)
-                    .width(27.dp)
-                    .height(8.dp)
-                    .background(color = Green200)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Green200)) {
+                        append("운명적인 멘토")
+                    }
+                    append("와 연결 중이에요!")
+                },
+                style = WizdumTheme.typography.h3_semib
             )
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "시간의 문이 열리는 중...",
-            style = WizdumTheme.typography.body2,
-            color = Black600
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Green200)) {
-                    append("운명적인 멘토")
-                }
-                append("와 연결 중이에요!")
-            },
-            style = WizdumTheme.typography.h3_semib
-        )
     }
 }
 

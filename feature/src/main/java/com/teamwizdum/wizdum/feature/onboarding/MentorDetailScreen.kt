@@ -281,6 +281,7 @@ private fun MentorDetailScreen(
         WizdumFilledButton(
             title = "시작하기",
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(
                     bottom = 80.dp,
                     start = 32.dp,

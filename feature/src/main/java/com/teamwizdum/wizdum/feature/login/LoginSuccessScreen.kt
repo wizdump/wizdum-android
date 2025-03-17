@@ -3,9 +3,12 @@ package com.teamwizdum.wizdum.feature.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -26,34 +29,39 @@ import com.teamwizdum.wizdum.feature.R
 
 @Composable
 fun LoginSuccessScreen(name: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(color = Color.White)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_checked),
-            contentDescription = "체크",
-            modifier = Modifier.size(32.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(color = Green200)) {
-                    append(name)
-                }
-                append("님 반가워요!")
-            },
-            style = WizdumTheme.typography.h2
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "멘토님이 대화할 준비를 하고 있어요!",
-            style = WizdumTheme.typography.body1,
-            color = Black600
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_checked),
+                contentDescription = "체크",
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Green200)) {
+                        append(name)
+                    }
+                    append("님 반가워요!")
+                },
+                style = WizdumTheme.typography.h2
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "멘토님이 대화할 준비를 하고 있어요!",
+                style = WizdumTheme.typography.body1,
+                color = Black600
+            )
+        }
     }
 }
 
