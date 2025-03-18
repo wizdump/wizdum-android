@@ -66,11 +66,11 @@ import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.UiState
-import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
-import com.teamwizdum.wizdum.feature.lecture.component.LectureProgressBar
 import com.teamwizdum.wizdum.feature.common.component.LectureStatusBadge
-import com.teamwizdum.wizdum.feature.lecture.component.StatusCircle
+import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 import com.teamwizdum.wizdum.feature.common.enums.LectureStatus
+import com.teamwizdum.wizdum.feature.lecture.component.LectureProgressBar
+import com.teamwizdum.wizdum.feature.lecture.component.StatusCircle
 import com.teamwizdum.wizdum.feature.lecture.navigation.argument.LectureArgument
 
 @Composable
@@ -309,11 +309,11 @@ fun ExpandableLectureCard(
     onHeightChanged: (Int) -> Unit = {},
     onNavigateToChat: () -> Unit,
 ) {
-    var isExpanded by remember { mutableStateOf(lectureInfo.isInProgress) }
+    var isExpanded by remember(lectureInfo.isInProgress) { mutableStateOf(lectureInfo.isInProgress) }
     val cardHeight by animateDpAsState(
         targetValue = if (isExpanded) 186.dp else if (!isExpanded && lectureInfo.lectureStatus == LectureStatus.WAIT.name) 95.dp else 71.dp,
         label = "",
-        finishedListener = { } // 애니메이션이 끝났을 때 높이
+        finishedListener = { }
     )
 
     Box(
