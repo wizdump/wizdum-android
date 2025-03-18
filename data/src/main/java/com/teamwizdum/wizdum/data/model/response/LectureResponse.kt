@@ -13,7 +13,7 @@ data class LectureResponse(
     val level: String = "",
     val lectures: List<LectureDetail> = emptyList(),
     val isFinished: Boolean = false, // 전체 강의 완료 여부
-    val canGetWiz: Boolean = false,
+    val hasWiz: Boolean = false,
 ) {
     fun getProgress(): Float {
         var totalWeight = 0f

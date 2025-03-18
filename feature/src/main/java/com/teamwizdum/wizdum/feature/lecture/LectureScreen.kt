@@ -193,7 +193,7 @@ fun LectureScreen(
                         color = Color.White
                     )
                 }
-                if (lectureInfo.canGetWiz) {
+                if (lectureInfo.hasWiz) {
                     TextWithIconBadge(
                         title = "Wiz 획득",
                         resId = R.drawable.ic_checked_whtie,
@@ -266,10 +266,11 @@ fun LectureScreen(
             }
         }
 
-        if (lectureInfo.isFinished && !lectureInfo.canGetWiz) {
+        if (lectureInfo.isFinished && !lectureInfo.hasWiz) {
             WizdumFilledButton(
                 title = "리워드 받기",
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
