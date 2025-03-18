@@ -9,7 +9,19 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+val keystoreProperties = Properties().apply {
+    load(File(rootProject.rootDir, "local.properties").inputStream())
+}
+
 android {
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["wizdum_key_alias"] as String
+            keyPassword = keystoreProperties["wizdum_key_password"] as String
+            storeFile = file(keystoreProperties["wizdum_store_file"] as String)
+            storePassword = keystoreProperties["wizdum_store_password"] as String
+        }
+    }
     namespace = "com.teamwizdum.wizdum"
     compileSdk = 35
 
@@ -17,7 +29,7 @@ android {
         applicationId = "com.teamwizdum.wizdum"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -25,8 +37,8 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", properties.getProperty("kako_native_app_key"))
-        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = properties.getProperty("kako_native_app_key")
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", properties.getProperty("kakao_native_app_key"))
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = properties.getProperty("kakao_redirect_key")
     }
 
     buildTypes {
@@ -36,6 +48,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs["release"]
         }
     }
     compileOptions {
