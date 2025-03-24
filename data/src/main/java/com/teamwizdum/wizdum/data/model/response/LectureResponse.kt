@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class LectureResponse(
-    val mentoId: Int = 1,
+    val mentoId: Int = 0,
     val mentoName: String = "",
     val userName: String = "",
     val logoImageFilePath: String = "",
-    val backgroundImageFilePath: String? = "",
+    val backgroundImageFilePath: String = "",
     val classTitle: String = "",
     val level: String = "",
     val lectures: List<LectureDetail> = emptyList(),

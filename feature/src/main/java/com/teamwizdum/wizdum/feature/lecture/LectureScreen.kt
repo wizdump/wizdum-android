@@ -57,6 +57,9 @@ import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.badge.TextBadge
 import com.teamwizdum.wizdum.designsystem.component.badge.TextWithIconBadge
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.dialog.ErrorDialog
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black300
@@ -65,7 +68,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Green100
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.common.component.LectureStatusBadge
 import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 import com.teamwizdum.wizdum.feature.common.enums.LectureStatus
@@ -81,17 +84,16 @@ fun LectureRoute(
     onNavigateToChat: (LectureArgument) -> Unit,
     onNavigateToLectureAllClear: (String) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.getLectures(classId)
     }
 
-    val uiState = viewModel.lectureInfo.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
+    when {
+        uiState.isLoading || uiState.lectureInfo != LectureResponse() -> {
             LectureScreen(
-                lectureInfo = uiState.data,
+                uiState = uiState,
                 onNavigateToBack = onNavigateBack,
                 onNavigateToChat = { lectureId, orderSeq, lectureStatus, lectureTitle ->
                     val selectedLectureInfo =
@@ -101,24 +103,27 @@ fun LectureRoute(
                             orderSeq = orderSeq,
                             lectureTitle = lectureTitle,
                             lectureStatus = lectureStatus,
-                            isLastLecture = uiState.data.isLastLecture(orderSeq),
-                            mentorName = uiState.data.mentoName,
-                            mentorImgUrl = uiState.data.logoImageFilePath,
-                            userName = uiState.data.userName,
+                            isLastLecture = uiState.lectureInfo.isLastLecture(orderSeq),
+                            mentorName = uiState.lectureInfo.mentoName,
+                            mentorImgUrl = uiState.lectureInfo.logoImageFilePath,
+                            userName = uiState.lectureInfo.userName,
                         )
                     onNavigateToChat(selectedLectureInfo)
                 },
                 onNavigateToLectureAllClear = onNavigateToLectureAllClear
             )
         }
-
-        is UiState.Failed -> {}
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
 }
 
 @Composable
 fun LectureScreen(
-    lectureInfo: LectureResponse,
+    uiState: LectureUiState,
     onNavigateToBack: () -> Unit,
     onNavigateToChat: (Int, Int, String, String) -> Unit,
     onNavigateToLectureAllClear: (String) -> Unit,
@@ -153,7 +158,7 @@ fun LectureScreen(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(lectureInfo.backgroundImageFilePath)
+                .data(uiState.lectureInfo.backgroundImageFilePath)
                 .crossfade(true)
                 .build(),
             contentDescription = "강의 배경 이미지",
@@ -171,7 +176,7 @@ fun LectureScreen(
             Row {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(lectureInfo.logoImageFilePath)
+                        .data(uiState.lectureInfo.logoImageFilePath)
                         .crossfade(true)
                         .build(),
                     contentDescription = "멘토 프로필 이미지",
@@ -183,17 +188,17 @@ fun LectureScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = lectureInfo.mentoName,
+                        text = uiState.lectureInfo.mentoName,
                         style = WizdumTheme.typography.body1_semib,
                         color = Color.White
                     )
                     Text(
-                        text = "${lectureInfo.userName}님의 멘토",
+                        text = "${uiState.lectureInfo.userName}님의 멘토",
                         style = WizdumTheme.typography.body2,
                         color = Color.White
                     )
                 }
-                if (lectureInfo.hasWiz) {
+                if (uiState.lectureInfo.hasWiz) {
                     TextWithIconBadge(
                         title = "Wiz 획득",
                         resId = R.drawable.ic_checked_whtie,
@@ -204,12 +209,12 @@ fun LectureScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = lectureInfo.classTitle,
+                text = uiState.lectureInfo.classTitle,
                 style = WizdumTheme.typography.h2,
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
-            LevelInfoCard(level = lectureInfo.level)
+            LevelInfoCard(level = uiState.lectureInfo.level)
             Spacer(modifier = Modifier.height(32.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -218,14 +223,14 @@ fun LectureScreen(
                 Text(text = "목표", style = WizdumTheme.typography.body1, color = Color.White)
                 LectureProgressBar(
                     modifier = Modifier.weight(1f),
-                    progress = lectureInfo.getProgress()
+                    progress = uiState.lectureInfo.getProgress()
                 )
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = Green200)) {
-                            append("${lectureInfo.getFinishedLectureCount()}")
+                            append("${uiState.lectureInfo.getFinishedLectureCount()}")
                         }
-                        append(" / ${lectureInfo.lectures.size}")
+                        append(" / ${uiState.lectureInfo.lectures.size}")
                     },
                     style = WizdumTheme.typography.body1,
                     color = Black200
@@ -251,7 +256,7 @@ fun LectureScreen(
                 .padding(top = 32.dp, start = 24.dp, end = 24.dp)
                 .align(Alignment.BottomCenter)
         ) {
-            items(lectureInfo.lectures, key = { it.lectureId }) { lecture ->
+            items(uiState.lectureInfo.lectures, key = { it.lectureId }) { lecture ->
                 LectureItem(
                     lecture = lecture,
                     onNavigateToChat = {
@@ -266,7 +271,7 @@ fun LectureScreen(
             }
         }
 
-        if (lectureInfo.isFinished && !lectureInfo.hasWiz) {
+        if (uiState.lectureInfo.isFinished && !uiState.lectureInfo.hasWiz) {
             WizdumFilledButton(
                 title = "리워드 받기",
                 modifier = Modifier
@@ -274,8 +279,12 @@ fun LectureScreen(
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateToLectureAllClear(lectureInfo.mentoName)
+                onNavigateToLectureAllClear(uiState.lectureInfo.mentoName)
             }
+        }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
         }
     }
 }
@@ -549,38 +558,40 @@ fun ExpandableLectureCardPreview() {
 fun LectureScreenPreview() {
     WizdumTheme {
         LectureScreen(
-            lectureInfo = LectureResponse(
-                mentoName = "스파르타",
-                userName = "유니",
-                classTitle = "작심삼일을 극복하는\n초집중력과 루틴 만들기",
-                level = "HIGH",
-                lectures = listOf(
-                    LectureDetail(
-                        lectureId = 1,
-                        orderSeq = 1,
-                        title = "결심을 넘어 행동으로!",
-                        preview = "즉각적인 실행력과 지속적인 루틴을 구축할거에요.",
-                        lectureStatus = "IN_PROGRESS",
-                        isInProgress = true,
-                        isFinished = false
-                    ),
-                    LectureDetail(
-                        lectureId = 2,
-                        orderSeq = 2,
-                        title = "결심을 넘어 행동으로!",
-                        preview = "즉각적인 실행력과 지속적인 루틴을 구축할거에요.",
-                        lectureStatus = "WAIT",
-                        isInProgress = false,
-                        isFinished = false
-                    ),
-                    LectureDetail(
-                        lectureId = 3,
-                        orderSeq = 3,
-                        title = "결심을 넘어 행동으로!",
-                        preview = "즉각적인 실행력과 지속적인 루틴을 구축할거에요.",
-                        lectureStatus = "WAIT",
-                        isInProgress = false,
-                        isFinished = false
+            uiState = LectureUiState(
+                lectureInfo = LectureResponse(
+                    mentoName = "스파르타",
+                    userName = "유니",
+                    classTitle = "작심삼일을 극복하는\n초집중력과 루틴 만들기",
+                    level = "HIGH",
+                    lectures = listOf(
+                        LectureDetail(
+                            lectureId = 1,
+                            orderSeq = 1,
+                            title = "결심을 넘어 행동으로!",
+                            preview = "즉각적인 실행력과 지속적인 루틴을 구축할거에요.",
+                            lectureStatus = "IN_PROGRESS",
+                            isInProgress = true,
+                            isFinished = false
+                        ),
+                        LectureDetail(
+                            lectureId = 2,
+                            orderSeq = 2,
+                            title = "결심을 넘어 행동으로!",
+                            preview = "즉각적인 실행력과 지속적인 루틴을 구축할거에요.",
+                            lectureStatus = "WAIT",
+                            isInProgress = false,
+                            isFinished = false
+                        ),
+                        LectureDetail(
+                            lectureId = 3,
+                            orderSeq = 3,
+                            title = "결심을 넘어 행동으로!",
+                            preview = "즉각적인 실행력과 지속적인 루틴을 구축할거에요.",
+                            lectureStatus = "WAIT",
+                            isInProgress = false,
+                            isFinished = false
+                        )
                     )
                 )
             ),

@@ -97,6 +97,9 @@ fun LoginRoute(
 
     ErrorDialog(
         dialogState = errorDialogState,
+        onDismissRequest = {
+            errorDialogState = false
+        },
         retry = {
             errorDialogState = false
             retryAction()

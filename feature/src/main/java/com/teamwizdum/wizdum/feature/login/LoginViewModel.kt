@@ -121,7 +121,7 @@ class LoginViewModel @Inject constructor(
                     _eventFlow.emit(
                         LoginUiEvent.ShowErrorDialog(
                             throwable = throwable,
-                            retry = ::checkRegisteredUser
+                            retry = { startLecture(classId) }
                         )
                     )
                 }

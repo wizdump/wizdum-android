@@ -11,6 +11,7 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 @Composable
 fun ErrorDialog(
     dialogState: Boolean,
+    onDismissRequest: () -> Unit,
     retry: () -> Unit,
 ) {
     ChoiceDialog(
@@ -24,7 +25,8 @@ fun ErrorDialog(
         dismissTextColor = Black700,
         confirmButtonColor = Black700,
         dismissButtonColor = Black200,
-        onConfirmRequest = retry
+        onConfirmRequest = retry,
+        onDismissRequest = onDismissRequest
     )
 }
 
@@ -32,6 +34,10 @@ fun ErrorDialog(
 @Composable
 fun ErrorDialogPreview() {
     WizdumTheme {
-        ErrorDialog(dialogState = true) {}
+        ErrorDialog(
+            dialogState = true,
+            onDismissRequest = {},
+            retry = {}
+        )
     }
 }

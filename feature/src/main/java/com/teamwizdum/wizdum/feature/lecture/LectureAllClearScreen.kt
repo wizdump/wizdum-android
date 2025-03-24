@@ -11,6 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.dialog.ErrorDialog
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
@@ -30,19 +38,49 @@ fun LectureAllClearRoute(
     onNavigateBack: () -> Unit,
     onNavigateToReward: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    var errorDialogState by remember { mutableStateOf(false) }
+    var retryAction by remember { mutableStateOf({ }) }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is LectureUiEvent.NavigateToReward -> {
+                    onNavigateToReward()
+                }
+
+                is LectureUiEvent.ShowErrorDialog -> {
+                    errorDialogState = true
+                    retryAction = event.retry
+                }
+            }
+        }
+    }
+
     LectureAllClearScreen(
+        uiState = uiState,
         mentorName = mentorName,
         onNavigateBack = onNavigateBack,
         onNavigateToReward = {
-            viewModel.postReward(classId) {
-                onNavigateToReward()
-            }
+            viewModel.postReward(classId)
+        }
+    )
+
+    ErrorDialog(
+        dialogState = errorDialogState,
+        onDismissRequest = {
+            errorDialogState = false
+        },
+        retry = {
+            errorDialogState = false
+            retryAction()
         }
     )
 }
 
 @Composable
 private fun LectureAllClearScreen(
+    uiState: LectureUiState,
     mentorName: String,
     onNavigateBack: () -> Unit,
     onNavigateToReward: () -> Unit,
@@ -88,6 +126,10 @@ private fun LectureAllClearScreen(
                 }
             )
         }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
+        }
     }
 }
 
@@ -96,6 +138,7 @@ private fun LectureAllClearScreen(
 fun LectureAllClearScreenPreview() {
     WizdumTheme {
         LectureAllClearScreen(
+            uiState = LectureUiState(),
             mentorName = "스파르타",
             onNavigateBack = {},
             onNavigateToReward = {}
