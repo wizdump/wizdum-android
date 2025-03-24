@@ -3,10 +3,12 @@ package com.teamwizdum.wizdum.feature.reward
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,14 +39,21 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.RewardResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black300
 import com.teamwizdum.wizdum.designsystem.theme.Black400
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.common.extensions.formatBasicDateTime
+import com.teamwizdum.wizdum.feature.onboarding.OnboardingUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @Composable
 fun RewardRoute(
@@ -51,29 +61,32 @@ fun RewardRoute(
     classId: Int,
     onNavigateToHome: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.getReward(classId)
     }
 
-    val uiState = viewModel.rewardInfo.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
+    when {
+        uiState.isLoading || uiState.reward != RewardResponse() -> {
             RewardScreen(
-                rewardInfo = uiState.data,
+                uiState = uiState,
                 onNavigateToHome = onNavigateToHome
             )
         }
-        is UiState.Failed -> {}
+
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
 }
 
 @Composable
 private fun RewardScreen(
-    rewardInfo: RewardResponse,
-    onNavigateToHome: () -> Unit
+    uiState: RewardUiState,
+    onNavigateToHome: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -85,20 +98,22 @@ private fun RewardScreen(
         })
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 176.dp, start = 32.dp, end = 32.dp, bottom = 80.dp),
+                .fillMaxWidth()
+                .fillMaxHeight(0.84f)
+                .padding(start = 32.dp, end = 32.dp),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = buildAnnotatedString {
-                    append("${rewardInfo.mentoName} 멘토님이 ")
+                    append("${uiState.reward.mentoName} 멘토님이 ")
                     withStyle(
                         style = SpanStyle(
                             color = WizdumTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
                         )
                     ) {
-                        append(rewardInfo.userName)
+                        append(uiState.reward.userName)
                     }
                     append("님에게")
                 },
@@ -107,30 +122,38 @@ private fun RewardScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = "리워드를 수여하셨습니다!", style = WizdumTheme.typography.h2)
             Spacer(modifier = Modifier.height(16.dp))
-            RewardCard(rewardInfo)
-            Spacer(modifier = Modifier.height(48.dp))
-            Spacer(modifier = Modifier.weight(1f))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .width(50.dp)
-                        .height(50.dp)
-                        .background(color = Black200, shape = RoundedCornerShape(10.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_btn_save),
-                        contentDescription = "공유하기"
-                    )
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                WizdumFilledButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = "나의 승리 공유하기",
-                ) {
-                    // TODO : 공유로 넘어가면 창 종료, 복귀 시 메인 화면으로 이동
-                }
+            RewardCard(uiState.reward)
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
+                .align(Alignment.BottomCenter),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp)
+                    .background(color = Black200, shape = RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_btn_save),
+                    contentDescription = "공유하기"
+                )
             }
+            Spacer(modifier = Modifier.width(16.dp))
+            WizdumFilledButton(
+                modifier = Modifier.fillMaxWidth(),
+                title = "나의 승리 공유하기",
+            ) {
+                // TODO : 공유로 넘어가면 창 종료, 복귀 시 메인 화면으로 이동
+            }
+        }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
         }
     }
 }
@@ -218,7 +241,7 @@ private fun RewardCard(rewardInfo: RewardResponse) {
 fun RewardScreenPreview() {
     WizdumTheme {
         RewardScreen(
-            rewardInfo = RewardResponse(),
+            uiState = RewardUiState(),
             onNavigateToHome = {}
         )
     }
