@@ -1,6 +1,5 @@
 package com.teamwizdum.wizdum.feature.reward
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,12 +47,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black400
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.ErrorState
-import com.teamwizdum.wizdum.feature.common.base.UiState
 import com.teamwizdum.wizdum.feature.common.extensions.formatBasicDateTime
-import com.teamwizdum.wizdum.feature.onboarding.OnboardingUiState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 @Composable
 fun RewardRoute(
@@ -68,7 +62,7 @@ fun RewardRoute(
     }
 
     when {
-        uiState.isLoading || uiState.reward != RewardResponse() -> {
+        uiState.isLoading || uiState.rewardInfo != RewardResponse() -> {
             RewardScreen(
                 uiState = uiState,
                 onNavigateToHome = onNavigateToHome
@@ -106,14 +100,14 @@ private fun RewardScreen(
         ) {
             Text(
                 text = buildAnnotatedString {
-                    append("${uiState.reward.mentoName} 멘토님이 ")
+                    append("${uiState.rewardInfo.mentoName} 멘토님이 ")
                     withStyle(
                         style = SpanStyle(
                             color = WizdumTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
                         )
                     ) {
-                        append(uiState.reward.userName)
+                        append(uiState.rewardInfo.userName)
                     }
                     append("님에게")
                 },
@@ -122,7 +116,7 @@ private fun RewardScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = "리워드를 수여하셨습니다!", style = WizdumTheme.typography.h2)
             Spacer(modifier = Modifier.height(16.dp))
-            RewardCard(uiState.reward)
+            RewardCard(uiState.rewardInfo)
         }
         Row(
             modifier = Modifier

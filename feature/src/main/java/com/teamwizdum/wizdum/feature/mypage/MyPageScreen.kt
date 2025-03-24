@@ -38,10 +38,15 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.UserResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.TitleAppbar
 import com.teamwizdum.wizdum.designsystem.component.dialog.ChoiceDialog
+import com.teamwizdum.wizdum.designsystem.component.dialog.ErrorDialog
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.Black100
+import com.teamwizdum.wizdum.designsystem.theme.Error
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel.Companion.PRIVACY_POLICY
 import com.teamwizdum.wizdum.feature.mypage.MyPageViewModel.Companion.TERMS_OF_SERVICE
 
@@ -52,21 +57,59 @@ fun MyPageRoute(
     restartMainActivity: () -> Unit,
     onNavigateToTerm: (String, String) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    var errorDialogState by remember { mutableStateOf(false) }
+    var retryAction by remember { mutableStateOf({ }) }
+    var logoutDialogState by remember { mutableStateOf(false) }
+    var withdrawDialogState by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is MyPageViewModel.MyPageUiEvent.NavigateToMainActivity -> {
+                    restartMainActivity()
+                }
+
+                is MyPageViewModel.MyPageUiEvent.ShowErrorDialog -> {
+                    errorDialogState = true
+                    retryAction = event.retry
+                }
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getUserInfo()
     }
 
-    val userInfo = viewModel.userInfo.collectAsState().value
-    var logoutDialogState by remember { mutableStateOf(false) }
-    var withdrawDialogState by remember { mutableStateOf(false) }
+    when {
+        uiState.isLoading || uiState.userInfo != UserResponse() -> {
+            MyPageScreen(
+                padding = padding,
+                uiState = uiState,
+                onLogout = { logoutDialogState = true },
+                onWithdraw = { withdrawDialogState = true },
+                onNavigateToTerm = onNavigateToTerm
+            )
+        }
 
-    MyPageScreen(
-        padding = padding,
-        userInfo = userInfo,
-        onLogout = { logoutDialogState = true },
-        onWithdraw = { withdrawDialogState = true },
-        onNavigateToTerm = onNavigateToTerm
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                modifier = Modifier.padding(padding),
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
+    }
+
+    ErrorDialog(
+        dialogState = errorDialogState,
+        onDismissRequest = {
+            errorDialogState = false
+        },
+        retry = {
+            errorDialogState = false
+            retryAction()
+        }
     )
 
     ChoiceDialog(
@@ -74,10 +117,9 @@ fun MyPageRoute(
         title = "로그아웃 하시겠어요?",
         confirmTitle = "로그아웃",
         dismissTitle = "취소",
+        confirmButtonColor = Error,
         onConfirmRequest = {
-            viewModel.logout {
-                restartMainActivity()
-            }
+            viewModel.logout()
         },
         onDismissRequest = {
             logoutDialogState = false
@@ -90,10 +132,9 @@ fun MyPageRoute(
         subTitle = "계정 정보와 학습 기록이 영구 삭제됩니다.",
         confirmTitle = "탈퇴",
         dismissTitle = "취소",
+        confirmButtonColor = Error,
         onConfirmRequest = {
-            viewModel.withdraw {
-                restartMainActivity()
-            }
+            viewModel.withdraw()
         },
         onDismissRequest = {
             withdrawDialogState = false
@@ -104,7 +145,7 @@ fun MyPageRoute(
 @Composable
 private fun MyPageScreen(
     padding: PaddingValues,
-    userInfo: UserResponse,
+    uiState: MyPageViewModel.MyPageUiState,
     onLogout: () -> Unit,
     onWithdraw: () -> Unit,
     onNavigateToTerm: (String, String) -> Unit,
@@ -112,6 +153,7 @@ private fun MyPageScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .padding(padding)
             .background(color = Color.White)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -122,7 +164,7 @@ private fun MyPageScreen(
                 Row {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(userInfo.profileImageUrl)
+                            .data(uiState.userInfo.profileImageUrl)
                             .crossfade(true)
                             .build(),
                         contentDescription = "유저 프로필 사진",
@@ -133,9 +175,12 @@ private fun MyPageScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
-                        Text(text = userInfo.name, style = WizdumTheme.typography.body1_semib)
+                        Text(
+                            text = uiState.userInfo.name,
+                            style = WizdumTheme.typography.body1_semib
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(text = userInfo.email, style = WizdumTheme.typography.body3)
+                        Text(text = uiState.userInfo.email, style = WizdumTheme.typography.body3)
                     }
                 }
             }
@@ -166,6 +211,9 @@ private fun MyPageScreen(
                     onClick = { onWithdraw() }
                 )
             }
+        }
+        if (uiState.isLoading) {
+            LoadingScreen()
         }
     }
 }
@@ -207,12 +255,14 @@ fun MyPageScreenPreview() {
     WizdumTheme {
         MyPageScreen(
             padding = PaddingValues(),
-            userInfo = UserResponse(
-                userId = 1,
-                snsId = 1,
-                email = "aaa@naver.com",
-                name = "유니",
-                password = ""
+            uiState = MyPageViewModel.MyPageUiState(
+                userInfo = UserResponse(
+                    userId = 1,
+                    snsId = 1,
+                    email = "aaa@naver.com",
+                    name = "유니",
+                    password = ""
+                )
             ),
             onLogout = {},
             onWithdraw = {},

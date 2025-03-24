@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.response.RewardResponse
 import com.teamwizdum.wizdum.data.repository.RewardRepository
 import com.teamwizdum.wizdum.feature.common.base.ErrorState
-import com.teamwizdum.wizdum.feature.common.base.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,14 +19,14 @@ class RewardViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RewardUiState())
-    val uiState: StateFlow<RewardUiState> = _uiState
+    val uiState: StateFlow<RewardUiState> = _uiState.asStateFlow()
 
     fun getReward(lectureId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             rewardRepository.getReward(lectureId)
                 .onSuccess { data ->
-                    _uiState.update { it.copy(reward = data) }
+                    _uiState.update { it.copy(rewardInfo = data) }
                 }.onFailure { throwable ->
                     _uiState.update {
                         it.copy(
@@ -44,6 +44,6 @@ class RewardViewModel @Inject constructor(
 
 data class RewardUiState(
     val isLoading: Boolean = false,
-    val reward: RewardResponse = RewardResponse(),
+    val rewardInfo: RewardResponse = RewardResponse(),
     val handleException: ErrorState = ErrorState.None,
 )

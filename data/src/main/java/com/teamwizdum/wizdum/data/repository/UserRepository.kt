@@ -5,8 +5,6 @@ import com.teamwizdum.wizdum.data.api.UserApi
 import com.teamwizdum.wizdum.data.model.request.TokenRequest
 import com.teamwizdum.wizdum.data.model.response.TokenResponse
 import com.teamwizdum.wizdum.data.model.response.UserResponse
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -23,15 +21,15 @@ class UserRepository @Inject constructor(
         return runCatching { authApi.login() }
     }
 
-    suspend fun logout(): Flow<Response<Unit>> = flow {
-        emit(authApi.logout())
+    suspend fun logout(): Result<Response<Unit>> {
+        return runCatching { authApi.logout() }
     }
 
-    suspend fun getUserInfo(): Flow<UserResponse> = flow {
-        emit(userApi.getUserInfo())
+    suspend fun getUserInfo(): Result<UserResponse> {
+        return runCatching { userApi.getUserInfo() }
     }
 
-    suspend fun withdraw(): Flow<Response<Unit>> = flow {
-        emit(userApi.withdraw())
+    suspend fun withdraw(): Result<Response<Unit>> {
+        return runCatching { userApi.withdraw() }
     }
 }

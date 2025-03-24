@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class HomeResponse(
-    val username: String,
-    val myWizCount: Int,
-    val friendWithLectureCount: Int,
+    val username: String = "",
+    val myWizCount: Int = 0,
+    val friendWithLectureCount: Int = 0,
     val beforeAndInProgressLectures: List<BeforeAndInProgressLecture> = emptyList(),
     val finishLectures: List<FinishLecture> = emptyList()
 )

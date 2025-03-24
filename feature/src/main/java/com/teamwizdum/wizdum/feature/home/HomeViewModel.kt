@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.teamwizdum.wizdum.data.model.response.HomeResponse
 import com.teamwizdum.wizdum.data.repository.HomeRepository
-import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,17 +18,33 @@ class HomeViewModel @Inject constructor(
     private val repository: HomeRepository,
 ) : ViewModel() {
 
-    private val _homeData = MutableStateFlow<UiState<HomeResponse>>(UiState.Loading)
-    val homeData: StateFlow<UiState<HomeResponse>> = _homeData
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     fun getHomeData() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
             repository.getHomeData()
                 .onSuccess { data ->
-                    _homeData.value = UiState.Success(data)
-                }.onFailure { error ->
-                    _homeData.value = UiState.Failed(error.message)
+                    _uiState.update { it.copy(homeInfo = data) }
+                }.onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            handleException = ErrorState.DisplayError(
+                                throwable = throwable,
+                                retry = ::getHomeData
+                            )
+                        )
+                    }
                 }
+            _uiState.update { it.copy(isLoading = false) }
         }
     }
 }
+
+data class HomeUiState(
+    val isLoading: Boolean = false,
+    val homeInfo: HomeResponse = HomeResponse(),
+    val handleException: ErrorState = ErrorState.None,
+)

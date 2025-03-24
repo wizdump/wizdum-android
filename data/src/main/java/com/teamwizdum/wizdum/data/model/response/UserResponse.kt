@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserResponse(
-    val userId: Int = 1,
+    val userId: Int = 0,
     val snsId: Long = 0L,
     val profileImageUrl: String = "",
     val email: String = "",

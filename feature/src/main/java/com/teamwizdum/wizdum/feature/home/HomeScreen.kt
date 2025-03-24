@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +43,8 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.BeforeAndInProgressLecture
 import com.teamwizdum.wizdum.data.model.response.FinishLecture
 import com.teamwizdum.wizdum.data.model.response.HomeResponse
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.extension.noRippleClickable
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black500
@@ -50,9 +53,9 @@ import com.teamwizdum.wizdum.designsystem.theme.Black700
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
-import com.teamwizdum.wizdum.feature.common.component.LevelStarRating
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.common.component.LectureStatusBadge
+import com.teamwizdum.wizdum.feature.common.component.LevelStarRating
 import com.teamwizdum.wizdum.feature.common.extensions.formatBasicDateTime
 
 @Composable
@@ -62,31 +65,34 @@ fun HomeRoute(
     onNavigateToInterest: () -> Unit,
     onNavigateToLecture: (Int) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.getHomeData()
     }
 
-    val uiState = viewModel.homeData.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
+    when {
+        uiState.isLoading || uiState.homeInfo != HomeResponse() -> {
             HomeScreen(
                 padding = padding,
-                homeInfo = uiState.data,
+                uiState = uiState,
                 onNavigateToInterest = onNavigateToInterest,
                 onNavigateToLecture = onNavigateToLecture
             )
         }
-
-        is UiState.Failed -> {}
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                modifier = Modifier.padding(padding),
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
 }
 
 @Composable
 fun HomeScreen(
     padding: PaddingValues,
-    homeInfo: HomeResponse,
+    uiState: HomeUiState,
     onNavigateToInterest: () -> Unit,
     onNavigateToLecture: (Int) -> Unit,
 ) {
@@ -110,9 +116,9 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(48.dp))
                 Text(
                     text = buildAnnotatedString {
-                        append("${homeInfo.username}님은 지금까지\n총 ")
+                        append("${uiState.homeInfo.username}님은 지금까지\n총 ")
                         withStyle(style = SpanStyle(color = WizdumTheme.colorScheme.primary)) {
-                            append("${homeInfo.myWizCount}")
+                            append("${uiState.homeInfo.myWizCount}")
                         }
                         append("개의 Wiz를\n습득하셨어요")
                     },
@@ -128,7 +134,7 @@ fun HomeScreen(
                                 color = Black700
                             )
                         ) {
-                            append("${homeInfo.friendWithLectureCount}명")
+                            append("${uiState.homeInfo.friendWithLectureCount}명")
                         }
                         append(" 의 친구들이 같이 수강중이에요")
                     },
@@ -150,12 +156,12 @@ fun HomeScreen(
                         Text(text = "지금 듣고 있는 클래스", style = WizdumTheme.typography.body1_semib)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "${homeInfo.beforeAndInProgressLectures.size}",
+                            text = "${uiState.homeInfo.beforeAndInProgressLectures.size}",
                             style = WizdumTheme.typography.body1_semib
                         )
                     }
 
-                    if (homeInfo.beforeAndInProgressLectures.isEmpty()) {
+                    if (uiState.homeInfo.beforeAndInProgressLectures.isEmpty()) {
                         TodayWizCard(
                             onNavigateToInterest = onNavigateToInterest
                         )
@@ -164,7 +170,7 @@ fun HomeScreen(
                             modifier = Modifier.padding(top = 16.dp, start = 32.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            items(homeInfo.beforeAndInProgressLectures) { lecture ->
+                            items(uiState.homeInfo.beforeAndInProgressLectures) { lecture ->
                                 InProgressWizCard(
                                     inProgressLecture = lecture,
                                     onNavigateToLecture = { onNavigateToLecture(lecture.classId) }
@@ -181,14 +187,14 @@ fun HomeScreen(
                         Text(text = "습득한 Wiz", style = WizdumTheme.typography.body1_semib)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "${homeInfo.finishLectures.size}",
+                            text = "${uiState.homeInfo.finishLectures.size}",
                             style = WizdumTheme.typography.body1_semib,
                             //color =
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    if (homeInfo.finishLectures.isEmpty()) {
+                    if (uiState.homeInfo.finishLectures.isEmpty()) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -207,7 +213,7 @@ fun HomeScreen(
                             )
                         }
                     } else {
-                        homeInfo.finishLectures.forEach { lecture ->
+                        uiState.homeInfo.finishLectures.forEach { lecture ->
                             CollectionWizCard(
                                 finishedLecture = lecture,
                                 onNavigateToLecture = { onNavigateToLecture(lecture.classId) }
@@ -217,6 +223,10 @@ fun HomeScreen(
                     }
                 }
             }
+        }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
         }
     }
 }
@@ -473,7 +483,7 @@ fun HomeScreenPreview() {
     WizdumTheme {
         HomeScreen(
             padding = PaddingValues(),
-            homeInfo = homeResponse,
+            uiState = HomeUiState(homeInfo = homeResponse),
             onNavigateToInterest = {},
             onNavigateToLecture = {}
         )
