@@ -21,7 +21,7 @@ object KaKaoLoginManager {
                 onSuccess = onSuccess,
                 onFailed = { error ->
                     // 의도적인 로그인 취소가 아닌 경우 카카오 계정으로 로그인 시도
-                    if (error is AuthError || (error is ClientError && error.reason == ClientErrorCause.Cancelled)) {
+                    if (error is AuthError || (error is ClientError && error.reason != ClientErrorCause.Cancelled)) {
                         loginWithKakaoAccount(
                             context = context,
                             onSuccess = onSuccess,

@@ -1,6 +1,7 @@
 package com.teamwizdum.wizdum.feature.login
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -25,13 +30,18 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.kakao.sdk.common.model.AuthError
+import com.kakao.sdk.common.model.AuthErrorCause
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.dialog.ErrorDialog
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
 
 @Composable
 fun LoginRoute(
@@ -41,39 +51,65 @@ fun LoginRoute(
     onNavigateToLecture: () -> Unit,
     onNavigateToHome: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
+    var errorDialogState by remember { mutableStateOf(false) }
+    var retryAction by remember { mutableStateOf({ }) }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is LoginUiEvent.NavigateToLecture -> {
+                    onNavigateToLecture()
+                }
+
+                is LoginUiEvent.NavigateToHome -> {
+                    onNavigateToHome()
+                }
+
+                is LoginUiEvent.ShowErrorDialog -> {
+                    errorDialogState = true
+                    retryAction = event.retry
+                }
+
+                is LoginUiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     LaunchedEffect(classId) {
         viewModel.classId = classId
     }
 
-    val uiState = viewModel.loginState.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {
-            LoginScreen(
-                onNavigateBack = onNavigateBack,
-                onLogin = { accessToken, nickName ->
-                    viewModel.nickName = nickName
-                    viewModel.login(
-                        accessToken = accessToken,
-                        moveToLecture = { onNavigateToLecture() },
-                        moveToHome = { onNavigateToHome() }
-                    )
-                }
-            )
+    LoginScreen(
+        uiState = uiState,
+        onNavigateBack = onNavigateBack,
+        onLogin = { accessToken, nickName ->
+            viewModel.nickName = nickName
+            viewModel.login(accessToken)
+        },
+        onKakaoFailed = { message ->
+            viewModel.showToast(message)
         }
+    )
 
-        is UiState.Success -> {
-            LoginSuccessScreen(name = viewModel.nickName)
+    ErrorDialog(
+        dialogState = errorDialogState,
+        retry = {
+            errorDialogState = false
+            retryAction()
         }
-
-        is UiState.Failed -> {}
-    }
+    )
 }
 
 @Composable
 private fun LoginScreen(
+    uiState: LoginUiState,
     onNavigateBack: () -> Unit,
     onLogin: (String, String) -> Unit,
+    onKakaoFailed: (String) -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -111,14 +147,24 @@ private fun LoginScreen(
                 context = context,
                 onKakaoSuccess = { accessToken, nickName ->
                     onLogin(accessToken, nickName)
+                },
+                onKakaoFailed = { message ->
+                    onKakaoFailed(message)
                 }
             )
+        }
+        if (uiState.isLoading) {
+            LoadingScreen()
         }
     }
 }
 
 @Composable
-fun KakaoLoginButton(context: Context, onKakaoSuccess: (String, String) -> Unit) {
+fun KakaoLoginButton(
+    context: Context,
+    onKakaoSuccess: (String, String) -> Unit,
+    onKakaoFailed: (String) -> Unit,
+) {
     WizdumFilledButton(
         title = "카카오로 로그인",
         backgroundColor = Color(0xFFFFDC00),
@@ -131,7 +177,25 @@ fun KakaoLoginButton(context: Context, onKakaoSuccess: (String, String) -> Unit)
                     onKakaoSuccess(accessToken, nickName)
                 },
                 onFailed = {
+                    val message = when (it) {
+                        is ClientError -> {
+                            when (it.reason) {
+                                ClientErrorCause.NotSupported -> "카카오톡 또는 브러우저를 설치해주세요"
+                                ClientErrorCause.Cancelled -> "로그인을 취소했습니다"
+                                else -> "알 수 없는 에러가 발생했어요"
+                            }
+                        }
 
+                        is AuthError -> {
+                            when (it.reason) {
+                                AuthErrorCause.ServerError -> "카카오톡 서버에서 에러가 발생했어요"
+                                else -> "알 수 없는 에러가 발생했어요"
+                            }
+                        }
+
+                        else -> "알 수 없는 에러가 발생했어요"
+                    }
+                    onKakaoFailed(message)
                 }
             )
         }
@@ -143,8 +207,10 @@ fun KakaoLoginButton(context: Context, onKakaoSuccess: (String, String) -> Unit)
 fun LoginScreenPreview() {
     WizdumTheme {
         LoginScreen(
+            uiState = LoginUiState(),
             onNavigateBack = {},
             onLogin = { _, _ -> },
+            onKakaoFailed = { _ -> }
         )
     }
 }
