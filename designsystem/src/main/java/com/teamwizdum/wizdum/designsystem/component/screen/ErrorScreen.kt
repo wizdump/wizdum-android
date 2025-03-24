@@ -64,9 +64,9 @@ fun ErrorScreen(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun ErrorScreen() {
+fun ErrorScreenPreview() {
     WizdumTheme {
         ErrorScreen {}
     }

@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,11 +43,13 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.KeywordResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 
 @Composable
 fun KeywordSelectionRoute(
@@ -55,28 +57,32 @@ fun KeywordSelectionRoute(
     onNavigateBack: () -> Unit,
     onNavigateToMentor: (Int) -> Unit,
 ) {
-    LaunchedEffect(key1 = Unit) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
         viewModel.getKeyword()
     }
 
-    val uiState = viewModel.keywords.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
+    when {
+        uiState.isLoading || uiState.keywords.isNotEmpty() -> {
             KeywordSelectionScreen(
-                keywords = uiState.data,
+                uiState = uiState,
                 onNavigateBack = onNavigateBack,
                 onNavigateToMentor = { onNavigateToMentor(it) }
             )
         }
-        is UiState.Failed -> {}
+
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
 }
 
 @Composable
 private fun KeywordSelectionScreen(
-    keywords: List<KeywordResponse>,
+    uiState: OnboardingUiState,
     onNavigateBack: () -> Unit,
     onNavigateToMentor: (Int) -> Unit,
 ) {
@@ -104,11 +110,11 @@ private fun KeywordSelectionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(keywords.size, key = { it }) { index ->
+                    items(uiState.keywords.size, key = { it }) { index ->
                         KeywordCard(
-                            title = keywords[index].value,
-                            description = keywords[index].description,
-                            imageUrl = keywords[index].fileUrl,
+                            title = uiState.keywords[index].value,
+                            description = uiState.keywords[index].description,
+                            imageUrl = uiState.keywords[index].fileUrl,
                             isSelected = selectedIndex.value == index,
                             onClick = {
                                 selectedIndex.value =
@@ -145,8 +151,12 @@ private fun KeywordSelectionScreen(
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateToMentor(keywords[selectedIndex.value].keywordId)
+                onNavigateToMentor(uiState.keywords[selectedIndex.value].keywordId)
             }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
+        }
     }
 }
 
@@ -253,7 +263,7 @@ fun KeywordSelectionScreenPreview() {
             ),
         )
         KeywordSelectionScreen(
-            keywords = keywordList,
+            uiState = OnboardingUiState(keywords = keywordList),
             onNavigateBack = {},
             onNavigateToMentor = {}
         )

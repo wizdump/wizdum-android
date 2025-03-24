@@ -14,11 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,11 +35,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.teamwizdum.wizdum.data.model.response.LevelResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 
 @Composable
@@ -48,29 +50,32 @@ fun LevelSelectionRoute(
     onNavigateBack: () -> Unit,
     onNavigateToKeyword: (Int) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.getLevel()
     }
 
-    val uiState = viewModel.levels.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
+    when {
+        uiState.isLoading || uiState.levels.isNotEmpty() -> {
             LevelSelectionScreen(
-                levels = uiState.data,
+                uiState = uiState,
                 onNavigateBack = onNavigateBack,
                 onNavigateToKeyword = onNavigateToKeyword
             )
         }
 
-        is UiState.Failed -> {}
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
 }
 
 @Composable
 private fun LevelSelectionScreen(
-    levels: List<LevelResponse>,
+    uiState: OnboardingUiState,
     onNavigateBack: () -> Unit,
     onNavigateToKeyword: (Int) -> Unit,
 ) {
@@ -102,7 +107,7 @@ private fun LevelSelectionScreen(
 
                 Spacer(modifier = Modifier.height(34.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    levels.forEachIndexed { index, quest ->
+                    uiState.levels.forEachIndexed { index, quest ->
                         LevelCard(
                             content = quest.description,
                             level = quest.level,
@@ -116,7 +121,7 @@ private fun LevelSelectionScreen(
                 }
             }
         }
-        if (selectedIndex.value != -1)
+        if (selectedIndex.value != -1) {
             WizdumFilledButton(
                 title = "다음",
                 modifier = Modifier
@@ -124,8 +129,13 @@ private fun LevelSelectionScreen(
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateToKeyword(levels[selectedIndex.value].levelId)
+                onNavigateToKeyword(uiState.levels[selectedIndex.value].levelId)
             }
+        }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
+        }
     }
 }
 
@@ -136,7 +146,6 @@ private fun LevelCard(
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -205,7 +214,7 @@ fun LevelSelectionScreenPreview() {
                 LevelResponse(description = "누가 나를 채찍질해줬으면 좋겠어요.", level = "LOW")
             )
         LevelSelectionScreen(
-            levels = questionList,
+            uiState = OnboardingUiState(levels = questionList),
             onNavigateBack = {},
             onNavigateToKeyword = {}
         )

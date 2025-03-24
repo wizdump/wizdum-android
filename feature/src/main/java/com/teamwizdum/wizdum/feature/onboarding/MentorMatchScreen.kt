@@ -47,13 +47,15 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.MentorsResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
@@ -67,12 +69,7 @@ fun MentorMatchRoute(
     onNavigateBack: () -> Unit,
     onNavigateToMentorDetail: (Int) -> Unit,
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.getMentors(interestId, levelId, categoryId)
-    }
-
-    val uiState = viewModel.mentors.collectAsState().value
-
+    val uiState by viewModel.uiState.collectAsState()
     var isDelayedLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
@@ -80,27 +77,38 @@ fun MentorMatchRoute(
         isDelayedLoading = false
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.getMentors(interestId, levelId, categoryId)
+    }
+
     when {
         isDelayedLoading -> {
             MatchingInProgressScreen()
         }
-        uiState is UiState.Loading -> {
+
+        uiState.isLoading -> {
             MatchingInProgressScreen()
         }
-        uiState is UiState.Success -> {
+
+        uiState.mentors.isNotEmpty() -> {
             MentorMatchScreen(
-                mentors = uiState.data,
+                uiState = uiState,
                 onNavigateBack = onNavigateBack,
                 onNavigateToDetail = onNavigateToMentorDetail
             )
         }
-        uiState is UiState.Failed -> {}
+
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
 }
 
 @Composable
 private fun MentorMatchScreen(
-    mentors: List<MentorsResponse>,
+    uiState: OnboardingUiState,
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (Int) -> Unit,
 ) {
@@ -132,7 +140,7 @@ private fun MentorMatchScreen(
              */
             LazyColumn {
                 item {
-                    mentors.forEach { mentor ->
+                    uiState.mentors.forEach { mentor ->
                         RenewalMentorCard(mentorInfo = mentor)
                     }
                     Spacer(modifier = Modifier.height(200.dp))
@@ -148,7 +156,7 @@ private fun MentorMatchScreen(
                 .align(Alignment.BottomCenter),
             title = "강의 미리보기"
         ) {
-            mentors.forEach { mentors ->
+            uiState.mentors.forEach { mentors ->
                 onNavigateToDetail(mentors.classId)
             }
         }
@@ -210,7 +218,7 @@ fun RenewalMentorCard(mentorInfo: MentorsResponse) {
                     modifier = Modifier
                         .size(197.dp)
                         .clip(HexagonShape)
-                        .background(color = Black600)
+                        .background(color = Black100)
                 )
             }
 
@@ -410,7 +418,7 @@ fun MentorMatchScreenPreview() {
     )
     WizdumTheme {
         MentorMatchScreen(
-            mentors = mentorList,
+            uiState = OnboardingUiState(mentors = mentorList),
             onNavigateBack = {},
             onNavigateToDetail = {}
         )

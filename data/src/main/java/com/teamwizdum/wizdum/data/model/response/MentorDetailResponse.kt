@@ -5,13 +5,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MentorDetailResponse(
     val mentoId: Int = 0,
-    val mentoName: String,
-    val classTitle: String,
-    val backgroundImageFilePath: String? = "",
+    val mentoName: String = "",
+    val classTitle: String = "",
+    val backgroundImageFilePath: String = "",
     val mentoringStyle: String = "",
-    val itemLevel: String,
+    val itemLevel: String = "",
     val wiseSaying: String= "",
-    val friendWithLectureCount: Int,
+    val friendWithLectureCount: Int = 0,
     val benefits: List<String> = emptyList(),
     val lectures: List<Lecture> = emptyList()
 )

@@ -52,6 +52,9 @@ import com.teamwizdum.wizdum.data.model.response.Lecture
 import com.teamwizdum.wizdum.data.model.response.MentorDetailResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.CloseAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.dialog.ErrorDialog
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.Black100
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
@@ -59,7 +62,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.Green50
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.common.component.LevelInfoCard
 
 // TODO: Status Bar 영역 체크
@@ -72,40 +75,67 @@ fun MentorDetailRoute(
     onNavigateToLogin: () -> Unit,
     onNavigateToLecture: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val hasSeenOnboarding = viewModel.hasSeenOnboarding.collectAsState().value
+    var errorDialogState by remember { mutableStateOf(false) }
+    var retryAction by remember { mutableStateOf({ }) }
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is OnboardingUiEvent.NavigateToLecture -> {
+                    onNavigateToLecture()
+                }
+
+                is OnboardingUiEvent.ShowErrorDialog -> {
+                    errorDialogState = true
+                    retryAction = event.retry
+                }
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.getMentorDetail(classId)
         viewModel.hasSeenOnboarding()
     }
 
-    val uiState = viewModel.mentorInfo.collectAsState().value
-    val hasSeenOnboarding = viewModel.hasSeenOnboarding.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
+    when {
+        uiState.isLoading || uiState.mentorDetail != MentorDetailResponse() -> {
             MentorDetailScreen(
-                mentorInfo = uiState.data,
+                uiState = uiState,
                 checkOnboarding = hasSeenOnboarding,
                 onNavigateBack = onNavigateBack,
                 onNavigateToLogin = onNavigateToLogin,
-                onNavigateToLecture = {
-                    viewModel.startLecture(classId) {
-                        onNavigateToLecture()
-                    }
+                startLecture = {
+                    viewModel.startLecture(classId)
                 }
             )
         }
-        is UiState.Failed -> {}
+
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
+
+    ErrorDialog(
+        dialogState = errorDialogState,
+        retry = {
+            errorDialogState = false
+            retryAction()
+        }
+    )
 }
 
 @Composable
 private fun MentorDetailScreen(
-    mentorInfo: MentorDetailResponse,
+    uiState: OnboardingUiState,
     checkOnboarding: Boolean,
     onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit,
-    onNavigateToLecture: () -> Unit,
+    startLecture: () -> Unit,
 ) {
     var columnHeightFraction by remember { mutableStateOf(0.76f) }
     val animatedHeight by animateFloatAsState(targetValue = columnHeightFraction, label = "")
@@ -130,7 +160,7 @@ private fun MentorDetailScreen(
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(mentorInfo.backgroundImageFilePath)
+                .data(uiState.mentorDetail.backgroundImageFilePath)
                 .crossfade(true)
                 .build(),
             contentDescription = "멘토 배경 이미지",
@@ -163,7 +193,7 @@ private fun MentorDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = mentorInfo.mentoName,
+                            text = uiState.mentorDetail.mentoName,
                             style = WizdumTheme.typography.body1_semib
                         )
                         Text(
@@ -176,7 +206,7 @@ private fun MentorDetailScreen(
                             text = buildAnnotatedString {
                                 append("총 ")
                                 withStyle(style = SpanStyle(color = Green200)) {
-                                    append("${mentorInfo.friendWithLectureCount}명")
+                                    append("${uiState.mentorDetail.friendWithLectureCount}명")
                                 }
                                 append(" 함께 수강 중")
                             },
@@ -185,11 +215,11 @@ private fun MentorDetailScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = mentorInfo.classTitle, style = WizdumTheme.typography.h2)
+                    Text(text = uiState.mentorDetail.classTitle, style = WizdumTheme.typography.h2)
 
                     Spacer(modifier = Modifier.height(8.dp))
                     LevelInfoCard(
-                        level = mentorInfo.itemLevel,
+                        level = uiState.mentorDetail.itemLevel,
                         levelColor = Black600,
                         subTitleColor = Black600
                     )
@@ -215,7 +245,7 @@ private fun MentorDetailScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "\"${mentorInfo.wiseSaying}\"",
+                            text = "\"${uiState.mentorDetail.wiseSaying}\"",
                             style = WizdumTheme.typography.body2,
                             color = Green200,
                             textAlign = TextAlign.Center,
@@ -226,7 +256,7 @@ private fun MentorDetailScreen(
                     Text(text = "멘토링 스타일", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = mentorInfo.mentoringStyle,
+                        text = uiState.mentorDetail.mentoringStyle,
                         style = WizdumTheme.typography.body1,
                         color = Black600
                     )
@@ -235,7 +265,7 @@ private fun MentorDetailScreen(
                     Text(text = "배울점", style = WizdumTheme.typography.body1_semib)
                     Spacer(modifier = Modifier.height(8.dp))
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        mentorInfo.benefits.forEach { benefit ->
+                        uiState.mentorDetail.benefits.forEach { benefit ->
                             Row(verticalAlignment = Alignment.Top) {
                                 Box(
                                     modifier = Modifier
@@ -257,8 +287,8 @@ private fun MentorDetailScreen(
                 Text(text = "강의 리스트", style = WizdumTheme.typography.body1_semib)
                 Spacer(modifier = Modifier.height(8.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    items(mentorInfo.lectures.size) { index ->
-                        QuestCard(mentorInfo.lectures[index])
+                    items(uiState.mentorDetail.lectures.size) { index ->
+                        QuestCard(uiState.mentorDetail.lectures[index])
                     }
                 }
                 Spacer(modifier = Modifier.height(200.dp))
@@ -290,10 +320,14 @@ private fun MentorDetailScreen(
                 .align(Alignment.BottomCenter)
         ) {
             if (checkOnboarding) {
-                onNavigateToLecture()
+                startLecture()
             } else {
                 onNavigateToLogin()
             }
+        }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
         }
     }
 }
@@ -344,28 +378,30 @@ fun QuestCardPreview() {
 fun MentorDetailScreenPreview() {
     WizdumTheme {
         MentorDetailScreen(
-            mentorInfo = MentorDetailResponse(
-                mentoName = "스파르타",
-                classTitle = "스파르타 코딩클럽",
-                mentoringStyle = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!",
-                friendWithLectureCount = 1,
-                itemLevel = "HIGH",
-                wiseSaying = "강인한 정신력과 철저한 자기 훈련을 통해 목표를 달성하는 스파르타식 도전!",
-                benefits = listOf(
-                    "실패를 두려워하지 않는 도전 정신",
-                    "목표를 달성하기 위한 전략적 사고와 계획 수립 능력",
-                    "계획을 즉각적으로 실행하는 추진력과 끈기"
-                ),
-                lectures = listOf(
-                    Lecture(orderSeq = 1, title = "결심을 넘어 행동으로"),
-                    Lecture(orderSeq = 1, title = "결심을 넘어 행동으로"),
-                    Lecture(orderSeq = 1, title = "결심을 넘어 행동으로")
+            uiState = OnboardingUiState(
+                mentorDetail = MentorDetailResponse(
+                    mentoName = "스파르타",
+                    classTitle = "스파르타 코딩클럽",
+                    mentoringStyle = "망설임을 없애고 즉시 실행하는 강철 멘탈 코칭!",
+                    friendWithLectureCount = 1,
+                    itemLevel = "HIGH",
+                    wiseSaying = "강인한 정신력과 철저한 자기 훈련을 통해 목표를 달성하는 스파르타식 도전!",
+                    benefits = listOf(
+                        "실패를 두려워하지 않는 도전 정신",
+                        "목표를 달성하기 위한 전략적 사고와 계획 수립 능력",
+                        "계획을 즉각적으로 실행하는 추진력과 끈기"
+                    ),
+                    lectures = listOf(
+                        Lecture(orderSeq = 1, title = "결심을 넘어 행동으로"),
+                        Lecture(orderSeq = 1, title = "결심을 넘어 행동으로"),
+                        Lecture(orderSeq = 1, title = "결심을 넘어 행동으로")
+                    )
                 )
             ),
             checkOnboarding = false,
             onNavigateBack = {},
             onNavigateToLogin = {},
-            onNavigateToLecture = {}
+            startLecture = {}
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.teamwizdum.wizdum.designsystem.component.dialog
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,6 +26,7 @@ import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
 import com.teamwizdum.wizdum.designsystem.theme.Black200
 import com.teamwizdum.wizdum.designsystem.theme.Black50
 import com.teamwizdum.wizdum.designsystem.theme.Black600
+import com.teamwizdum.wizdum.designsystem.theme.Green200
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 
 @Composable
@@ -30,8 +34,13 @@ fun ChoiceDialog(
     dialogState: Boolean,
     title: String,
     subTitle: String = "",
+    imgResId: Int? = null,
     confirmTitle: String,
     dismissTitle: String,
+    confirmTextColor: Color = Color.White,
+    dismissTextColor: Color = Black600,
+    confirmButtonColor: Color = Green200,
+    dismissButtonColor: Color = Black200,
     onConfirmRequest: () -> Unit,
     onDismissRequest: () -> Unit = {},
 ) {
@@ -42,24 +51,32 @@ fun ChoiceDialog(
                     .fillMaxWidth()
                     .background(color = Black50, shape = RoundedCornerShape(20.dp))
                     .border(width = 1.dp, color = Black200, shape = RoundedCornerShape(20.dp))
-                    .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                    .padding(top = 24.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                if (imgResId != null) {
+                    Image(
+                        painter = painterResource(id = imgResId),
+                        contentDescription = "다이얼로그 이미지"
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                }
                 Text(
                     text = title,
-                    style = WizdumTheme.typography.h3,
+                    style = WizdumTheme.typography.body1_semib,
                     textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 if (subTitle.isNotEmpty()) {
                     Text(
                         text = subTitle,
-                        style = WizdumTheme.typography.body2,
+                        style = WizdumTheme.typography.body3,
                         color = Black600,
                         textAlign = TextAlign.Center,
                     )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -67,16 +84,18 @@ fun ChoiceDialog(
                     WizdumFilledButton(
                         modifier = Modifier.weight(1f),
                         title = dismissTitle,
-                        backgroundColor = Black200,
-                        textColor = Black600,
+                        backgroundColor = dismissButtonColor,
+                        textColor = dismissTextColor,
                         textStyle = WizdumTheme.typography.body1_semib
                     ) {
                         onDismissRequest()
                     }
-                    Spacer(modifier = Modifier.width(24.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                     WizdumFilledButton(
                         modifier = Modifier.weight(1f),
                         title = confirmTitle,
+                        backgroundColor = confirmButtonColor,
+                        textColor = confirmTextColor,
                         textStyle = WizdumTheme.typography.body1_semib
                     ) {
                         onConfirmRequest()

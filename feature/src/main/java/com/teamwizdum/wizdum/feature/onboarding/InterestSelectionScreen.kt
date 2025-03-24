@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,11 +43,13 @@ import coil.request.ImageRequest
 import com.teamwizdum.wizdum.data.model.response.InterestResponse
 import com.teamwizdum.wizdum.designsystem.component.appbar.BackAppBar
 import com.teamwizdum.wizdum.designsystem.component.button.WizdumFilledButton
+import com.teamwizdum.wizdum.designsystem.component.screen.ErrorScreen
+import com.teamwizdum.wizdum.designsystem.component.screen.LoadingScreen
 import com.teamwizdum.wizdum.designsystem.theme.Black500
 import com.teamwizdum.wizdum.designsystem.theme.Black600
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
-import com.teamwizdum.wizdum.feature.common.base.UiState
+import com.teamwizdum.wizdum.feature.common.base.ErrorState
 
 @Composable
 fun InterestSelectionRoute(
@@ -55,28 +57,33 @@ fun InterestSelectionRoute(
     onNavigateBack: () -> Unit,
     onNavigateToLevel: (Int) -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.getInterest()
     }
 
-    val uiState = viewModel.interests.collectAsState().value
-
-    when (uiState) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
+    when {
+        uiState.isLoading || uiState.interests.isNotEmpty() -> {
             InterestSelectionScreen(
-                interests = uiState.data,
+                uiState = uiState,
                 onNavigateBack = onNavigateBack,
                 onNavigateToLevel = { onNavigateToLevel(it) }
             )
         }
-        is UiState.Failed  -> {}
+
+        uiState.handleException is ErrorState.DisplayError -> {
+            ErrorScreen(
+                retry = ((uiState.handleException as ErrorState.DisplayError).retry)
+            )
+        }
     }
 }
 
+
 @Composable
 fun InterestSelectionScreen(
-    interests: List<InterestResponse>,
+    uiState: OnboardingUiState = OnboardingUiState(),
     onNavigateBack: () -> Unit,
     onNavigateToLevel: (Int) -> Unit,
 ) {
@@ -104,11 +111,11 @@ fun InterestSelectionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    items(interests.size, key = { it }) { index ->
+                    items(uiState.interests.size, key = { it }) { index ->
                         InterestCard(
-                            title = interests[index].value,
-                            description = interests[index].description,
-                            imageUrl = interests[index].fileUrl,
+                            title = uiState.interests[index].value,
+                            description = uiState.interests[index].description,
+                            imageUrl = uiState.interests[index].fileUrl,
                             isSelected = selectedIndex.value == index,
                             onClick = {
                                 selectedIndex.value =
@@ -137,7 +144,7 @@ fun InterestSelectionScreen(
                 .align(Alignment.BottomCenter)
         )
 
-        if (selectedIndex.value != -1)
+        if (selectedIndex.value != -1) {
             WizdumFilledButton(
                 title = "다음",
                 modifier = Modifier
@@ -145,8 +152,13 @@ fun InterestSelectionScreen(
                     .padding(bottom = 80.dp, start = 32.dp, end = 32.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                onNavigateToLevel(interests[selectedIndex.value].interestId)
+                onNavigateToLevel(uiState.interests[selectedIndex.value].interestId)
             }
+        }
+
+        if (uiState.isLoading) {
+            LoadingScreen()
+        }
     }
 }
 
@@ -211,42 +223,44 @@ private fun InterestCard(
 fun InterestSelectionScreenPreview() {
     WizdumTheme {
         InterestSelectionScreen(
-            interests = listOf(
-                InterestResponse(
-                    interestId = 1,
-                    value = "창의성과 혁신",
-                    description = "기존의 틀을 깨고 새로운 아이디어를 찾고 싶어요.",
-                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_303.png"
-                ),
-                InterestResponse(
-                    interestId = 2,
-                    value = "리더십과 경영철학",
-                    description = "효과적인 리더십과 조직 운영을 배우고 싶어요.",
-                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_304.png"
-                ),
-                InterestResponse(
-                    interestId = 3,
-                    value = "논리적 사고 & 문제 해결",
-                    description = "복잡한 문제를 분석하고 최적의 해결책을 찾고 싶어요.",
-                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_305.png"
-                ),
-                InterestResponse(
-                    interestId = 4,
-                    value = "역사적 인물들의 철학",
-                    description = "위인들의 지혜를 통해 삶을 더 깊이 이해하고 싶어요.",
-                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_306.png"
-                ),
-                InterestResponse(
-                    interestId = 5,
-                    value = "목표 설정 & 습관 형성",
-                    description = "나에게 맞는 루틴을 만들고 꾸준히 실천하고 싶어요.",
-                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_307.png"
-                ),
-                InterestResponse(
-                    interestId = 6,
-                    value = "웰빙과 균형",
-                    description = "정신/신체적 건강을 유지하며 지속적으로 성장하고 싶어요.",
-                    fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_307_1.png"
+            uiState = OnboardingUiState(
+                interests = listOf(
+                    InterestResponse(
+                        interestId = 1,
+                        value = "창의성과 혁신",
+                        description = "기존의 틀을 깨고 새로운 아이디어를 찾고 싶어요.",
+                        fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_303.png"
+                    ),
+                    InterestResponse(
+                        interestId = 2,
+                        value = "리더십과 경영철학",
+                        description = "효과적인 리더십과 조직 운영을 배우고 싶어요.",
+                        fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_304.png"
+                    ),
+                    InterestResponse(
+                        interestId = 3,
+                        value = "논리적 사고 & 문제 해결",
+                        description = "복잡한 문제를 분석하고 최적의 해결책을 찾고 싶어요.",
+                        fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_305.png"
+                    ),
+                    InterestResponse(
+                        interestId = 4,
+                        value = "역사적 인물들의 철학",
+                        description = "위인들의 지혜를 통해 삶을 더 깊이 이해하고 싶어요.",
+                        fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_306.png"
+                    ),
+                    InterestResponse(
+                        interestId = 5,
+                        value = "목표 설정 & 습관 형성",
+                        description = "나에게 맞는 루틴을 만들고 꾸준히 실천하고 싶어요.",
+                        fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_307.png"
+                    ),
+                    InterestResponse(
+                        interestId = 6,
+                        value = "웰빙과 균형",
+                        description = "정신/신체적 건강을 유지하며 지속적으로 성장하고 싶어요.",
+                        fileUrl = "https://kr.object.ncloudstorage.com/wizdump/category_interest/Group_307_1.png"
+                    )
                 )
             ),
             onNavigateBack = {},
