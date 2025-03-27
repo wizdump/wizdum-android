@@ -72,7 +72,10 @@ fun HomeRoute(
     }
 
     when {
-        uiState.isLoading || uiState.homeInfo != HomeResponse() -> {
+        uiState.isLoading -> {
+            LoadingScreen(modifier = Modifier.padding(padding))
+        }
+        uiState.homeInfo != HomeResponse() -> {
             HomeScreen(
                 padding = padding,
                 uiState = uiState,
@@ -223,10 +226,6 @@ fun HomeScreen(
                     }
                 }
             }
-        }
-
-        if (uiState.isLoading) {
-            LoadingScreen()
         }
     }
 }

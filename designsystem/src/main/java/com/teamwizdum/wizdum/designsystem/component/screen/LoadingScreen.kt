@@ -19,7 +19,7 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun LoadingScreen() {
+fun LoadingScreen(modifier: Modifier = Modifier) {
     var showProgressBar by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
