@@ -37,7 +37,7 @@ import com.teamwizdum.wizdum.designsystem.theme.Black300
 import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.chat.component.ChatBubble
-import com.teamwizdum.wizdum.feature.chat.component.ChatDialog
+import com.teamwizdum.wizdum.feature.chat.component.ChatExitDialog
 import com.teamwizdum.wizdum.feature.chat.component.ChatFinishSelectionBox
 import com.teamwizdum.wizdum.feature.chat.component.ChatHeader
 import com.teamwizdum.wizdum.feature.chat.component.ChatStartSelectionBox
@@ -103,7 +103,7 @@ fun ChatRoute(
         is UiState.Failed -> {}
     }
 
-    ChatDialog(
+    ChatExitDialog(
         dialogState = dialogState,
         onExit = {
             dialogState = false

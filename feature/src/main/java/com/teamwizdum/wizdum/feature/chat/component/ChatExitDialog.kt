@@ -27,7 +27,7 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 
 @Composable
-fun ChatDialog(
+fun ChatExitDialog(
     dialogState: Boolean,
     onDismissRequest: () -> Unit,
     onExit: () -> Unit,
@@ -87,7 +87,7 @@ fun ChatDialog(
 @Composable
 fun ChatDialogPreview() {
     WizdumTheme {
-        ChatDialog(
+        ChatExitDialog(
             dialogState = true,
             onExit = {},
             onDismissRequest = {}
