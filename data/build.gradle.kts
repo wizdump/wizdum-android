@@ -1,6 +1,5 @@
 plugins {
-    id("kotlin-kapt")
-
+    alias(libs.plugins.ksp)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.hilt)
@@ -56,5 +55,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt.android)
     implementation(libs.hilt.core)
-    kapt(libs.hilt.compiler)
+    compileOnly(libs.ksp.gradle.plugin)
+    ksp(libs.hilt.compiler)
 }

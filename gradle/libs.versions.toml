@@ -1,6 +1,7 @@
 [versions]
 agp = "8.3.2"
 coreKtx = "1.15.0"
+ksp = "1.9.10-1.0.13"
 
 kotlin = "1.9.0"
 kotlinx-coroutines = "1.7.3"
@@ -40,6 +41,7 @@ material = "1.12.0"
 kakao-user = "2.20.6"
 
 [libraries]
+ksp-gradle-plugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -85,9 +87,9 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 kakao-sdk-user = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao-user" }
 
 [plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
