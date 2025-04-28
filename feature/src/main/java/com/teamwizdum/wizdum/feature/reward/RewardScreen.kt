@@ -1,7 +1,16 @@
 package com.teamwizdum.wizdum.feature.reward
 
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,10 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -32,6 +43,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.FileProvider
+import androidx.core.view.drawToBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -48,6 +62,9 @@ import com.teamwizdum.wizdum.designsystem.theme.WizdumTheme
 import com.teamwizdum.wizdum.feature.R
 import com.teamwizdum.wizdum.feature.common.base.ErrorState
 import com.teamwizdum.wizdum.feature.common.extensions.formatBasicDateTime
+import kotlinx.serialization.json.JsonNull.content
+import java.io.File
+import java.io.FileOutputStream
 
 @Composable
 fun RewardRoute(
@@ -82,6 +99,9 @@ private fun RewardScreen(
     uiState: RewardUiState,
     onNavigateToHome: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val snapShot = CaptureBitmap(context) { RewardCard(uiState.rewardInfo) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -129,7 +149,10 @@ private fun RewardScreen(
                 modifier = Modifier
                     .width(50.dp)
                     .height(50.dp)
-                    .background(color = Black200, shape = RoundedCornerShape(10.dp)),
+                    .background(color = Black200, shape = RoundedCornerShape(10.dp))
+                    .clickable {
+                        saveImageToDevice(context, snapShot.invoke())
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -142,7 +165,7 @@ private fun RewardScreen(
                 modifier = Modifier.fillMaxWidth(),
                 title = "나의 승리 공유하기",
             ) {
-                // TODO : 공유로 넘어가면 창 종료, 복귀 시 메인 화면으로 이동
+                shareImageToSNS(context, snapShot.invoke())
             }
         }
 
@@ -165,6 +188,7 @@ private fun RewardCard(rewardInfo: RewardResponse) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(rewardInfo.filePath)
+                .allowHardware(false)
                 .crossfade(true)
                 .build(),
             contentDescription = "멘토 프로필 사진",
@@ -229,6 +253,73 @@ private fun RewardCard(rewardInfo: RewardResponse) {
         }
     }
 }
+
+@Composable
+fun CaptureBitmap(
+    context: Context,
+    content: @Composable () -> Unit
+): () -> Bitmap {
+    val composeView = remember { ComposeView(context) }
+
+    fun captureBitmap(): Bitmap = composeView.drawToBitmap(config = Bitmap.Config.ARGB_8888)
+
+    AndroidView(
+        factory = {
+            composeView.apply {
+                setContent {
+                    content.invoke()
+                }
+            }
+        }
+    )
+
+    return ::captureBitmap
+}
+
+fun saveImageToDevice(context: Context, bitmap: Bitmap) {
+    val contentResolver = context.contentResolver
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "reward_image_${System.currentTimeMillis()}.png")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+        put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+    }
+
+    val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    uri?.let {
+        val outputStream = contentResolver.openOutputStream(it)
+        outputStream?.use { stream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            Toast.makeText(context, "이미지가 저장되었습니다!", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
+fun shareImageToSNS(context: Context, bitmap: Bitmap) {
+    // 임시 파일에 비트맵 저장
+    val file = File(context.cacheDir, "reward_image.png")
+    val outputStream = FileOutputStream(file)
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+    outputStream.flush()
+    outputStream.close()
+
+    // 파일 URI 생성
+    val uri: Uri = FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        file
+    )
+
+    // SNS 공유용 Intent 생성
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_STREAM, uri)
+        type = "image/png"
+    }
+
+    // SNS 앱 선택 화면 띄우기
+    context.startActivity(Intent.createChooser(shareIntent, "이미지 공유하기"))
+}
+
 
 @Preview
 @Composable
